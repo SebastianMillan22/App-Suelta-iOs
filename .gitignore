@@ -8,3 +8,6 @@ OneDrive - PETPLUS
 OneDrive - PETPLUS/
 ios/App/Pods/
 corrupt_*
+*.key
+*.pem
+ios_distribution_private_key*
