@@ -19618,6 +19618,20 @@ export default function SueltaPrototipo() {
   }, []);
   const [authCargado, setAuthCargado] = useState(false);
   
+  // Temporizador de seguridad: Desbloquea la pantalla de carga tras 1.5s si Firebase o la red tardan en responder en iOS
+  useEffect(() => {
+    const safetyTimer = setTimeout(() => {
+      setAuthCargado(cargado => {
+        if (!cargado) {
+          console.warn("Safety timeout activado: Desbloqueando pantalla de carga inicial de Suelta.");
+          return true;
+        }
+        return cargado;
+      });
+    }, 1500);
+    return () => clearTimeout(safetyTimer);
+  }, []);
+  
   // La guía instructiva antigua ha sido reemplazada por el checklist interactivo paso a paso (GuiaChecklistPasoAPaso).
   // No se fuerza ningún tutorial invasivo al inicio.
   useEffect(() => {
@@ -19754,12 +19768,12 @@ export default function SueltaPrototipo() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (isRegisteringWithGoogleRef.current) {
-        console.log("onAuthStateChanged: Omitiendo procesamiento porque se está registrando con Google.");
-        setAuthCargado(true);
-        return;
-      }
+      try {
+        setCurrentUser(user);
+        if (isRegisteringWithGoogleRef.current) {
+          console.log("onAuthStateChanged: Omitiendo procesamiento porque se está registrando con Google.");
+          return;
+        }
       if (user) {
         if (user.email) {
           guardarCuentaRecordadaLocal({
@@ -20058,9 +20072,13 @@ export default function SueltaPrototipo() {
           return "bienvenida";
         });
       }
+    } catch (err) {
+      console.warn("Aviso procesando sesión inicial:", err);
+    } finally {
       setAuthCargado(true);
-    });
-    return unsubscribe;
+    }
+  });
+  return unsubscribe;
   }, [auth]);
 
   // Flujo 100% dentro de la app: Invoca el selector nativo de Google en Android o el modal integrado

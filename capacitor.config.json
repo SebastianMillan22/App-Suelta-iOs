@@ -7,8 +7,12 @@
     "allowNavigation": [
       "*.firebaseapp.com",
       "*.googleapis.com",
+      "*.firebaseio.com",
+      "*.firebasestorage.app",
+      "*.gstatic.com",
       "accounts.google.com",
-      "*.google.com"
+      "*.google.com",
+      "nominatim.openstreetmap.org"
     ]
   },
   "android": {
