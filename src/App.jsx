@@ -1776,7 +1776,7 @@ function HojasDispersas({ variante = 0 }) {
 // ondas de calma, el mensaje central del "Diálogo" (la app da herramientas; el destino
 // de esas herramientas es la conversación humana), el control del sonido ambiental y el
 // idioma detectado automáticamente de la configuración del dispositivo.
-function ScreenBienvenida({ onNext, onLogin, onLoginOld, onLoginManual, onRegisterManual, onCargarPrueba, onVerLegal, idiomaLabel, idiomaEsEspanol, onBorrarDatos, idioma, onChangeIdioma, onAbrirSelectorIdioma, onOpenMenu }) {
+function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginManual, onRegisterManual, onCargarPrueba, onVerLegal, idiomaLabel, idiomaEsEspanol, onBorrarDatos, idioma, onChangeIdioma, onAbrirSelectorIdioma, onOpenMenu }) {
   const menuCtx = React.useContext(MenuContext);
   const handleOpenMenu = onOpenMenu || menuCtx?.onOpenMenu;
   const [tab, setTab] = React.useState("presentacion");
@@ -2054,6 +2054,48 @@ function ScreenBienvenida({ onNext, onLogin, onLoginOld, onLoginManual, onRegist
                 {t("Registrarme con Google", idioma)}
               </button>
 
+              {/* Botón de Apple en registro (Requisito App Store Guideline 4.8) */}
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setErrorLogin("");
+                    if (onLoginApple) {
+                      await onLoginApple();
+                    } else {
+                      await onLogin(false);
+                    }
+                  } catch (err) {
+                    const errMsg = err?.message || String(err);
+                    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
+                    setErrorLogin("ERROR: " + formatAuthError(err));
+                  }
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  width: "100%",
+                  padding: "14px 16px",
+                  borderRadius: "14px",
+                  border: `1.5px solid #000000`,
+                  background: "#000000",
+                  color: "#FFFFFF",
+                  fontFamily: FONT_BODY,
+                  fontSize: "14.5px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 170 170" fill="#FFFFFF">
+                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.85-11.7-14.44-6.01-9.67-10.74-20.47-14.19-32.41-3.46-11.94-5.19-23.2-5.19-33.78 0-14.75 3.65-27.15 10.96-37.19 7.31-10.04 16.7-15.17 28.16-15.39 4.36 0 9.29 1.14 14.81 3.42 5.51 2.29 9.3 3.48 11.35 3.58 2.07-.1 6.03-1.35 11.89-3.74 5.86-2.39 10.78-3.48 14.75-3.26 12.19.65 21.94 4.99 29.27 13.04-10.66 6.52-15.88 15.54-15.66 27.06.22 9.13 3.69 16.85 10.43 23.15 6.74 6.3 14.78 9.99 24.12 11.08-2.17 6.74-4.78 13.68-7.83 20.82zM119.22 33.15c0-7.39 2.61-14.13 7.83-20.21 5.22-6.09 11.63-9.88 19.23-11.39.22 1.09.33 2.17.33 3.26 0 7.39-2.72 14.23-8.15 20.53-5.43 6.3-12.06 10.05-19.89 11.24-.22-1.08-.35-2.22-.35-3.43z" />
+                </svg>
+                {t("Registrarme con Apple", idioma)}
+              </button>
+
               {/* Separador */}
               <div style={{ display: "flex", alignItems: "center", margin: "2px 0" }}>
                 <div style={{ flex: 1, height: "1px", background: "#e1ebe5" }} />
@@ -2125,6 +2167,48 @@ function ScreenBienvenida({ onNext, onLogin, onLoginOld, onLoginManual, onRegist
                   <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z"/>
                 </svg>
                 {t("Continuar con Google", idioma)}
+              </button>
+
+              {/* Botón de Apple en login (Requisito App Store Guideline 4.8) */}
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setErrorLogin("");
+                    if (onLoginApple) {
+                      await onLoginApple();
+                    } else {
+                      await onLogin(true);
+                    }
+                  } catch (err) {
+                    const errMsg = err?.message || String(err);
+                    if (err.code === "auth/popup-closed-by-user" || err.code === "auth/cancelled-popup-request") return;
+                    setErrorLogin("ERROR: " + formatAuthError(err));
+                  }
+                }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "10px",
+                  width: "100%",
+                  padding: "14px 16px",
+                  borderRadius: "14px",
+                  border: `1.5px solid #000000`,
+                  background: "#000000",
+                  color: "#FFFFFF",
+                  fontFamily: FONT_BODY,
+                  fontSize: "14.5px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 170 170" fill="#FFFFFF">
+                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.85-11.7-14.44-6.01-9.67-10.74-20.47-14.19-32.41-3.46-11.94-5.19-23.2-5.19-33.78 0-14.75 3.65-27.15 10.96-37.19 7.31-10.04 16.7-15.17 28.16-15.39 4.36 0 9.29 1.14 14.81 3.42 5.51 2.29 9.3 3.48 11.35 3.58 2.07-.1 6.03-1.35 11.89-3.74 5.86-2.39 10.78-3.48 14.75-3.26 12.19.65 21.94 4.99 29.27 13.04-10.66 6.52-15.88 15.54-15.66 27.06.22 9.13 3.69 16.85 10.43 23.15 6.74 6.3 14.78 9.99 24.12 11.08-2.17 6.74-4.78 13.68-7.83 20.82zM119.22 33.15c0-7.39 2.61-14.13 7.83-20.21 5.22-6.09 11.63-9.88 19.23-11.39.22 1.09.33 2.17.33 3.26 0 7.39-2.72 14.23-8.15 20.53-5.43 6.3-12.06 10.05-19.89 11.24-.22-1.08-.35-2.22-.35-3.43z" />
+                </svg>
+                {t("Continuar con Apple", idioma)}
               </button>
 
               {/* Separador */}
@@ -20083,8 +20167,8 @@ export default function SueltaPrototipo() {
 
   // Flujo 100% dentro de la app: Invoca el selector nativo de Google en Android o el modal integrado
   const handleGoogleLogin = async (isLoginOnly = false) => {
-    const isCapacitorNative = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
-    if (isCapacitorNative) {
+    const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
+    if (isAndroid) {
       try {
         const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
         try {
@@ -20125,6 +20209,33 @@ export default function SueltaPrototipo() {
 
     // Modal de selección de cuentas
     setMostrarModalGoogleInApp(true);
+  };
+
+  // Autenticación con Apple (Sign in with Apple) para cumplir con App Store Guideline 4.8
+  const handleAppleLogin = async () => {
+    try {
+      const { OAuthProvider, signInWithPopup } = await import("firebase/auth");
+      const provider = new OAuthProvider("apple.com");
+      provider.addScope("email");
+      provider.addScope("name");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      if (user) {
+        await handleSeleccionarCuentaGoogleInApp({
+          id: user.uid,
+          email: user.email || `${user.uid}@privaterelay.appleid.com`,
+          nombre: user.displayName || "Usuario Apple",
+          foto: null
+        });
+      }
+    } catch (appleErr) {
+      console.warn("Aviso en login con Apple:", appleErr);
+      const msg = String(appleErr?.message || appleErr || "");
+      if (msg.includes("popup-closed-by-user") || msg.includes("cancelled")) {
+        return;
+      }
+      setMostrarModalGoogleInApp(true);
+    }
   };
 
   // Valida y autentica la cuenta de Google o cuenta personalizada directamente dentro de la aplicación
@@ -20807,12 +20918,12 @@ export default function SueltaPrototipo() {
       await signOut(auth);
     } catch(e) {}
 
-    // 5. Cerrar sesión en Capacitor Google Auth si es nativo y el usuario usó Google
+    // 5. Cerrar sesión en Capacitor Google Auth si es nativo Android y el usuario usó Google
     try {
-      const isCapacitorNative = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+      const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
       const esUsuarioGoogle = window.sessionStorage.getItem("suelta_used_google_native_auth") === "true" ||
         auth?.currentUser?.providerData?.some((p) => p.providerId === "google.com");
-      if (isCapacitorNative && esUsuarioGoogle) {
+      if (isAndroid && esUsuarioGoogle) {
         try {
           const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
           await GoogleAuth.initialize({
@@ -20848,10 +20959,10 @@ export default function SueltaPrototipo() {
   const cerrarSesion = async () => {
     isLoggingOutRef.current = true;
     try {
-      const isCapacitorNative = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+      const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
       const esUsuarioGoogle = window.sessionStorage.getItem("suelta_used_google_native_auth") === "true" ||
         auth?.currentUser?.providerData?.some((p) => p.providerId === "google.com");
-      if (isCapacitorNative && esUsuarioGoogle) {
+      if (isAndroid && esUsuarioGoogle) {
         try {
           const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
           await GoogleAuth.initialize({
@@ -21280,6 +21391,7 @@ export default function SueltaPrototipo() {
               setStage("registro");
             }}
             onLogin={handleGoogleLogin}
+            onLoginApple={handleAppleLogin}
             onLoginManual={handleEmailLogin}
             onRegisterManual={handleEmailRegister}
             onLoginOld={() => {
@@ -21979,6 +22091,10 @@ export default function SueltaPrototipo() {
             await handleGoogleLogin();
             setMostrarModalRequiereAuth(false);
           }}
+          onLoginApple={async () => {
+            await handleAppleLogin();
+            setMostrarModalRequiereAuth(false);
+          }}
           onLoginEmail={async (em, pw) => {
             await handleEmailLogin(em, pw);
             setMostrarModalRequiereAuth(false);
@@ -21995,7 +22111,11 @@ export default function SueltaPrototipo() {
           onClose={() => setMostrarModalGoogleInApp(false)}
           onSeleccionarCuenta={handleSeleccionarCuentaGoogleInApp}
           onCredentialGoogle={handleCredentialGoogleGIS}
-          onLoginGooglePopup={handleGooglePopupLogin}
+          onLoginGooglePopup={
+            typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform()
+              ? null
+              : handleGooglePopupLogin
+          }
           idioma={idiomaDetectado}
         />
         {errorNotificacion && typeof document !== "undefined" && createPortal(
