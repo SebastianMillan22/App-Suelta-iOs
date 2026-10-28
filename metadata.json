@@ -1,0 +1,6 @@
+{
+  "name": "Suelta",
+  "description": "App de bienestar emocional, biodescodificación, astrología y constelaciones familiares.",
+  "requestFramePermissions": ["microphone", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,15 @@
+# This file specifies files and directories that should not be uploaded
+# when packing or deploying to Google Cloud.
+
+# Ignore common build and environment files
+.git
+.github
+node_modules/
+dist/
+.env
+.DS_Store
+*.log
+*.pdf
+docs/
+tmp/
+temp/

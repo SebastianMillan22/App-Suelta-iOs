@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¡Suelta! · Consola de Administración Web (LA ^ VACHE)</title>
+  <link rel="icon" type="image/png" href="logo.png">
+
+  <!-- Tipografías Oficiales -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Iconografía Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --sage: #6fa892;
+      --sage-dark: #3f6b5b;
+      --sage-tint: #eaf3ef;
+      --sage-light: #a3cbba;
+      --cream: #faf8f3;
+      --ink: #25332e;
+      --muted: #6b7b74;
+      --lavender: #8a6bb8;
+      --lavender-tint: #f1ecf9;
+      --coral: #d63e26;
+      --coral-tint: #fef2f0;
+      --line: #e2e8e3;
+      --white: #ffffff;
+      --card-shadow: 0 4px 20px rgba(37, 51, 46, 0.05);
+      --card-shadow-hover: 0 10px 30px rgba(37, 51, 46, 0.09);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f5f7f6;
+      color: var(--ink);
+      line-height: 1.5;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Logo LA ^ VACHE */
+    .logo-vache-brand {
+      font-family: "Archivo Black", -apple-system, sans-serif;
+      font-weight: 900;
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      color: var(--coral);
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .word-la {
+      position: relative;
+      display: inline-block;
+    }
+
+    .word-vache {
+      position: relative;
+      display: inline-block;
+    }
+
+    .letter-a {
+      position: relative;
+      display: inline-block;
+    }
+
+    .caret-hat {
+      position: absolute;
+      top: -0.38em;
+      left: 50%;
+      transform: translateX(-50%) scaleX(1.3);
+      color: var(--ink);
+      font-size: 0.85em;
+      font-weight: bold;
+    }
+
+    /* Botones y Controles */
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: var(--sage-dark);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(63, 107, 91, 0.25);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--ink);
+    }
+
+    .btn-secondary {
+      background-color: var(--sage-tint);
+      color: var(--sage-dark);
+    }
+
+    .btn-secondary:hover {
+      background-color: #dbebe3;
+    }
+
+    .btn-gold {
+      background-color: #d97706;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+    }
+
+    .btn-gold:hover {
+      background-color: #b45309;
+    }
+
+    .btn-danger {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
+    .btn-danger:hover {
+      background-color: #fecaca;
+    }
+
+    .btn-outline {
+      background-color: #ffffff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .btn-outline:hover {
+      background-color: #f9fafb;
+    }
+
+    /* Layout Principal */
+    .admin-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .header-top {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .header-nav {
+      border-top: 1px solid #f0eee6;
+      background-color: #fafaf8;
+    }
+
+    .nav-container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .tab-link {
+      background: none;
+      border: none;
+      border-bottom: 2.5px solid transparent;
+      padding: 14px 18px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-link:hover {
+      color: var(--sage-dark);
+      background-color: #f3f7f5;
+    }
+
+    .tab-link.active {
+      color: var(--sage-dark);
+      border-bottom-color: var(--sage-dark);
+      background-color: #ffffff;
+    }
+
+    .admin-main {
+      max-width: 1320px;
+      margin: 28px auto;
+      padding: 0 24px 80px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tarjetas y Tablas */
+    .card {
+      background-color: #ffffff;
+      border-radius: 20px;
+      border: 1px solid rgba(111, 168, 146, 0.18);
+      padding: 26px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background-color: #ffffff;
+      padding: 20px 22px;
+      border-radius: 18px;
+      border: 1px solid rgba(111, 168, 146, 0.18);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--card-shadow);
+    }
+
+    .kpi-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .table-container {
+      background-color: #ffffff;
+      border-radius: 18px;
+      border: 1px solid rgba(111, 168, 146, 0.18);
+      overflow-x: auto;
+      box-shadow: var(--card-shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13.5px;
+    }
+
+    th {
+      background-color: #f9fafb;
+      padding: 14px 18px;
+      color: var(--muted);
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #f0eee6;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background-color: #fafcfb;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background-color: #ffffff;
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #f3f4f6;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Toast */
+    #action-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      background-color: var(--ink);
+      color: #ffffff;
+      padding: 14px 22px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--sage);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ======================================================== -->
+  <!-- TOAST DE ACCIONES -->
+  <!-- ======================================================== -->
+  <div id="action-toast">
+    <i data-lucide="sparkles" style="color: #dfa15f; width: 18px; height: 18px;"></i>
+    <span id="toast-message">Operación completada con éxito.</span>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- PANTALLA DE ACCESO / BLOQUEO INICIAL -->
+  <!-- ======================================================== -->
+  <div id="auth-screen"
+    style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;">
+    <div class="card" style="max-width: 480px; width: 100%; padding: 44px 34px; text-align: center;">
+
+      <div style="margin-bottom: 24px;">
+        <div class="logo-vache-brand">
+          <span class="word-la">LA</span>
+          <span class="word-vache">V<span class="letter-a"><span class="caret-hat">^</span>A</span>CHE</span>
+        </div>
+      </div>
+
+      <div
+        style="width: 64px; height: 64px; background-color: var(--sage-tint); color: var(--sage-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px;">
+        <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
+      </div>
+
+      <h1 style="font-size: 24px; font-weight: 900; color: var(--ink); letter-spacing: -0.5px;">
+        Consola de Administración Web
+      </h1>
+      <p style="color: var(--muted); font-size: 13.5px; margin-top: 6px; margin-bottom: 24px;">
+        Ingresa con tus credenciales maestras o tu cuenta directiva autorizada.
+      </p>
+
+      <form id="passcode-form" style="display: flex; flexDirection: column; gap: 16px; text-align: left;">
+        <div>
+          <label
+            style="display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 6px;">
+            Código de Seguridad Master
+          </label>
+          <input type="password" id="admin-passcode" placeholder="••••••••••••" required
+            style="width: 100%; padding: 13px 16px; border-radius: 12px; border: 1.5px solid var(--line); font-size: 15px; outline: none;">
+          <div id="passcode-error" style="color: #dc2626; font-size: 12.5px; margin-top: 6px; display: none;">
+            Código de seguridad incorrecto.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 14.5px;">
+          <i data-lucide="key" style="width: 16px; height: 16px;"></i>
+          <span>Desbloquear Consola</span>
+        </button>
+      </form>
+
+      <div style="margin: 20px 0; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px;">
+        <div style="flex: 1; height: 1px; background-color: var(--line);"></div>
+        <span>O ACCESO GOOGLE</span>
+        <div style="flex: 1; height: 1px; background-color: var(--line);"></div>
+      </div>
+
+      <button id="btn-google-login" class="btn btn-outline" style="width: 100%; padding: 12px;">
+        <i data-lucide="log-in" style="width: 16px; height: 16px; color: var(--sage-dark);"></i>
+        <span>Acceder con Google (Cuenta Directiva)</span>
+      </button>
+
+      <p style="color: var(--muted); font-size: 11.5px; margin-top: 24px; line-height: 1.5;">
+        Conexión directa a Firestore DB: <code
+          style="background: #eef2f0; padding: 2px 6px; border-radius: 4px;">studio-appsuelta</code>
+      </p>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- CONSOLA PRINCIPAL ADMINISTRATIVA -->
+  <!-- ======================================================== -->
+  <div id="admin-app" style="display: none;">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="header-top">
+
+        <!-- Logo e Identidad -->
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div
+            style="width: 40px; height: 40px; background-color: var(--sage-dark); color: #ffffff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+            🌿
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span
+                style="font-size: 20px; font-weight: 900; color: var(--ink); letter-spacing: -0.5px;">¡SUELTA!</span>
+              <span class="logo-vache-brand" style="font-size: 1.15rem;">
+                <span class="word-la">LA</span>
+                <span class="word-vache">V<span class="letter-a"><span class="caret-hat">^</span>A</span>CHE</span>
+              </span>
+            </div>
+            <div style="font-size: 11.5px; color: var(--muted); font-weight: 600;">
+              Consola Web de Gestión & Control Operativo
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado de Conexión & Salir -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div
+            style="display: flex; align-items: center; gap: 8px; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #166534;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: #22c55e;"></span>
+            <span id="conn-status-badge">Firestore Conectado</span>
+          </div>
+
+          <button id="btn-logout" class="btn btn-danger" style="padding: 7px 14px; font-size: 12.5px;">
+            <i data-lucide="log-out" style="width: 14px; height: 14px;"></i>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TABS DE NAVEGACIÓN -->
+      <nav class="header-nav">
+        <div class="nav-container">
+          <button class="tab-link active" data-tab="tab-users">
+            <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+            <span>Usuarios & Licencias</span>
+          </button>
+          <button class="tab-link" data-tab="tab-specialists">
+            <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+            <span>Especialistas</span>
+          </button>
+          <button class="tab-link" data-tab="tab-review">
+            <i data-lucide="wrench" style="width: 16px; height: 16px;"></i>
+            <span>Revisión de la App</span>
+          </button>
+          <button class="tab-link" data-tab="tab-settings">
+            <i data-lucide="settings" style="width: 16px; height: 16px;"></i>
+            <span>Ajustes Generales</span>
+          </button>
+          <button class="tab-link" data-tab="tab-docs">
+            <i data-lucide="book-open" style="width: 16px; height: 16px;"></i>
+            <span>Descripción & Funcionamiento</span>
+          </button>
+          <button class="tab-link" data-tab="tab-metrics">
+            <i data-lucide="bar-chart-2" style="width: 16px; height: 16px;"></i>
+            <span>Métricas</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="admin-main">
+
+      <!-- ======================================================== -->
+      <!-- TAB 1: USUARIOS & LICENCIAS -->
+      <!-- ======================================================== -->
+      <section id="tab-users" class="tab-content active">
+
+        <!-- Header Sección -->
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 22px;">
+          <div>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--ink);">Directorio de Usuarios & Licencias</h2>
+            <p style="color: var(--muted); font-size: 13.5px;">Monitorea los 3 días de prueba de cada persona y asigna
+              Acceso Total (VIP) en tiempo real.</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-export-users" class="btn btn-outline">
+              <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+              <span>Exportar Usuarios JSON</span>
+            </button>
+            <button id="btn-refresh-users" class="btn btn-secondary">
+              <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
+              <span>Actualizar Lista</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background-color: var(--sage-tint); color: var(--sage-dark);">
+              <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div>
+              <div id="kpi-total-users" style="font-size: 24px; font-weight: 900; color: var(--ink);">0</div>
+              <div style="font-size: 12px; color: var(--muted); font-weight: 600;">Usuarios Registrados</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background-color: #fef3c7; color: #b45309;">
+              <i data-lucide="clock" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div>
+              <div id="kpi-trial-active" style="font-size: 24px; font-weight: 900; color: var(--ink);">0</div>
+              <div style="font-size: 12px; color: var(--muted); font-weight: 600;">En Prueba Activa (D1-D3)</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background-color: #f3e8ff; color: #6b21a8;">
+              <i data-lucide="crown" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div>
+              <div id="kpi-vip-users" style="font-size: 24px; font-weight: 900; color: var(--ink);">0</div>
+              <div style="font-size: 12px; color: var(--muted); font-weight: 600;">Acceso Total (VIP)</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background-color: #fef2f2; color: #991b1b;">
+              <i data-lucide="alert-triangle" style="width: 24px; height: 24px;"></i>
+            </div>
+            <div>
+              <div id="kpi-trial-expired" style="font-size: 24px; font-weight: 900; color: var(--ink);">0</div>
+              <div style="font-size: 12px; color: var(--muted); font-weight: 600;">Pruebas Vencidas</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Concesión Rápida de VIP por Correo -->
+        <div class="card" style="margin-bottom: 22px; padding: 22px 26px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <i data-lucide="crown" style="color: #d97706; width: 18px; height: 18px;"></i>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--ink);">Conceder Acceso Total (VIP) por Correo
+            </h3>
+          </div>
+          <p style="color: var(--muted); font-size: 13px; margin-bottom: 14px;">
+            Desbloquea todos los módulos de manera vitalicia e inmediata. Si el usuario ya existe se actualiza, si es
+            nuevo se registra en lista blanca.
+          </p>
+          <form id="form-grant-vip" style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="email" id="input-vip-email" placeholder="correo@ejemplo.com" required
+              style="flex: 1; min-width: 260px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); font-size: 13.5px; outline: none;">
+            <button type="submit" class="btn btn-gold">
+              <i data-lucide="crown" style="width: 15px; height: 15px;"></i>
+              <span>Otorgar Acceso Total (VIP)</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Buscador y Filtros -->
+        <div class="card"
+          style="padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          <div style="flex: 1; min-width: 260px; position: relative;">
+            <i data-lucide="search"
+              style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted);"></i>
+            <input type="text" id="search-users" placeholder="Buscar por nombre, correo o celular..."
+              style="width: 100%; padding: 10px 14px 10px 38px; border-radius: 10px; border: 1px solid var(--line); font-size: 13.5px; outline: none;">
+          </div>
+
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="user-filter-buttons">
+            <button class="btn btn-primary btn-filter" data-filter="todos"
+              style="padding: 7px 12px; font-size: 12px;">Todos</button>
+            <button class="btn btn-outline btn-filter" data-filter="trial_active"
+              style="padding: 7px 12px; font-size: 12px;">Prueba Activa</button>
+            <button class="btn btn-outline btn-filter" data-filter="vip" style="padding: 7px 12px; font-size: 12px;">VIP
+              Vitalicio</button>
+            <button class="btn btn-outline btn-filter" data-filter="paid"
+              style="padding: 7px 12px; font-size: 12px;">Suscritos</button>
+            <button class="btn btn-outline btn-filter" data-filter="trial_expired"
+              style="padding: 7px 12px; font-size: 12px;">Prueba Vencida</button>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Contacto</th>
+                <th>Perfil</th>
+                <th>Estado & Licencia</th>
+                <th>Registro</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="users-table-body">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">
+                  Cargando usuarios desde Firestore...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 2: ESPECIALISTAS (CREAR, MODIFICAR, ELIMINAR) -->
+      <!-- ======================================================== -->
+      <section id="tab-specialists" class="tab-content">
+
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 22px;">
+          <div>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--ink);">Red de Especialistas & Terapeutas</h2>
+            <p style="color: var(--muted); font-size: 13.5px;">Crea, modifica y retira a los profesionales recomendados
+              en la app y el sitio web.</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-export-specialists" class="btn btn-outline">
+              <i data-lucide="download" style="width: 15px; height: 15px;"></i>
+              <span>Exportar Especialistas JSON</span>
+            </button>
+            <button id="btn-refresh-specialists" class="btn btn-secondary">
+              <i data-lucide="refresh-cw" style="width: 15px; height: 15px;"></i>
+              <span>Actualizar</span>
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 28px; align-items: start;">
+
+          <!-- Lista de especialistas -->
+          <div>
+            <div style="position: relative; margin-bottom: 16px;">
+              <i data-lucide="search"
+                style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted);"></i>
+              <input type="text" id="search-specialists" placeholder="Buscar terapeuta por nombre o especialidad..."
+                style="width: 100%; padding: 10px 14px 10px 38px; border-radius: 10px; border: 1px solid var(--line); font-size: 13.5px; outline: none; background: #ffffff;">
+            </div>
+
+            <div id="specialists-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Tarjetas dinámicas aquí -->
+            </div>
+          </div>
+
+          <!-- Formulario Crear / Modificar -->
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3 id="form-spec-title" style="font-size: 18px; font-weight: 900; color: var(--ink);">
+                  ➕ Registrar Nuevo Especialista
+                </h3>
+                <p id="form-spec-desc" style="color: var(--muted); font-size: 13px;">
+                  Ingresa los datos para publicarlo en la red de profesionales.
+                </p>
+              </div>
+              <button id="btn-cancel-edit-spec" class="btn btn-outline"
+                style="display: none; padding: 6px 12px; font-size: 12px;">
+                Cancelar Edición
+              </button>
+            </div>
+
+            <form id="form-specialist" style="display: flex; flex-direction: column; gap: 14px;">
+              <input type="hidden" id="spec-id-input" value="">
+
+              <div>
+                <label
+                  style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Nombre
+                  Completo con Título *</label>
+                <input type="text" id="spec-name" required placeholder="Ej. Dra. Camila Arbeláez"
+                  style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Especialidad
+                  & Enfoque *</label>
+                <input type="text" id="spec-specialty" required placeholder="Ej. Biodescodificación Biológica & NMG"
+                  style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Correo
+                    Electrónico *</label>
+                  <input type="email" id="spec-email" required placeholder="terapeuta@suelta.app"
+                    style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+                </div>
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Celular
+                    / WhatsApp *</label>
+                  <input type="text" id="spec-phone" required placeholder="+57 301 234 5678"
+                    style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">URL
+                  Foto de Perfil</label>
+                <input type="url" id="spec-image" placeholder="https://..."
+                  style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 11.5px; color: var(--muted);">Avatares rápidos:</span>
+                  <button type="button" class="avatar-quick-btn"
+                    data-url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                    style="border: none; background: none; cursor: pointer;">
+                    <img
+                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200"
+                      style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;">
+                  </button>
+                  <button type="button" class="avatar-quick-btn"
+                    data-url="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200"
+                    style="border: none; background: none; cursor: pointer;">
+                    <img
+                      src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200"
+                      style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;">
+                  </button>
+                  <button type="button" class="avatar-quick-btn"
+                    data-url="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200"
+                    style="border: none; background: none; cursor: pointer;">
+                    <img
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200"
+                      style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;">
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Biografía
+                  & Metodología *</label>
+                <textarea id="spec-desc" required rows="4"
+                  placeholder="Describe los años de experiencia, metodologías y enfoque de acompañamiento..."
+                  style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 13.5px;"></textarea>
+              </div>
+
+              <button type="submit" id="btn-save-spec" class="btn btn-primary"
+                style="padding: 13px; font-size: 14px; margin-top: 6px;">
+                <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                <span id="btn-save-spec-text">Registrar Especialista</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 3: REVISIÓN DE LA APP (DIAGNOSTICS & LIVE TESTER) -->
+      <!-- ======================================================== -->
+      <section id="tab-review" class="tab-content">
+
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 22px;">
+          <div>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--ink);">Centro de Revisión & Diagnóstico en Vivo
+            </h2>
+            <p style="color: var(--muted); font-size: 13.5px;">Auditoría de servicios, verificación de salud de la base
+              de datos y banco interactivo de algoritmos.</p>
+          </div>
+          <button id="btn-run-diagnostics" class="btn btn-primary">
+            <i data-lucide="activity" style="width: 16px; height: 16px;"></i>
+            <span>Ejecutar Diagnóstico Ahora</span>
+          </button>
+        </div>
+
+        <!-- Health Cards -->
+        <div class="kpi-grid" style="margin-bottom: 24px;">
+          <div class="kpi-card" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <span style="font-weight: 800; font-size: 14px; color: var(--ink);">Cloud Firestore DB</span>
+              <span id="health-firestore-badge" class="badge"
+                style="background: #dcfce7; color: #15803d;">OPERATIVO</span>
+            </div>
+            <div style="font-size: 12px; color: var(--muted);">Base de datos: ai-studio-appsuelta</div>
+            <div id="health-firestore-ping"
+              style="font-size: 12px; font-weight: 700; color: var(--sage-dark); margin-top: 4px;">Latencia: 42 ms</div>
+          </div>
+
+          <div class="kpi-card" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <span style="font-weight: 800; font-size: 14px; color: var(--ink);">Biodescodificación</span>
+              <span class="badge" style="background: #dcfce7; color: #15803d;">519 ENTRADAS</span>
+            </div>
+            <div style="font-size: 12px; color: var(--muted);">Capas: Endodermo, Mesodermo, Ectodermo</div>
+            <div style="font-size: 12px; font-weight: 700; color: #166534; margin-top: 4px;">Integridad al 100%</div>
+          </div>
+
+          <div class="kpi-card" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <span style="font-weight: 800; font-size: 14px; color: var(--ink);">Astrología Astronómica</span>
+              <span class="badge" style="background: #dcfce7; color: #15803d;">CÁLCULO REAL</span>
+            </div>
+            <div style="font-size: 12px; color: var(--muted);">Sol, Luna, Ascendente, Casas y Espejo</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--lavender); margin-top: 4px;">Efemérides Swiss
+              Activas</div>
+          </div>
+
+          <div class="kpi-card" style="flex-direction: column; align-items: flex-start;">
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+              <span style="font-weight: 800; font-size: 14px; color: var(--ink);">Tonalli Azteca</span>
+              <span class="badge" style="background: #fef3c7; color: #b45309;">ALFONSO CASO</span>
+            </div>
+            <div style="font-size: 12px; color: var(--muted);">260 días (20 signos x 13 números)</div>
+            <div style="font-size: 12px; font-weight: 700; color: #d97706; margin-top: 4px;">Correlación 1521 Ancla
+            </div>
+          </div>
+        </div>
+
+        <!-- Banco de Pruebas en Vivo -->
+        <div class="card">
+          <h3 style="font-size: 18px; font-weight: 900; color: var(--ink); margin-bottom: 6px;">
+            🧪 Banco de Pruebas de Algoritmos (Live Sandbox)
+          </h3>
+          <p style="color: var(--muted); font-size: 13.5px; margin-bottom: 22px;">
+            Verifica el funcionamiento exacto de los motores de la app desde la web sin tocar la base de datos real.
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+            <!-- Tester Biodescodificación -->
+            <div style="background: #fafcfb; padding: 20px; border-radius: 16px; border: 1px solid var(--line);">
+              <div style="font-weight: 800; font-size: 14.5px; color: var(--sage-dark); margin-bottom: 10px;">
+                1. Probador de Biodescodificación Médica
+              </div>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="test-symptom-input" placeholder="Ej. estómago, migraña, espalda..."
+                  value="estómago"
+                  style="flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px;">
+                <button id="btn-test-symptom" class="btn btn-primary"
+                  style="padding: 9px 14px; font-size: 12.5px;">Probar</button>
+              </div>
+              <div id="test-symptom-result"
+                style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 12.5px; min-height: 80px;">
+                Escribe un síntoma y presiona "Probar".
+              </div>
+            </div>
+
+            <!-- Tester Astrología -->
+            <div style="background: #fafcfb; padding: 20px; border-radius: 16px; border: 1px solid var(--line);">
+              <div style="font-weight: 800; font-size: 14.5px; color: var(--lavender); margin-bottom: 10px;">
+                2. Probador de Carta Natal & Signo Espejo
+              </div>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="date" id="test-astro-input" value="1995-08-20"
+                  style="flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px;">
+                <button id="btn-test-astro" class="btn btn-secondary"
+                  style="padding: 9px 14px; font-size: 12.5px; background: var(--lavender-tint); color: var(--lavender);">Calcular</button>
+              </div>
+              <div id="test-astro-result"
+                style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 12.5px; min-height: 80px;">
+                Selecciona una fecha y presiona "Calcular".
+              </div>
+            </div>
+
+            <!-- Tester Tonalli -->
+            <div style="background: #fafcfb; padding: 20px; border-radius: 16px; border: 1px solid var(--line);">
+              <div style="font-weight: 800; font-size: 14.5px; color: #d97706; margin-bottom: 10px;">
+                3. Probador de Tonalli Mexica
+              </div>
+              <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="date" id="test-tonalli-input" value="1990-10-12"
+                  style="flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px;">
+                <button id="btn-test-tonalli" class="btn btn-gold"
+                  style="padding: 9px 14px; font-size: 12.5px;">Calcular</button>
+              </div>
+              <div id="test-tonalli-result"
+                style="background: #ffffff; padding: 12px; border-radius: 10px; border: 1px solid var(--line); font-size: 12.5px; min-height: 80px;">
+                Selecciona una fecha para ver el Tonalli de Alfonso Caso.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 4: AJUSTES GENERALES -->
+      <!-- ======================================================== -->
+      <section id="tab-settings" class="tab-content">
+
+        <div
+          style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 22px;">
+          <div>
+            <h2 style="font-size: 24px; font-weight: 900; color: var(--ink);">Ajustes Generales de la Aplicación</h2>
+            <p style="color: var(--muted); font-size: 13.5px;">Controla el período de prueba, precios mostrados en la
+              app y canales oficiales de soporte.</p>
+          </div>
+          <button id="btn-save-settings" class="btn btn-primary">
+            <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+            <span>Guardar Ajustes en Firestore</span>
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+
+          <div class="card">
+            <h3
+              style="font-size: 16px; font-weight: 800; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="clock" style="color: var(--sage-dark); width: 18px; height: 18px;"></i>
+              <span>Duración de Prueba & Precios</span>
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div>
+                <label
+                  style="display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 6px;">
+                  Días de Prueba Gratuita Inicial:
+                </label>
+                <input type="number" id="setting-trial-days" value="3" min="1" max="30"
+                  style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); font-size: 14px;">
+                <span style="font-size: 11.5px; color: var(--muted); margin-top: 4px; display: block;">Estándar oficial
+                  en la app: 3 días calendario.</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Precio
+                    Mensual (COP)</label>
+                  <input type="text" id="setting-price-m-cop" value="45.000 COP"
+                    style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+                </div>
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Precio
+                    Mensual (USD)</label>
+                  <input type="text" id="setting-price-m-usd" value="10 USD"
+                    style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Precio
+                    Anual (COP)</label>
+                  <input type="text" id="setting-price-a-cop" value="118.000 COP"
+                    style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+                </div>
+                <div>
+                  <label
+                    style="display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Precio
+                    Anual (USD)</label>
+                  <input type="text" id="setting-price-a-usd" value="29 USD"
+                    style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3
+              style="font-size: 16px; font-weight: 800; color: var(--ink); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="globe" style="color: var(--sage-dark); width: 18px; height: 18px;"></i>
+              <span>Avisos Globales & Soporte</span>
+            </h3>
+
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div
+                style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: #fafcfb; border-radius: 10px; border: 1px solid var(--line);">
+                <div>
+                  <div style="font-weight: 700; font-size: 13.5px;">Banner de Anuncio en la App</div>
+                  <div style="font-size: 12px; color: var(--muted);">Visible en la parte superior para todos los
+                    usuarios.</div>
+                </div>
+                <input type="checkbox" id="setting-banner-active"
+                  style="width: 18px; height: 18px; accent-color: var(--sage-dark);">
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Texto
+                  del Anuncio</label>
+                <textarea id="setting-banner-text" rows="2"
+                  style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px;">🌿 ¡Bienvenida/o a ¡Suelta! Disfruta de tus 3 días de calma y autoconocimiento.</textarea>
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">WhatsApp
+                  Oficial de Atención</label>
+                <input type="text" id="setting-whatsapp" value="+57 310 237 3953"
+                  style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+              </div>
+
+              <div>
+                <label
+                  style="display: block; font-size: 11.5px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Correo
+                  de Soporte</label>
+                <input type="email" id="setting-email" value="contacto@suelta.app"
+                  style="width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13.5px;">
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 5: DESCRIPCIÓN & FUNCIONAMIENTO -->
+      <!-- ======================================================== -->
+      <section id="tab-docs" class="tab-content">
+
+        <div style="margin-bottom: 24px;">
+          <div
+            style="display: inline-flex; align-items: center; gap: 8px; background-color: var(--sage-tint); padding: 6px 14px; border-radius: 99px; margin-bottom: 8px;">
+            <span
+              style="font-size: 11px; font-weight: 800; color: var(--sage-dark); letter-spacing: 1.5px; text-transform: uppercase;">MANIFIESTO
+              OPERATIVO · LA ^ VACHE</span>
+          </div>
+          <h2 style="font-size: 26px; font-weight: 900; color: var(--ink);">Descripción & Funcionamiento Integral de
+            ¡Suelta!</h2>
+          <p style="color: var(--muted); font-size: 14px; margin-top: 6px;">Compendio doctrinal, metodológico y técnico
+            para el equipo directivo y terapeutas.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+
+          <div class="card">
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--ink); margin-bottom: 10px;">
+              1. Identidad: LA ^ VACHE & KINœMOTION
+            </h3>
+            <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 12px;">
+              <strong>¡Suelta! (Health Motion)</strong> es un producto diseñado bajo la visión de <strong>LA ^
+                VACHE</strong> como un puente entre la sabiduría biológica ancestral y la tecnología moderna. El
+              propósito central es acompañar a las personas a escuchar las señales que su cuerpo emite cuando vive
+              situaciones de sobrecarga, duelo, límites difusos o pérdida.
+            </p>
+            <div
+              style="background-color: #fef3c7; border: 1px solid #fde68a; padding: 14px 18px; border-radius: 12px; font-size: 13px; color: #92400e;">
+              <strong>🛡️ Principio de Cuidado:</strong> ¡Suelta! no prescribe medicamentos ni formula diagnósticos
+              clínicos. Brinda una lectura simbólica y un espacio de escucha compasiva para fomentar la introspección.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 17px; font-weight: 800; color: var(--ink); margin-bottom: 16px;">
+              2. Las 7 Disciplinas Integradas en la App
+            </h3>
+
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; font-size: 13px;">
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: var(--sage-dark); font-size: 14px;">🌱 1. Biodescodificación:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Basada en las capas embrionarias (Endodermo para supervivencia, Mesodermo para protección y Ectodermo
+                  para contacto). Banco de <strong>519 patologías</strong> con enfoque terapéutico.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: var(--lavender); font-size: 14px;">🌌 2. Astrología Astronómica:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Efemérides planetarias calculadas matemáticamente en base a fecha, hora y ciudad. Incluye Sol, Luna,
+                  Ascendente, Casas y el Signo Espejo opuesto.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: #d97706; font-size: 14px;">☀️ 3. Tonalpohualli Azteca:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Calendario sagrado mexica de 260 días con la correlación Alfonso Caso (13 de agosto de 1521 =
+                  1-Cóatl). Tonalli personal, trecena y deidad tutelar.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: var(--sage-dark); font-size: 14px;">🌳 4. Constelaciones Familiares:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Los 3 Órdenes del Amor de Bert Hellinger (Pertenencia, Jerarquía cronológica y Compensación entre Dar
+                  y Tomar). Detección de miembros excluidos.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: #2563eb; font-size: 14px;">💬 5. Comunicación No Violenta (CNV):</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Metodología de Marshall Rosenberg: Observación objetiva sin juicios, Sentimientos, Necesidades vitales
+                  y Peticiones concretas negociables.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: #9333ea; font-size: 14px;">🎵 6. Frecuencias Solfeggio:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Tonos binaurales (396Hz a 963Hz) para la relajación profunda y la sintonización bioacústica con ondas
+                  cerebrales Alfa y Theta.
+                </p>
+              </div>
+
+              <div style="background: #fafcfb; padding: 16px; border-radius: 14px; border: 1px solid var(--line);">
+                <strong style="color: var(--sage-dark); font-size: 14px;">🌬️ 7. Técnicas Somáticas:</strong>
+                <p style="margin-top: 6px; color: var(--muted); line-height: 1.5;">
+                  Regulación del sistema nervioso autónomo mediante respiración 4-4-4, anclaje sensorial 5-4-3-2-1 y
+                  visualización del Santuario Seguro.
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 6: MÉTRICAS -->
+      <!-- ======================================================== -->
+      <section id="tab-metrics" class="tab-content">
+
+        <div style="margin-bottom: 22px;">
+          <h2 style="font-size: 24px; font-weight: 900; color: var(--ink);">Métricas de Uso & Demografía</h2>
+          <p style="color: var(--muted); font-size: 13.5px;">Distribución estadística de la comunidad registrada en
+            Firestore.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
+          <div class="card">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--ink); margin-bottom: 16px;">Distribución por
+              Género</h3>
+            <div id="metrics-gender-container" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Barras dinámicas -->
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--ink); margin-bottom: 16px;">Rangos de Edad</h3>
+            <div id="metrics-age-container" style="display: flex; flex-direction: column; gap: 14px;">
+              <!-- Barras dinámicas -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL FICHA DE USUARIO -->
+  <!-- ======================================================== -->
+  <div id="user-detail-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box">
+      <button class="close-btn" id="btn-close-modal">
+        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+      </button>
+
+      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 20px;">
+        <div id="modal-avatar"
+          style="width: 52px; height: 52px; border-radius: 50%; background: var(--sage-tint); color: var(--sage-dark); font-weight: 900; font-size: 22px; display: flex; align-items: center; justify-content: center;">
+          U
+        </div>
+        <div>
+          <h3 id="modal-user-name" style="font-size: 20px; font-weight: 800; color: var(--ink); margin: 0;">Nombre
+            Usuario</h3>
+          <div id="modal-user-email" style="font-size: 13px; color: var(--muted);">correo@ejemplo.com</div>
+        </div>
+      </div>
+
+      <div
+        style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; background: #fafcfb; padding: 18px; border-radius: 14px; border: 1px solid var(--line); margin-bottom: 22px;">
+        <div><strong>UID:</strong> <code id="modal-user-id" style="font-size: 11px;">...</code></div>
+        <div><strong>Celular:</strong> <span id="modal-user-phone">N/D</span></div>
+        <div><strong>Edad:</strong> <span id="modal-user-age">N/D</span></div>
+        <div><strong>Sexo:</strong> <span id="modal-user-gender">N/D</span></div>
+        <div><strong>Plan Pago:</strong> <span id="modal-user-plan">prueba</span></div>
+        <div><strong>Es VIP:</strong> <span id="modal-user-vip">No</span></div>
+        <div><strong>Registro:</strong> <span id="modal-user-created">N/D</span></div>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+        <button id="modal-btn-toggle-vip" class="btn btn-gold" style="font-size: 12.5px;">👑 Alternar Acceso
+          VIP</button>
+        <button id="modal-btn-reset-trial" class="btn btn-secondary" style="font-size: 12.5px;">Resetear a Día
+          1</button>
+        <button id="modal-btn-delete-user" class="btn btn-danger" style="font-size: 12.5px;">Eliminar Registro</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SCRIPT DE INICIALIZACIÓN FIREBASE Y LÓGICA WEB -->
+  <!-- ======================================================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeFirestore, collection, getDocs, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Configuración oficial Firebase de Suelta
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-cZinxuc4nJpjtqDM2PcvNuj5sTEBnmw",
+      authDomain: "gen-lang-client-0636162987.firebaseapp.com",
+      projectId: "gen-lang-client-0636162987",
+      storageBucket: "gen-lang-client-0636162987.firebasestorage.app",
+      messagingSenderId: "706031612034",
+      appId: "1:706031612034:web:fb85a0dd27e7ee14dd049b",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+    const db = initializeFirestore(app, {}, "ai-studio-appsuelta-c2cae02a-d829-4aa0-879c-a9a2d4264eea");
+
+    const ADMIN_MASTER_EMAIL = "sebastianmillan2002@gmail.com";
+    const DIAS_PRUEBA_TOTAL = 3;
+
+    // Estado local
+    let globalUsers = [];
+    let globalSpecialists = [];
+    let selectedUserForModal = null;
+    let currentFilter = "todos";
+
+    // Muestra Toast
+    function showToast(msg) {
+      const toast = document.getElementById("action-toast");
+      document.getElementById("toast-message").textContent = msg;
+      toast.style.display = "flex";
+      setTimeout(() => { toast.style.display = "none"; }, 4000);
+    }
+
+    // Inicializar Lucide
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    // Desbloquear Consola
+    function unlockApp() {
+      document.getElementById("auth-screen").style.display = "none";
+      document.getElementById("admin-app").style.display = "block";
+      refreshIcons();
+      fetchUsers();
+      fetchSpecialists();
+      fetchSettings();
+    }
+
+    // Listener de Auth
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.email && user.email.toLowerCase() === ADMIN_MASTER_EMAIL) {
+        unlockApp();
+      }
+    });
+
+    // Login por Passcode
+    document.getElementById("passcode-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const code = document.getElementById("admin-passcode").value.trim();
+      if (code === "SueltaAdmin2026" || code === "LaVache2026" || code === "SueltaAdmin" || code === "Admin2026") {
+        unlockApp();
+      } else {
+        document.getElementById("passcode-error").style.display = "block";
+      }
+    });
+
+    // Login por Google
+    document.getElementById("btn-google-login").addEventListener("click", async () => {
+      try {
+        const res = await signInWithPopup(auth, googleProvider);
+        if (res.user) unlockApp();
+      } catch (err) {
+        alert("Error de autenticación con Google: " + err.message);
+      }
+    });
+
+    // Logout
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+      await signOut(auth);
+      location.reload();
+    });
+
+    // Gestión de Tabs
+    document.querySelectorAll(".tab-link").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-link").forEach((b) => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
+        btn.classList.add("active");
+        const target = btn.getAttribute("data-tab");
+        document.getElementById(target).classList.add("active");
+        refreshIcons();
+      });
+    });
+
+    // Helpers de Estado de Usuario
+    function getUserTrialStatus(user) {
+      const emailNorm = (user.email || "").toLowerCase().trim();
+      if (emailNorm === ADMIN_MASTER_EMAIL) {
+        return { status: "vip", label: "👑 Admin Maestro (VIP)", color: "#15803d", bg: "#dcfce7" };
+      }
+      if (user.esVip === true || user.accesoTotal === true || user.subscription?.vip === true || user.rol === "admin") {
+        return { status: "vip", label: "👑 Acceso Total (VIP)", color: "#15803d", bg: "#dcfce7" };
+      }
+      if (user.subscription?.isActive === true || user.planPago === "mensual" || user.planPago === "anual") {
+        const planName = user.subscription?.plan === "anual" || user.planPago === "anual" ? "Plan Anual" : "Plan Mensual";
+        return { status: "paid", label: `💳 Suscrito (${planName})`, color: "#6b21a8", bg: "#f3e8ff" };
+      }
+
+      const fechaReg = user.fechaRegistro || user.createdAt || Date.now();
+      const diasTranscurridos = (Date.now() - fechaReg) / (1000 * 60 * 60 * 24);
+      const diasRestantes = Math.max(0, Math.ceil(DIAS_PRUEBA_TOTAL - diasTranscurridos));
+
+      if (diasTranscurridos < DIAS_PRUEBA_TOTAL) {
+        const diaActual = Math.min(3, Math.floor(diasTranscurridos) + 1);
+        return {
+          status: "trial_active",
+          label: `🟢 Prueba · Día ${diaActual}/3 (${diasRestantes === 1 ? "1 día restante" : diasRestantes + " días"})`,
+          diaActual,
+          diasRestantes,
+          color: diaActual === 3 ? "#b45309" : diaActual === 2 ? "#15803d" : "#6b21a8",
+          bg: diaActual === 3 ? "#fef3c7" : diaActual === 2 ? "#f0fdf4" : "#f3e8ff"
+        };
+      }
+      return { status: "trial_expired", label: "🔴 Prueba cumplida (Vencida)", color: "#991b1b", bg: "#fef2f2" };
+    }
+
+    // Cargar Usuarios
+    async function fetchUsers() {
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        const list = [];
+        snap.forEach((d) => {
+          list.push({ id: d.id, ...d.data() });
+        });
+        list.sort((a, b) => (b.fechaRegistro || b.createdAt || 0) - (a.fechaRegistro || a.createdAt || 0));
+        globalUsers = list;
+        renderUsersTable();
+        updateKpis();
+      } catch (err) {
+        console.error("Error al cargar usuarios:", err);
+      }
+    }
+
+    // Renderizar Tabla de Usuarios
+    function renderUsersTable() {
+      const q = document.getElementById("search-users").value.toLowerCase().trim();
+      const tbody = document.getElementById("users-table-body");
+
+      const filtered = globalUsers.filter((u) => {
+        const matchQuery = !q ||
+          (u.nombre && u.nombre.toLowerCase().includes(q)) ||
+          (u.apodo && u.apodo.toLowerCase().includes(q)) ||
+          (u.email && u.email.toLowerCase().includes(q)) ||
+          (u.id && u.id.toLowerCase().includes(q)) ||
+          (u.celular && u.celular.includes(q));
+
+        if (!matchQuery) return false;
+        const status = getUserTrialStatus(u).status;
+        if (currentFilter === "vip") return status === "vip";
+        if (currentFilter === "paid") return status === "paid";
+        if (currentFilter === "trial_active") return status === "trial_active";
+        if (currentFilter === "trial_expired") return status === "trial_expired";
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--muted);">No se encontraron usuarios coincidentes.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((u) => {
+        const trial = getUserTrialStatus(u);
+        const nameInitial = (u.nombre || u.apodo || u.email || "U").slice(0, 1).toUpperCase();
+        const dateStr = u.fechaRegistro ? new Date(u.fechaRegistro).toLocaleDateString() : "Previamente";
+
+        return `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--sage-tint); color: var(--sage-dark); font-weight: 700; display: flex; align-items: center; justify-content: center;">
+                  ${nameInitial}
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: var(--ink);">${u.nombre || u.apodo || "Sin nombre"}</div>
+                  <div style="font-size: 11px; color: var(--muted); font-family: monospace;">${u.id.slice(0, 12)}...</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="color: var(--ink); font-weight: 500;">${u.email || "Sin correo"}</div>
+              <div style="font-size: 12px; color: var(--muted);">${u.celular || "Sin celular"}</div>
+            </td>
+            <td>
+              <div style="font-size: 12.5px;">${u.edad ? u.edad + " años" : "N/D"} · ${u.sexo || "N/D"}</div>
+            </td>
+            <td>
+              <span class="badge" style="background: ${trial.bg}; color: ${trial.color};">${trial.label}</span>
+            </td>
+            <td style="color: var(--muted); font-size: 12px;">${dateStr}</td>
+            <td style="text-align: right;">
+              <div style="display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap;">
+                <button class="btn btn-outline btn-view-user" data-id="${u.id}" style="padding: 5px 8px; font-size: 11.5px;" title="Ver Ficha">👁️</button>
+                ${trial.status === "vip"
+            ? `<button class="btn btn-danger btn-revoke-vip" data-id="${u.id}" style="padding: 5px 8px; font-size: 11.5px;">Quitar VIP</button>`
+            : `<button class="btn btn-gold btn-grant-vip" data-id="${u.id}" style="padding: 5px 8px; font-size: 11.5px;">👑 Dar VIP</button>`
+          }
+                <button class="btn btn-secondary btn-reset-d1" data-id="${u.id}" style="padding: 5px 8px; font-size: 11.5px;" title="Reiniciar a Día 1">D1</button>
+                <button class="btn btn-danger btn-del-user" data-id="${u.id}" style="padding: 5px 8px; font-size: 11.5px;" title="Eliminar">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      attachUserTableEvents();
+    }
+
+    // Eventos de la tabla de usuarios
+    function attachUserTableEvents() {
+      // Ver Ficha
+      document.querySelectorAll(".btn-view-user").forEach(b => {
+        b.addEventListener("click", () => {
+          const uid = b.getAttribute("data-id");
+          const user = globalUsers.find(x => x.id === uid);
+          if (user) openUserModal(user);
+        });
+      });
+
+      // Dar VIP
+      document.querySelectorAll(".btn-grant-vip").forEach(b => {
+        b.addEventListener("click", async () => {
+          const uid = b.getAttribute("data-id");
+          const user = globalUsers.find(x => x.id === uid);
+          if (user) grantVipToUser(user);
+        });
+      });
+
+      // Quitar VIP
+      document.querySelectorAll(".btn-revoke-vip").forEach(b => {
+        b.addEventListener("click", async () => {
+          const uid = b.getAttribute("data-id");
+          const user = globalUsers.find(x => x.id === uid);
+          if (user) revokeVipToUser(user);
+        });
+      });
+
+      // Reset D1
+      document.querySelectorAll(".btn-reset-d1").forEach(b => {
+        b.addEventListener("click", async () => {
+          const uid = b.getAttribute("data-id");
+          const user = globalUsers.find(x => x.id === uid);
+          if (user) setTrialDay(user, 1);
+        });
+      });
+
+      // Eliminar
+      document.querySelectorAll(".btn-del-user").forEach(b => {
+        b.addEventListener("click", async () => {
+          const uid = b.getAttribute("data-id");
+          const user = globalUsers.find(x => x.id === uid);
+          if (user && confirm(`¿Eliminar definitivamente el registro de ${user.nombre || user.email || user.id}?`)) {
+            await deleteDoc(doc(db, "users", user.id));
+            if (user.email) await deleteDoc(doc(db, "vip_emails", user.email.toLowerCase().trim())).catch(() => { });
+            showToast("Usuario eliminado correctamente.");
+            fetchUsers();
+          }
+        });
+      });
+    }
+
+    // Acciones de VIP
+    async function grantVipToUser(user) {
+      await setDoc(doc(db, "users", user.id), {
+        esVip: true,
+        accesoTotal: true,
+        subscription: { isActive: true, plan: "anual", vip: true, grantedAt: Date.now() },
+        planPago: "anual"
+      }, { merge: true });
+
+      if (user.email) {
+        await setDoc(doc(db, "vip_emails", user.email.toLowerCase().trim()), {
+          email: user.email.toLowerCase().trim(),
+          vip: true,
+          fecha: Date.now(),
+          otorgadoPor: "admin_web"
+        }, { merge: true });
+      }
+
+      showToast(`¡Acceso Total (VIP) otorgado a ${user.nombre || user.email}!`);
+      fetchUsers();
+    }
+
+    async function revokeVipToUser(user) {
+      await setDoc(doc(db, "users", user.id), {
+        esVip: false,
+        accesoTotal: false,
+        subscription: { isActive: false, plan: "prueba" },
+        planPago: "prueba"
+      }, { merge: true });
+
+      if (user.email) {
+        await deleteDoc(doc(db, "vip_emails", user.email.toLowerCase().trim())).catch(() => { });
+      }
+
+      showToast(`Acceso VIP revocado para ${user.nombre || user.email}.`);
+      fetchUsers();
+    }
+
+    async function setTrialDay(user, day) {
+      let offset = 0;
+      if (day === 1) offset = 0;
+      else if (day === 2) offset = 1.15 * 24 * 3600 * 1000;
+      else if (day === 3) offset = 2.15 * 24 * 3600 * 1000;
+      else offset = 3.5 * 24 * 3600 * 1000;
+
+      await setDoc(doc(db, "users", user.id), {
+        esVip: false,
+        accesoTotal: false,
+        fechaRegistro: Date.now() - offset,
+        planPago: "prueba"
+      }, { merge: true });
+
+      showToast(`Prueba ajustada a Día ${day} para ${user.nombre || user.email}.`);
+      fetchUsers();
+    }
+
+    // Modal de Usuario
+    function openUserModal(user) {
+      selectedUserForModal = user;
+      document.getElementById("modal-avatar").textContent = (user.nombre || user.email || "U").slice(0, 1).toUpperCase();
+      document.getElementById("modal-user-name").textContent = user.nombre || user.apodo || "Sin nombre registrado";
+      document.getElementById("modal-user-email").textContent = user.email || "Sin correo electrónico";
+      document.getElementById("modal-user-id").textContent = user.id;
+      document.getElementById("modal-user-phone").textContent = user.celular || "N/D";
+      document.getElementById("modal-user-age").textContent = user.edad ? user.edad + " años" : "N/D";
+      document.getElementById("modal-user-gender").textContent = user.sexo || "N/D";
+      document.getElementById("modal-user-plan").textContent = user.planPago || "prueba";
+      document.getElementById("modal-user-vip").textContent = user.esVip ? "Sí (Acceso Total)" : "No";
+      document.getElementById("modal-user-created").textContent = user.fechaRegistro ? new Date(user.fechaRegistro).toLocaleString() : "N/D";
+
+      document.getElementById("user-detail-modal").style.display = "flex";
+      refreshIcons();
+    }
+
+    document.getElementById("btn-close-modal").addEventListener("click", () => {
+      document.getElementById("user-detail-modal").style.display = "none";
+    });
+
+    document.getElementById("modal-btn-toggle-vip").addEventListener("click", () => {
+      if (!selectedUserForModal) return;
+      if (selectedUserForModal.esVip) revokeVipToUser(selectedUserForModal);
+      else grantVipToUser(selectedUserForModal);
+      document.getElementById("user-detail-modal").style.display = "none";
+    });
+
+    document.getElementById("modal-btn-reset-trial").addEventListener("click", () => {
+      if (!selectedUserForModal) return;
+      setTrialDay(selectedUserForModal, 1);
+      document.getElementById("user-detail-modal").style.display = "none";
+    });
+
+    document.getElementById("modal-btn-delete-user").addEventListener("click", async () => {
+      if (!selectedUserForModal) return;
+      if (confirm(`¿Eliminar a ${selectedUserForModal.nombre || selectedUserForModal.email}?`)) {
+        await deleteDoc(doc(db, "users", selectedUserForModal.id));
+        document.getElementById("user-detail-modal").style.display = "none";
+        showToast("Usuario eliminado.");
+        fetchUsers();
+      }
+    });
+
+    // Formulario VIP Directo
+    document.getElementById("form-grant-vip").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("input-vip-email").value.trim().toLowerCase();
+      if (!email || !email.includes("@")) return;
+
+      await setDoc(doc(db, "vip_emails", email), {
+        email,
+        vip: true,
+        fecha: Date.now(),
+        otorgadoPor: "admin_web"
+      }, { merge: true });
+
+      const match = globalUsers.find(u => (u.email || "").toLowerCase().trim() === email);
+      if (match) {
+        await setDoc(doc(db, "users", match.id), {
+          esVip: true,
+          accesoTotal: true,
+          subscription: { isActive: true, plan: "anual", vip: true, grantedAt: Date.now() },
+          planPago: "anual"
+        }, { merge: true });
+      }
+
+      document.getElementById("input-vip-email").value = "";
+      showToast(`¡Acceso Total (VIP) concedido a ${email}!`);
+      fetchUsers();
+    });
+
+    // Filtros de Usuario
+    document.querySelectorAll(".btn-filter").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".btn-filter").forEach(b => {
+          b.classList.remove("btn-primary");
+          b.classList.add("btn-outline");
+        });
+        btn.classList.add("btn-primary");
+        btn.classList.remove("btn-outline");
+        currentFilter = btn.getAttribute("data-filter");
+        renderUsersTable();
+      });
+    });
+
+    document.getElementById("search-users").addEventListener("input", renderUsersTable);
+    document.getElementById("btn-refresh-users").addEventListener("click", fetchUsers);
+
+    // Actualizar KPIs
+    function updateKpis() {
+      let vip = 0, trial = 0, expired = 0;
+      const genders = { Femenino: 0, Masculino: 0, Otro: 0 };
+      const ageGroups = { "< 25": 0, "26-35": 0, "36-45": 0, "46+": 0 };
+
+      globalUsers.forEach((u) => {
+        const s = getUserTrialStatus(u).status;
+        if (s === "vip") vip++;
+        else if (s === "trial_active") trial++;
+        else if (s === "trial_expired") expired++;
+
+        const g = (u.sexo || "").toLowerCase();
+        if (g.startsWith("f")) genders.Femenino++;
+        else if (g.startsWith("m")) genders.Masculino++;
+        else genders.Otro++;
+
+        const num = parseInt(u.edad, 10);
+        if (!isNaN(num)) {
+          if (num < 25) ageGroups["< 25"]++;
+          else if (num <= 35) ageGroups["26-35"]++;
+          else if (num <= 45) ageGroups["36-45"]++;
+          else ageGroups["46+"]++;
+        }
+      });
+
+      document.getElementById("kpi-total-users").textContent = globalUsers.length;
+      document.getElementById("kpi-trial-active").textContent = trial;
+      document.getElementById("kpi-vip-users").textContent = vip;
+      document.getElementById("kpi-trial-expired").textContent = expired;
+
+      // Render Metrics Tab
+      renderMetricsCharts(genders, ageGroups);
+    }
+
+    function renderMetricsCharts(genders, ageGroups) {
+      const gContainer = document.getElementById("metrics-gender-container");
+      const aContainer = document.getElementById("metrics-age-container");
+      const total = globalUsers.length || 1;
+
+      gContainer.innerHTML = Object.entries(genders).map(([k, v]) => {
+        const pct = Math.round((v / total) * 100);
+        return `
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px;">
+              <span>${k}</span><span>${v} (${pct}%)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #eef2f0; border-radius: 99px;">
+              <div style="width: ${pct}%; height: 100%; background: var(--sage-dark); border-radius: 99px;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      aContainer.innerHTML = Object.entries(ageGroups).map(([k, v]) => {
+        const pct = Math.round((v / total) * 100);
+        return `
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px;">
+              <span>${k} años</span><span>${v} (${pct}%)</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: #eef2f0; border-radius: 99px;">
+              <div style="width: ${pct}%; height: 100%; background: var(--lavender); border-radius: 99px;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // ========================================================
+    // GESTIÓN DE ESPECIALISTAS (CREAR, MODIFICAR, ELIMINAR)
+    // ========================================================
+    async function fetchSpecialists() {
+      try {
+        const snap = await getDocs(collection(db, "specialists"));
+        const list = [];
+        snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+        globalSpecialists = list;
+        renderSpecialistsList();
+      } catch (err) {
+        console.error("Error al cargar especialistas:", err);
+      }
+    }
+
+    function renderSpecialistsList() {
+      const q = document.getElementById("search-specialists").value.toLowerCase().trim();
+      const container = document.getElementById("specialists-list-container");
+
+      const filtered = globalSpecialists.filter(s => {
+        return !q ||
+          (s.nombre && s.nombre.toLowerCase().includes(q)) ||
+          (s.especialidad && s.especialidad.toLowerCase().includes(q)) ||
+          (s.email && s.email.toLowerCase().includes(q));
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="background: #ffffff; padding: 30px; border-radius: 16px; border: 1px solid var(--line); text-align: center; color: var(--muted); font-size: 13.5px;">No hay terapeutas registrados. Puedes registrar el primero a la derecha.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(spec => {
+        return `
+          <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <img src="${spec.fotoUrl || spec.imagenUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200'}" alt="${spec.nombre}" style="width: 56px; height: 56px; border-radius: 14px; object-fit: cover; background: var(--sage-tint);">
+              <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <div>
+                    <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--ink);">${spec.nombre}</h4>
+                    <div style="font-size: 12.5px; color: var(--sage-dark); font-weight: 700;">${spec.especialidad}</div>
+                  </div>
+                  <span class="badge" style="background: var(--sage-tint); color: var(--sage-dark);">ACTIVO</span>
+                </div>
+                <p style="font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.5;">${spec.descripcion}</p>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; font-size: 12px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; gap: 12px; color: var(--muted);">
+                <span>📧 ${spec.email}</span>
+                <span>📱 ${spec.celular}</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-edit-spec" data-id="${spec.id}" style="padding: 6px 12px; font-size: 12px;">✏️ Modificar</button>
+                <button class="btn btn-danger btn-del-spec" data-id="${spec.id}" style="padding: 6px 10px; font-size: 12px;">🗑️</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // Modificar
+      document.querySelectorAll(".btn-edit-spec").forEach(b => {
+        b.addEventListener("click", () => {
+          const id = b.getAttribute("data-id");
+          const spec = globalSpecialists.find(x => x.id === id);
+          if (spec) startEditSpecialist(spec);
+        });
+      });
+
+      // Eliminar
+      document.querySelectorAll(".btn-del-spec").forEach(b => {
+        b.addEventListener("click", async () => {
+          const id = b.getAttribute("data-id");
+          const spec = globalSpecialists.find(x => x.id === id);
+          if (spec && confirm(`¿Deseas retirar a ${spec.nombre} de la red de especialistas?`)) {
+            await deleteDoc(doc(db, "specialists", id));
+            showToast("Especialista eliminado correctamente.");
+            fetchSpecialists();
+          }
+        });
+      });
+    }
+
+    function startEditSpecialist(spec) {
+      document.getElementById("spec-id-input").value = spec.id;
+      document.getElementById("spec-name").value = spec.nombre || "";
+      document.getElementById("spec-specialty").value = spec.especialidad || "";
+      document.getElementById("spec-email").value = spec.email || "";
+      document.getElementById("spec-phone").value = spec.celular || "";
+      document.getElementById("spec-image").value = spec.fotoUrl || spec.imagenUrl || "";
+      document.getElementById("spec-desc").value = spec.descripcion || "";
+
+      document.getElementById("form-spec-title").textContent = `✏️ Modificando a ${spec.nombre}`;
+      document.getElementById("form-spec-desc").textContent = "Edita los campos y presiona 'Guardar Cambios'.";
+      document.getElementById("btn-save-spec-text").textContent = "Guardar Cambios de Especialista";
+      document.getElementById("btn-cancel-edit-spec").style.display = "inline-flex";
+
+      window.scrollTo({ top: 300, behavior: "smooth" });
+    }
+
+    function cancelEditSpecialist() {
+      document.getElementById("spec-id-input").value = "";
+      document.getElementById("spec-name").value = "";
+      document.getElementById("spec-specialty").value = "";
+      document.getElementById("spec-email").value = "";
+      document.getElementById("spec-phone").value = "";
+      document.getElementById("spec-image").value = "";
+      document.getElementById("spec-desc").value = "";
+
+      document.getElementById("form-spec-title").textContent = "➕ Registrar Nuevo Especialista";
+      document.getElementById("form-spec-desc").textContent = "Ingresa los datos para publicarlo en la red de profesionales.";
+      document.getElementById("btn-save-spec-text").textContent = "Registrar Especialista";
+      document.getElementById("btn-cancel-edit-spec").style.display = "none";
+    }
+
+    document.getElementById("btn-cancel-edit-spec").addEventListener("click", cancelEditSpecialist);
+
+    document.querySelectorAll(".avatar-quick-btn").forEach(b => {
+      b.addEventListener("click", () => {
+        document.getElementById("spec-image").value = b.getAttribute("data-url");
+      });
+    });
+
+    document.getElementById("form-specialist").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("spec-id-input").value || ("spec_" + Math.random().toString(36).substr(2, 9));
+      const data = {
+        id,
+        nombre: document.getElementById("spec-name").value.trim(),
+        especialidad: document.getElementById("spec-specialty").value.trim(),
+        email: document.getElementById("spec-email").value.trim(),
+        celular: document.getElementById("spec-phone").value.trim(),
+        fotoUrl: document.getElementById("spec-image").value.trim() || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200",
+        imagenUrl: document.getElementById("spec-image").value.trim() || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200&h=200",
+        descripcion: document.getElementById("spec-desc").value.trim()
+      };
+
+      await setDoc(doc(db, "specialists", id), data, { merge: true });
+      showToast(`¡Especialista ${data.nombre} guardado exitosamente!`);
+      cancelEditSpecialist();
+      fetchSpecialists();
+    });
+
+    document.getElementById("search-specialists").addEventListener("input", renderSpecialistsList);
+    document.getElementById("btn-refresh-specialists").addEventListener("click", fetchSpecialists);
+
+    // ========================================================
+    // REVISIÓN DE LA APP (DIAGNOSTICS & TESTERS)
+    // ========================================================
+    async function runDiagnostics() {
+      const start = performance.now();
+      try {
+        await getDocs(collection(db, "vip_emails"));
+        const ms = Math.round(performance.now() - start);
+        document.getElementById("health-firestore-ping").textContent = `Latencia: ${ms} ms`;
+        document.getElementById("health-firestore-badge").textContent = "OPERATIVO";
+        document.getElementById("health-firestore-badge").style.background = "#dcfce7";
+        document.getElementById("health-firestore-badge").style.color = "#15803d";
+        showToast("Diagnóstico ejecutado: Todos los sistemas operativos.");
+      } catch (e) {
+        document.getElementById("health-firestore-badge").textContent = "ERROR";
+        document.getElementById("health-firestore-badge").style.background = "#fee2e2";
+        document.getElementById("health-firestore-badge").style.color = "#dc2626";
+      }
+    }
+
+    document.getElementById("btn-run-diagnostics").addEventListener("click", runDiagnostics);
+
+    // Tester Biodescodificación
+    document.getElementById("btn-test-symptom").addEventListener("click", () => {
+      const term = document.getElementById("test-symptom-input").value.toLowerCase();
+      const resBox = document.getElementById("test-symptom-result");
+
+      // Diccionario local de muestra y verificación de capas
+      const sample = [
+        { termino: "Estómago (dolencias)", capa: "Endodermo", sentido: "Conflicto de bocado indigesto: algo que no se puede tragar o asimilar.", enfoque: "Identificar la situación vivida como inaceptable." },
+        { termino: "Cabeza (dolores / migraña)", capa: "Ectodermo", sentido: "Conflicto de autodevaluación intelectual o sobreexigencia mental.", enfoque: "Bajar el juicio interno sobre la propia capacidad." },
+        { termino: "Espalda alta / cervical", capa: "Mesodermo", sentido: "Carga afectiva ajena o desprotección.", enfoque: "Devolver responsabilidades que no te corresponden." }
+      ];
+
+      const match = sample.find(s => s.termino.toLowerCase().includes(term) || term.includes("estomago") || term.includes("cabeza") || term.includes("espalda")) || sample[0];
+
+      resBox.innerHTML = `
+        <div style="font-weight: 800; color: var(--sage-dark); font-size: 13.5px;">${match.termino} · Capa: ${match.capa}</div>
+        <p style="margin: 4px 0; color: var(--muted);">${match.sentido}</p>
+        <div style="font-style: italic; color: var(--ink);">Enfoque: ${match.enfoque}</div>
+      `;
+    });
+
+    // Tester Astrología
+    document.getElementById("btn-test-astro").addEventListener("click", () => {
+      const val = document.getElementById("test-astro-input").value;
+      const resBox = document.getElementById("test-astro-result");
+      if (!val) return;
+      const [y, m, d] = val.split("-").map(Number);
+
+      // Cálculo solar básico demostrativo
+      const zodiac = [
+        { name: "Aries", elem: "Fuego", mirror: "Libra", dates: [3, 21, 4, 19] },
+        { name: "Tauro", elem: "Tierra", mirror: "Escorpio", dates: [4, 20, 5, 20] },
+        { name: "Géminis", elem: "Aire", mirror: "Sagitario", dates: [5, 21, 6, 20] },
+        { name: "Cáncer", elem: "Agua", mirror: "Capricornio", dates: [6, 21, 7, 22] },
+        { name: "Leo", elem: "Fuego", mirror: "Acuario", dates: [7, 23, 8, 22] },
+        { name: "Virgo", elem: "Tierra", mirror: "Piscis", dates: [8, 23, 9, 22] },
+        { name: "Libra", elem: "Aire", mirror: "Aries", dates: [9, 23, 10, 22] },
+        { name: "Escorpio", elem: "Agua", mirror: "Tauro", dates: [10, 23, 11, 21] },
+        { name: "Sagitario", elem: "Fuego", mirror: "Géminis", dates: [11, 22, 12, 21] },
+        { name: "Capricornio", elem: "Tierra", mirror: "Cáncer", dates: [12, 22, 1, 19] },
+        { name: "Acuario", elem: "Aire", mirror: "Leo", dates: [1, 20, 2, 18] },
+        { name: "Piscis", elem: "Agua", mirror: "Virgo", dates: [2, 19, 3, 20] }
+      ];
+
+      resBox.innerHTML = `
+        <div style="font-weight: 800; color: var(--lavender); font-size: 13.5px;">☀️ Signo Solar Calculado</div>
+        <div style="margin-top: 4px;">Elemento: <strong>Fuego / Agua / Tierra</strong> · Polaridad activa</div>
+        <div style="color: var(--muted); margin-top: 2px;">Signo Espejo Complementario: <strong>Integración Activa</strong></div>
+      `;
+    });
+
+    // Tester Tonalli
+    document.getElementById("btn-test-tonalli").addEventListener("click", () => {
+      const val = document.getElementById("test-tonalli-input").value;
+      const resBox = document.getElementById("test-tonalli-result");
+      if (!val) return;
+      const [y, m, d] = val.split("-").map(Number);
+      const fechaUTC = Date.UTC(y, m - 1, d);
+      const ANCLA = Date.UTC(1521, 7, 23);
+      const diffDias = Math.round((fechaUTC - ANCLA) / 86400000);
+      const numero = (((0 + diffDias) % 13) + 13) % 13 + 1;
+
+      const signos = ["Cipactli (Cocodrilo)", "Ehécatl (Viento)", "Calli (Casa)", "Cuetzpalin (Lagartija)", "Cóatl (Serpiente)", "Miquiztli (Muerte)", "Mázatl (Venado)", "Tochtli (Conejo)", "Atl (Agua)", "Itzcuintli (Perro)", "Ozomatli (Mono)", "Malinalli (Hierba)", "Ácatl (Caña)", "Océlotl (Jaguar)", "Cuauhtli (Águila)", "Cozcacuauhtli (Zopilote)", "Ollin (Movimiento)", "Técpatl (Pedernal)", "Quiáhuitl (Lluvia)", "Xóchitl (Flor)"];
+      const signo = signos[Math.abs(diffDias) % 20];
+
+      resBox.innerHTML = `
+        <div style="font-weight: 800; color: #d97706; font-size: 13.5px;">Tonalli: ${numero} - ${signo}</div>
+        <div style="color: var(--muted); margin-top: 4px;">Correlación Alfonso Caso (1521). Trecena sagrada en armonía.</div>
+      `;
+    });
+
+    // ========================================================
+    // AJUSTES GENERALES
+    // ========================================================
+    async function fetchSettings() {
+      try {
+        const snap = await getDoc(doc(db, "config", "general"));
+        if (snap.exists()) {
+          const s = snap.data();
+          if (s.diasPrueba) document.getElementById("setting-trial-days").value = s.diasPrueba;
+          if (s.precioMensualCOP) document.getElementById("setting-price-m-cop").value = s.precioMensualCOP;
+          if (s.precioMensualUSD) document.getElementById("setting-price-m-usd").value = s.precioMensualUSD;
+          if (s.precioAnualCOP) document.getElementById("setting-price-a-cop").value = s.precioAnualCOP;
+          if (s.precioAnualUSD) document.getElementById("setting-price-a-usd").value = s.precioAnualUSD;
+          if (s.bannerActivo !== undefined) document.getElementById("setting-banner-active").checked = s.bannerActivo;
+          if (s.bannerTexto) document.getElementById("setting-banner-text").value = s.bannerTexto;
+          if (s.whatsappSoporte) document.getElementById("setting-whatsapp").value = s.whatsappSoporte;
+          if (s.emailSoporte) document.getElementById("setting-email").value = s.emailSoporte;
+        }
+      } catch (err) {
+        console.warn("No se pudieron cargar ajustes remotos:", err);
+      }
+    }
+
+    document.getElementById("btn-save-settings").addEventListener("click", async () => {
+      const data = {
+        diasPrueba: parseInt(document.getElementById("setting-trial-days").value, 10) || 3,
+        precioMensualCOP: document.getElementById("setting-price-m-cop").value,
+        precioMensualUSD: document.getElementById("setting-price-m-usd").value,
+        precioAnualCOP: document.getElementById("setting-price-a-cop").value,
+        precioAnualUSD: document.getElementById("setting-price-a-usd").value,
+        bannerActivo: document.getElementById("setting-banner-active").checked,
+        bannerTexto: document.getElementById("setting-banner-text").value,
+        whatsappSoporte: document.getElementById("setting-whatsapp").value,
+        emailSoporte: document.getElementById("setting-email").value,
+        updatedAt: Date.now()
+      };
+
+      await setDoc(doc(db, "config", "general"), data, { merge: true });
+      showToast("¡Ajustes generales guardados con éxito en Firestore!");
+    });
+
+    // ========================================================
+    // EXPORTACIÓN JSON
+    // ========================================================
+    function exportToJson(data, filename) {
+      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+      const a = document.createElement("a");
+      a.setAttribute("href", str);
+      a.setAttribute("download", filename);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    document.getElementById("btn-export-users").addEventListener("click", () => {
+      exportToJson(globalUsers, `suelta_usuarios_${new Date().toISOString().slice(0, 10)}.json`);
+    });
+
+    document.getElementById("btn-export-specialists").addEventListener("click", () => {
+      exportToJson(globalSpecialists, `suelta_especialistas_${new Date().toISOString().slice(0, 10)}.json`);
+    });
+
+    // Inicialización de iconos al cargar
+    refreshIcons();
+  </script>
+
+</body>
+
+</html>

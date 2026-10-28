@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "nombre": {
+          "type": "string"
+        },
+        "apodo": {
+          "type": "string"
+        },
+        "edad": {
+          "type": "string"
+        },
+        "sexo": {
+          "type": "string"
+        },
+        "celular": {
+          "type": "string"
+        }
+      },
+      "required": ["email", "nombre"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "User"
+      },
+      "description": "User profile collection"
+    }
+  }
+}

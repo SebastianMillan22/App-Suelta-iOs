@@ -1,0 +1,33 @@
+{
+  "type": "AdaptiveCard",
+  "version": "1.5",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "${title}",
+      "weight": "Bolder",
+      "size": "Medium",
+      "color": "Dark"
+    },
+    {
+      "type": "TextBlock",
+      "text": "${affirmation}",
+      "wrap": true,
+      "size": "Default",
+      "color": "Default"
+    },
+    {
+      "type": "TextBlock",
+      "text": "🔥 Racha del Reto: ${streak} días",
+      "size": "Small",
+      "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.OpenUrl",
+      "title": "Abrir ¡Suelta!",
+      "url": "https://suelta.app/#app"
+    }
+  ]
+}

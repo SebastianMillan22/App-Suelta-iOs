@@ -1,0 +1,88 @@
+{
+  "id": "/",
+  "name": "¡Suelta! — Bienestar & Bioconexión",
+  "short_name": "¡Suelta!",
+  "description": "Tu santuario de biodescodificación, epigenética y constelaciones familiares en tu dispositivo móvil.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f1f7f4",
+  "theme_color": "#4a7c68",
+  "orientation": "portrait",
+  "categories": ["health", "lifestyle", "wellness"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Afirmación del Día",
+      "short_name": "Afirmación",
+      "description": "Recibe tu pensamiento sanador del momento",
+      "url": "/#reto",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Reto de 21 Días",
+      "short_name": "Mi Reto",
+      "description": "Avanza en tu práctica diaria de transformación",
+      "url": "/#reto",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Calma & Respiración",
+      "short_name": "Respiración",
+      "description": "Regulación somática inmediata con frecuencias",
+      "url": "/#calma",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Diario de Bienestar",
+      "short_name": "Diario",
+      "description": "Registra tus reflexiones y síntomas del día",
+      "url": "/#diario",
+      "icons": [{ "src": "/favicon.png", "sizes": "192x192" }]
+    }
+  ],
+  "widgets": [
+    {
+      "name": "¡Suelta! Bienestar Diario",
+      "short_name": "Suelta Widget",
+      "description": "Widget de pantalla de inicio con afirmaciones y racha diaria de bienestar.",
+      "tag": "suelta-wellness-widget",
+      "template": "widget",
+      "ms_ac_template": "/widget-template.json",
+      "data": "/widget-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/favicon.png",
+          "sizes": "512x512",
+          "label": "Widget de Bienestar Suelta"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

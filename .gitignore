@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+.DS_Store
+repo
+repo/
+OneDrive - PETPLUS
+OneDrive - PETPLUS/
+ios/App/Pods/
+corrupt_*

@@ -1,0 +1,101 @@
+flowchart TD
+    Start([Usuario abre la app]) --> Idioma[Selección de Idioma]
+    Idioma --> Registro["Suelta y Sana - Registro<br/>Nombre · Edad · Sexo · Email · Celular"]
+    Registro --> Home["Inicio<br/>Suelta y Sana (ES) / Health Motion (EN)"]
+
+    Home --> Progreso{"¿Tiene progreso<br/>guardado?"}
+    Progreso -->|Sí| Retomar["Retomar donde quedó"]
+    Progreso -->|No| Opciones
+    Retomar --> Opciones
+
+    Opciones{"¿Qué quiere compartir el usuario?<br/>(una, varias o las tres — combinables)"}
+
+    Opciones -->|Cuéntame tu historia| Historia[Escribir Mi Historia]
+    Opciones -->|Qué afectación física tienes| TipoIngreso{"¿Cómo indica el dolor?"}
+    TipoIngreso -->|Por texto| TextoDolor[Describe el síntoma por escrito]
+    TipoIngreso -->|De forma visual| Holograma["Escáner Holográfico Corporal"]
+    Opciones -->|Qué emoción tienes| Emocion[Selección / descripción de la emoción]
+
+    Historia -.->|Autoguardado| Guardado[(Progreso guardado)]
+    TextoDolor -.->|Autoguardado| Guardado
+    Holograma -.->|Autoguardado| Guardado
+    Emocion -.->|Autoguardado| Guardado
+
+    Historia --> Confirmar
+    TextoDolor --> Confirmar
+    Holograma --> Confirmar
+    Emocion --> Confirmar
+
+    Confirmar["Revisar y confirmar información<br/>El usuario puede editar antes de continuar"]
+    Confirmar -->|Editar| Opciones
+    Confirmar -->|Confirmar| Motor
+
+    Motor{{"Motor de Análisis<br/>Cruza los datos confirmados"}}
+    Motor --> BancoLocal[("Banco Local<br/>Diccionario 843 entradas<br/>+ NMG (Hamer) + Epigenética")]
+    BancoLocal -.->|Info insuficiente| Web[Búsqueda Web Complementaria]
+    Web -.->|Sin conexión, usa lo local| BancoLocal
+    Web --> Diagnostico
+    BancoLocal --> Diagnostico
+
+    subgraph GRATIS["🟢 PLAN GRATUITO"]
+        direction TB
+        Diagnostico["Diagnóstico<br/>Señales de la dolencia + posibles<br/>causas emocionales asociadas"]
+    end
+
+    Diagnostico --> Paywall{{"💳 Paywall Premium — 10 USD<br/>Desbloquea Reto 21 Días + Hub de Perspectivas"}}
+    Paywall -->|No paga| FinGratis(["Fin del recorrido gratuito<br/>puede volver al Inicio"])
+    FinGratis -.-> Home
+
+    Paywall -->|Paga Premium| DatosNacimiento["Captura datos de nacimiento<br/>Fecha y hora exacta<br/>(necesarios para las cartas)"]
+
+    subgraph PREMIUM["🟣 PLAN PREMIUM — 10 USD"]
+        direction TB
+        DatosNacimiento --> Proceso[Qué proceso seguir para sanar]
+        Proceso --> ExplicaReto["Explicación del Reto 21 Días"]
+        ExplicaReto --> PreguntaReto{"¿Acepta el<br/>Reto 21 Días?"}
+
+        PreguntaReto -->|Sí| RetoActivo{"¿Ya tiene otro<br/>reto activo?"}
+        RetoActivo -->|No| Calendario["Calendario 21 Días<br/>Ritual diario de Soltar y Sanar"]
+        RetoActivo -->|Sí| Decidir{"¿Terminar el actual<br/>o reemplazarlo?"}
+        Decidir -->|Terminar el actual primero| Diario
+        Decidir -->|Reemplazar por este nuevo| Calendario
+
+        Calendario --> Notif["Notificaciones diarias<br/>personalizadas"]
+        Notif -.->|Autoguardado diario| Guardado
+        Notif --> Diario[Diario de Bienestar]
+        PreguntaReto -->|Todavía no| Hub
+
+        Hub[["Hub de Perspectivas<br/>el usuario elige qué explorar"]]
+        Hub --> Constelacion[Constelación Familiar]
+        Hub --> ArbolGen[Árbol Genealógico]
+        Hub --> CartaNatal[Carta Natal]
+        Hub --> CartaAzteca[Carta Azteca]
+        Hub --> CartaAstral[Carta Astral]
+        Hub --> Holistico[Modos de Saneamiento Holístico]
+    end
+
+    ExplicaReto -.->|También puede explorar| Hub
+    Constelacion -.-> Diario
+    ArbolGen -.-> Diario
+    CartaNatal -.-> Diario
+    CartaAzteca -.-> Diario
+    CartaAstral -.-> Diario
+    Holistico -.-> Diario
+
+    Diario -.->|Vía BottomNavBar| Home
+
+    classDef entrada fill:#7fb6a4,stroke:#5c9382,color:#0b1f1a,font-weight:bold
+    classDef decision fill:#f6faff,stroke:#7fb6a4,stroke-width:2px,color:#1a2e28
+    classDef gratis fill:#e8f4f0,stroke:#4f8a76,color:#0b1f1a
+    classDef premium fill:#f2e6f7,stroke:#8a4bbf,color:#0b1f1a
+    classDef data fill:#d6ece4,stroke:#4f8a76,color:#0b1f1a,font-style:italic
+    classDef motor fill:#7fb6a4,stroke:#5c9382,color:#0b1f1a,font-weight:bold
+    classDef pago fill:#fde8d8,stroke:#c98a4b,color:#0b1f1a,stroke-width:2px
+
+    class Start,Home entrada
+    class Opciones,TipoIngreso,PreguntaReto,Progreso,RetoActivo,Decidir decision
+    class Registro,Historia,TextoDolor,Holograma,Emocion,Diagnostico,Confirmar gratis
+    class Proceso,Calendario,Notif,Diario,Hub,Constelacion,ArbolGen,CartaNatal,CartaAzteca,CartaAstral,Holistico,DatosNacimiento,ExplicaReto premium
+    class BancoLocal,Web,Guardado data
+    class Motor motor
+    class Idioma,Retomar,Paywall,FinGratis pago

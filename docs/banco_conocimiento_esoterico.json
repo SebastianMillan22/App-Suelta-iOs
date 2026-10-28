@@ -1,0 +1,387 @@
+{
+  "meta": {
+    "titulo": "Banco de conocimiento — Suelta y Sana",
+    "nota_importante": "Este contenido es interpretativo y espiritual, no científico ni clínico. Para la carta natal occidental, faltan ascendente y casas (requieren hora y lugar exactos + efemérides astronómicas, ej. Swiss Ephemeris). Para el Tonalpohualli, existen varias correlaciones académicas distintas (Alfonso Caso, León-Portilla, GMT); esta app usa Alfonso Caso por ser la más aceptada en México. Para constelaciones familiares, el motor solo puede leer lo que el usuario reporta sobre su propia familia — no sustituye una sesión con un facilitador certificado.",
+    "uso_recomendado": "Servir como capa base local (gratis, sin llamadas externas). Cuando se integre la API de Gemini, estos textos se usan como contexto/grounding del prompt, para que el modelo redacte la narrativa personalizada citando esta base en vez de inventar datos."
+  },
+  "carta_natal_occidental": {
+    "fuente": "Tradición de astrología tropical occidental (convención estándar de la disciplina, sin un único autor atribuible por tratarse de un sistema de siglos de desarrollo). Referencia general recomendada: Greene, L. (1976). Relating: An Astrological Guide to Living With Others. Londres: Coventure. Estructura de la carta (big three, cuatro ángulos, doce casas) verificada contra es.wikipedia.org/wiki/Carta_astral y es.wikipedia.org/wiki/Casa_(astrología), consultadas el 5 de julio de 2026.",
+    "big_three": {
+      "descripcion": "Los tres pilares de una carta natal en la astrología moderna.",
+      "sol": "Esencia, voluntad, vitalidad, personalidad consciente. Se calcula solo con la fecha.",
+      "luna": "Mundo emocional, instintos, lo que da seguridad. Requiere hora de nacimiento.",
+      "ascendente": "Cómo la persona se presenta al mundo y cómo la perciben los demás. Cambia ~cada 2 horas, por lo que requiere hora y lugar exactos."
+    },
+    "cuatro_angulos": {
+      "descripcion": "La cruz cardinal que estructura la carta. Requieren hora y lugar exactos.",
+      "ascendente_AC": "Cúspide de la casa 1. Cómo te muestras, el 'quién soy'.",
+      "descendente_DC": "Cúspide de la casa 7. Cómo te vinculas con los demás.",
+      "medio_cielo_MC": "Cúspide de la casa 10 (Medium Coeli). Vocación, lo que ofreces al mundo.",
+      "fondo_cielo_IC": "Cúspide de la casa 4 (Immum Coeli). Raíces, hogar, mundo interior."
+    },
+    "limitacion": "Solo calcula el Sol (signo solar) a partir de la fecha. Ascendente, Luna, los cuatro ángulos y las doce casas requieren hora y lugar exactos + una librería de efemérides (Swiss Ephemeris, o una API como AstrologyAPI / Astro-Seek).",
+    "signos": [
+      {
+        "signo": "Aries",
+        "fechas": "21 mar – 19 abr",
+        "elemento": "Fuego",
+        "modalidad": "Cardinal",
+        "regente": "Marte",
+        "palabra_clave": "Impulso",
+        "luz": "Iniciativa, coraje, capacidad de empezar de cero",
+        "sombra": "Impulsividad, impaciencia, dificultad para sostener lo que empieza"
+      },
+      {
+        "signo": "Tauro",
+        "fechas": "20 abr – 20 may",
+        "elemento": "Tierra",
+        "modalidad": "Fijo",
+        "regente": "Venus",
+        "palabra_clave": "Estabilidad",
+        "luz": "Constancia, disfrute sensorial, capacidad de construir con paciencia",
+        "sombra": "Apego excesivo, resistencia al cambio, terquedad"
+      },
+      {
+        "signo": "Géminis",
+        "fechas": "21 may – 20 jun",
+        "elemento": "Aire",
+        "modalidad": "Mutable",
+        "regente": "Mercurio",
+        "palabra_clave": "Curiosidad",
+        "luz": "Comunicación, adaptabilidad, mente ágil",
+        "sombra": "Dispersión, superficialidad, inconsistencia"
+      },
+      {
+        "signo": "Cáncer",
+        "fechas": "21 jun – 22 jul",
+        "elemento": "Agua",
+        "modalidad": "Cardinal",
+        "regente": "Luna",
+        "palabra_clave": "Protección",
+        "luz": "Sensibilidad, cuidado, memoria emocional",
+        "sombra": "Hermetismo, apego al pasado, sobreprotección"
+      },
+      {
+        "signo": "Leo",
+        "fechas": "23 jul – 22 ago",
+        "elemento": "Fuego",
+        "modalidad": "Fijo",
+        "regente": "Sol",
+        "palabra_clave": "Expresión",
+        "luz": "Generosidad, creatividad, liderazgo cálido",
+        "sombra": "Necesidad de validación, orgullo, dificultad para ceder protagonismo"
+      },
+      {
+        "signo": "Virgo",
+        "fechas": "23 ago – 22 sep",
+        "elemento": "Tierra",
+        "modalidad": "Mutable",
+        "regente": "Mercurio",
+        "palabra_clave": "Servicio",
+        "luz": "Análisis, cuidado del detalle, deseo de mejorar las cosas",
+        "sombra": "Autocrítica excesiva, perfeccionismo, ansiedad por control"
+      },
+      {
+        "signo": "Libra",
+        "fechas": "23 sep – 22 oct",
+        "elemento": "Aire",
+        "modalidad": "Cardinal",
+        "regente": "Venus",
+        "palabra_clave": "Equilibrio",
+        "luz": "Diplomacia, sentido estético, búsqueda de justicia",
+        "sombra": "Indecisión, dependencia del otro para sentirse completo"
+      },
+      {
+        "signo": "Escorpio",
+        "fechas": "23 oct – 21 nov",
+        "elemento": "Agua",
+        "modalidad": "Fijo",
+        "regente": "Marte / Plutón",
+        "palabra_clave": "Transformación",
+        "luz": "Profundidad emocional, intensidad, capacidad de regenerarse",
+        "sombra": "Desconfianza, control, dificultad para soltar"
+      },
+      {
+        "signo": "Sagitario",
+        "fechas": "22 nov – 21 dic",
+        "elemento": "Fuego",
+        "modalidad": "Mutable",
+        "regente": "Júpiter",
+        "palabra_clave": "Expansión",
+        "luz": "Optimismo, búsqueda de sentido, libertad",
+        "sombra": "Exceso, promesas que no se cumplen, evasión del compromiso"
+      },
+      {
+        "signo": "Capricornio",
+        "fechas": "22 dic – 19 ene",
+        "elemento": "Tierra",
+        "modalidad": "Cardinal",
+        "regente": "Saturno",
+        "palabra_clave": "Estructura",
+        "luz": "Disciplina, responsabilidad, visión a largo plazo",
+        "sombra": "Rigidez, autoexigencia, dificultad para pedir ayuda"
+      },
+      {
+        "signo": "Acuario",
+        "fechas": "20 ene – 18 feb",
+        "elemento": "Aire",
+        "modalidad": "Fijo",
+        "regente": "Saturno / Urano",
+        "palabra_clave": "Innovación",
+        "luz": "Originalidad, conciencia colectiva, independencia",
+        "sombra": "Desapego emocional, rebeldía sin causa, sentirse incomprendido"
+      },
+      {
+        "signo": "Piscis",
+        "fechas": "19 feb – 20 mar",
+        "elemento": "Agua",
+        "modalidad": "Mutable",
+        "regente": "Júpiter / Neptuno",
+        "palabra_clave": "Compasión",
+        "luz": "Empatía, intuición, sensibilidad artística",
+        "sombra": "Evasión de la realidad, victimismo, límites difusos"
+      }
+    ]
+  },
+  "tonalpohualli_azteca": {
+    "fuente_calculo": "Caso, A. (1967). Los calendarios prehispánicos. México: UNAM, Instituto de Investigaciones Históricas (Serie de Cultura Náhuatl, Monografías, 6). La correlación usada (13 de agosto de 1521 juliano = día 1-Cóatl) es la más aceptada académicamente en México; ver también es.wikipedia.org/wiki/Calendario_mexica.",
+    "fuente_signos": "Nombres y orden de los 20 signos según los códices Borgia, Florentino y Borbónico; ver arqueologiamexicana.mx y es.wikipedia.org/wiki/Calendario_mexica. Las cuatro series de dioses regentes (20 signos, 20 trecenas, 9 Señores de la Noche, 13 Señores del Día) fueron identificadas por Eduard Seler (1900-1903) y sistematizadas por Alfonso Caso (1967); ver books.openedition.org/cemca/9360 (Centro de Estudios Mexicanos y Centroamericanos), consultado el 5 de julio de 2026.",
+    "cuatro_series_de_regentes": {
+      "descripcion": "Cada día del tonalpohualli recibía varias influencias divinas simultáneas, no una sola.",
+      "regentes_de_los_20_signos": "Un dios patrono por cada signo del día (ej. Quetzalcóatl rige Ehécatl/Viento).",
+      "regentes_de_las_20_trecenas": "Un dios que rige los 13 días completos de cada trecena (ej. Tonacatecuhtli y Tonacacíhuatl rigen la primera trecena, 1-Cipactli).",
+      "señores_del_dia": "13 divinidades, una por cada número del 1 al 13. Todos los días con número 1 tienen por regente a Xiuhtecuhtli; los 2, a Tlaltecuhtli; los 3, a Chalchiuhtlicue; los 4, a Tonatiuh; etc. Aparecen en el Códice Borbónico y el Tonalámatl Aubin.",
+      "señores_de_la_noche": "9 divinidades que se alternan cíclicamente; frecuentes en los almanaques del Grupo Borgia."
+    },
+    "nota_numeros": "El significado energético de cada uno de los 13 números no tiene una fuente académica única y estandarizada; aquí se usa una lectura numerológica simplificada y comúnmente usada en divulgación contemporánea del Tonalpohualli, presentada como capa interpretativa, no como hecho histórico verificado.",
+    "veinte_signos": [
+      {
+        "orden": 1,
+        "nombre": "Cipactli",
+        "es": "Caimán / Cocodrilo",
+        "deidad_patrona": "Tonacatecuhtli",
+        "energia": "Origen, inicio, fuerza primordial de la creación"
+      },
+      {
+        "orden": 2,
+        "nombre": "Ehécatl",
+        "es": "Viento",
+        "deidad_patrona": "Quetzalcóatl",
+        "energia": "Comunicación, movimiento, cambio de dirección"
+      },
+      {
+        "orden": 3,
+        "nombre": "Calli",
+        "es": "Casa",
+        "deidad_patrona": "Tepeyollotl",
+        "energia": "Hogar, interioridad, protección del espacio propio"
+      },
+      {
+        "orden": 4,
+        "nombre": "Cuetzpalin",
+        "es": "Lagartija",
+        "deidad_patrona": "Huehuecóyotl",
+        "energia": "Fertilidad, agilidad, capacidad de regenerarse"
+      },
+      {
+        "orden": 5,
+        "nombre": "Cóatl",
+        "es": "Serpiente",
+        "deidad_patrona": "Chalchiuhtlicue",
+        "energia": "Transformación, sabiduría instintiva, renovación"
+      },
+      {
+        "orden": 6,
+        "nombre": "Miquiztli",
+        "es": "Muerte",
+        "deidad_patrona": "Tecciztécatl",
+        "energia": "Cierre de ciclos, desapego, renacimiento"
+      },
+      {
+        "orden": 7,
+        "nombre": "Mázatl",
+        "es": "Venado",
+        "deidad_patrona": "Tláloc",
+        "energia": "Sensibilidad, intuición, cuidado del entorno"
+      },
+      {
+        "orden": 8,
+        "nombre": "Tochtli",
+        "es": "Conejo",
+        "deidad_patrona": "Mayahuel",
+        "energia": "Abundancia, fertilidad, celebración de la vida"
+      },
+      {
+        "orden": 9,
+        "nombre": "Atl",
+        "es": "Agua",
+        "deidad_patrona": "Xiuhtecuhtli",
+        "energia": "Emoción, purificación, flujo constante"
+      },
+      {
+        "orden": 10,
+        "nombre": "Itzcuintli",
+        "es": "Perro",
+        "deidad_patrona": "Mictlantecuhtli",
+        "energia": "Lealtad, guía en la oscuridad, compañía fiel"
+      },
+      {
+        "orden": 11,
+        "nombre": "Ozomahtli",
+        "es": "Mono",
+        "deidad_patrona": "Xochipilli",
+        "energia": "Creatividad, juego, ingenio"
+      },
+      {
+        "orden": 12,
+        "nombre": "Malinalli",
+        "es": "Hierba",
+        "deidad_patrona": "Patécatl",
+        "energia": "Resiliencia, adaptación, tenacidad silenciosa"
+      },
+      {
+        "orden": 13,
+        "nombre": "Ácatl",
+        "es": "Carrizo",
+        "deidad_patrona": "Tezcatlipoca",
+        "energia": "Rectitud, liderazgo, dirección clara"
+      },
+      {
+        "orden": 14,
+        "nombre": "Océlotl",
+        "es": "Jaguar",
+        "deidad_patrona": "Tlazoltéotl",
+        "energia": "Poder, misterio, fuerza interior"
+      },
+      {
+        "orden": 15,
+        "nombre": "Cuāuhtli",
+        "es": "Águila",
+        "deidad_patrona": "Xipe Tótec",
+        "energia": "Visión amplia, libertad, ambición elevada"
+      },
+      {
+        "orden": 16,
+        "nombre": "Cozcacuāuhtli",
+        "es": "Zopilote",
+        "deidad_patrona": "Itzpapálotl",
+        "energia": "Longevidad, sabiduría, limpieza de lo que ya no sirve"
+      },
+      {
+        "orden": 17,
+        "nombre": "Ollin",
+        "es": "Movimiento",
+        "deidad_patrona": "Xólotl",
+        "energia": "Transformación constante, dinamismo, cambio de rumbo"
+      },
+      {
+        "orden": 18,
+        "nombre": "Técpatl",
+        "es": "Pedernal",
+        "deidad_patrona": "Chalchiuhtotolin",
+        "energia": "Claridad, decisión, corte preciso con lo que estorba"
+      },
+      {
+        "orden": 19,
+        "nombre": "Quiáhuitl",
+        "es": "Lluvia",
+        "deidad_patrona": "Tonatiuh",
+        "energia": "Renovación, generosidad, lo que cae del cielo para nutrir"
+      },
+      {
+        "orden": 20,
+        "nombre": "Xóchitl",
+        "es": "Flor",
+        "deidad_patrona": "Xochiquétzal",
+        "energia": "Belleza, arte, plenitud del ciclo"
+      }
+    ],
+    "trece_numeros": [
+      {
+        "numero": 1,
+        "energia": "Inicio, semilla, potencial puro"
+      },
+      {
+        "numero": 2,
+        "energia": "Polaridad, elección, primer contraste"
+      },
+      {
+        "numero": 3,
+        "energia": "Acción, movimiento hacia adelante"
+      },
+      {
+        "numero": 4,
+        "energia": "Estructura, base, orden"
+      },
+      {
+        "numero": 5,
+        "energia": "Centro, poder de decisión"
+      },
+      {
+        "numero": 6,
+        "energia": "Flujo, organización del entorno"
+      },
+      {
+        "numero": 7,
+        "energia": "Reflexión, sintonía interior"
+      },
+      {
+        "numero": 8,
+        "energia": "Justicia, equilibrio de fuerzas"
+      },
+      {
+        "numero": 9,
+        "energia": "Paciencia, proceso que aún no termina"
+      },
+      {
+        "numero": 10,
+        "energia": "Manifestación, resultado visible"
+      },
+      {
+        "numero": 11,
+        "energia": "Fuerza para sostener lo logrado"
+      },
+      {
+        "numero": 12,
+        "energia": "Comprensión, entendimiento más amplio"
+      },
+      {
+        "numero": 13,
+        "energia": "Trascendencia, cierre y salto a un nuevo ciclo"
+      }
+    ]
+  },
+  "constelaciones_familiares": {
+    "fuente": "Hellinger, B. (2001). Órdenes del amor: cursos seleccionados (trad. S. Kabelka). Barcelona: Herder. Título original: Ordnungen der Liebe. Ein Kurs-Buch (2000).",
+    "nota": "Bert Hellinger (1925–2019) desarrolló las Constelaciones Familiares como método de terapia sistémica. Sus 'órdenes del amor' son observaciones clínicas, no leyes científicas comprobadas; se presentan aquí como marco interpretativo, tal como se usan en el campo de la terapia sistémica.",
+    "conceptos_clave": {
+      "conciencia_colectiva": "Según Hellinger, toda familia se comporta como si tuviera una conciencia común que no se siente conscientemente, pero que busca mantener el orden del sistema (pertenencia, jerarquía, equilibrio). Fuente: constelacionesathy.com.ar (recopilación de textos de Hellinger), consultado el 5 de julio de 2026.",
+      "amor_ciego": "El amor que, por lealtad inconsciente al sistema, lleva a un descendiente a repetir el destino o el sentir de un miembro excluido, en lugar de liberarse. Hellinger lo contrapone al 'amor adulto' o consciente, que reconoce y ordena en vez de repetir.",
+      "movimiento_del_alma": "La tendencia del sistema a 'reunir lo que ha sido separado' y devolver su lugar al excluido, hasta que la familia vuelve a estar completa y es mirada con amor."
+    },
+    "tres_ordenes": [
+      {
+        "orden": "Pertenencia",
+        "descripcion": "Todo miembro que alguna vez formó parte del sistema familiar tiene derecho a un lugar en él, vivo o fallecido, querido o no. Excluir a alguien (por un secreto, una muerte temprana, un aborto, una ruptura) no lo elimina del sistema: el sistema tiende a 'recordarlo' a través de un miembro posterior, que sin saberlo repite algo de su destino.",
+        "senal_en_el_arbol": "Miembros marcados como excluidos, secretos familiares, personas de las que 'no se habla'."
+      },
+      {
+        "orden": "Jerarquía / orden de llegada",
+        "descripcion": "Quien llegó antes al sistema tiene precedencia sobre quien llegó después (los padres antes que los hijos, la primera pareja antes que la segunda). Cuando alguien más joven intenta ocupar el lugar de alguien mayor —por ejemplo, un hijo que 'cuida' emocionalmente a un padre— el sistema se desordena.",
+        "senal_en_el_arbol": "Un hijo en rol de cuidador de sus padres, jerarquías invertidas, un hermano menor 'liderando' la dinámica familiar."
+      },
+      {
+        "orden": "Equilibrio entre dar y recibir",
+        "descripcion": "En relaciones entre iguales (pareja, amistades), el vínculo se sostiene cuando hay un intercambio relativamente equilibrado. En relaciones entre generaciones (padres e hijos), el equilibrio no es simétrico: los padres dan y los hijos reciben; los hijos devuelven ese cuidado a la siguiente generación, no hacia atrás.",
+        "senal_en_el_arbol": "Vínculos donde una persona da mucho y no recibe nunca (o al revés), relaciones de pareja con desequilibrio marcado."
+      }
+    ]
+  },
+  "tarot": {
+    "fuente": "Tirada clásica de tres cartas (pasado–presente–futuro) con los 22 arcanos mayores. Estructura y significados según la tradición Rider-Waite-Smith (imaginería de Arthur Edward Waite y Pamela Colman Smith, 1909), el sistema de tarot más usado en el mundo. Verificado contra es.wikipedia.org/wiki/Arcanos_mayores y darkforesttarotcards.com, consultados el 6 de julio de 2026.",
+    "viaje_del_loco": "Los 22 arcanos mayores trazan un recorrido simbólico llamado 'el Viaje del Loco': desde El Loco (0), el potencial puro y el primer paso con fe, hasta El Mundo (XXI), la plenitud e integración. Cada carta es un arquetipo universal que representa una etapa de la vida.",
+    "estructura_carta": "Cada arcano incluye: número (0-21), nombre, significado al derecho, significado invertido, tres palabras clave, elemento/símbolo astrológico asociado y un consejo reflexivo para el usuario.",
+    "correspondencias_elementales": "Las correspondencias astrológicas de los arcanos mayores (ej. La Fuerza-Leo, La Muerte-Escorpio, El Sol-Sol) provienen de la tradición hermética de la Golden Dawn, ampliamente adoptada en el tarot moderno.",
+    "encuadre_etico": "El tarot se presenta explícitamente como herramienta de reflexión, no de predicción. La app declara en pantalla: 'el tarot no predice: refleja' y 'la última palabra siempre es tuya'. Coherente con el resto de Suelta y Sana."
+  }
+}

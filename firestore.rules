@@ -1,0 +1,168 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "sebastianmillan2002@gmail.com" ||
+        (request.auth.token.email_verified == true && request.auth.token.email == "sebastianmillan2002@gmail.com")
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.\\@]+$');
+    }
+
+    function isValidSpecialist(data) {
+      return data.keys().hasAll(['id', 'nombre', 'especialidad', 'descripcion', 'email', 'celular'])
+        && data.id is string && data.id.size() <= 128
+        && data.nombre is string && data.nombre.size() <= 256
+        && data.especialidad is string && data.especialidad.size() <= 256
+        && data.descripcion is string && data.descripcion.size() <= 10000
+        && data.email is string && data.email.size() <= 256
+        && data.celular is string && data.celular.size() <= 50
+        && (data.keys().hasAny(['imagenUrl']) ? (data.imagenUrl is string && data.imagenUrl.size() <= 1000) : true);
+    }
+
+    function isValidUser(data) {
+      return (data.keys().hasAny(['email']) ? (data.email is string && data.email.size() <= 256) : true)
+        && (data.keys().hasAny(['nombre']) ? (data.nombre is string && data.nombre.size() <= 256) : true)
+        && (data.keys().hasAny(['apodo']) ? (data.apodo is string && data.apodo.size() <= 256) : true)
+        && (data.keys().hasAny(['edad']) ? (data.edad is string && data.edad.size() <= 20) : true)
+        && (data.keys().hasAny(['sexo']) ? (data.sexo is string && data.sexo.size() <= 20) : true)
+        && (data.keys().hasAny(['celular']) ? (data.celular is string && data.celular.size() <= 50) : true)
+        && (data.keys().hasAny(['fechaRegistro']) ? (data.fechaRegistro is number) : true)
+        && (data.keys().hasAny(['esVip']) ? (data.esVip is bool) : true)
+        && (data.keys().hasAny(['esPremium']) ? (data.esPremium is bool) : true)
+        && (data.keys().hasAny(['accesoTotal']) ? (data.accesoTotal is bool) : true)
+        && (data.keys().hasAny(['subscription']) ? (data.subscription is map) : true)
+        && (data.keys().hasAny(['planPago']) ? (data.planPago is string) : true)
+        && (data.keys().hasAny(['datosPagoBasico']) ? (data.datosPagoBasico is map) : true)
+        && (data.keys().hasAny(['rol']) ? (data.rol is string) : true)
+        && (data.keys().hasAny(['fotoPerfil']) ? (data.fotoPerfil is string) : true)
+        && (data.keys().hasAny(['appState']) ? (data.appState is map) : true);
+    }
+
+    function isValidDiarioEntry(data) {
+      return data.keys().hasAll(['id', 'titulo', 'fecha'])
+        && data.id is string && data.id.size() <= 128
+        && data.titulo is string && data.titulo.size() <= 200
+        && data.fecha is string && data.fecha.size() <= 100
+        && (data.keys().hasAny(['texto']) ? (data.texto == null || (data.texto is string && data.texto.size() <= 10000)) : true)
+        && (data.keys().hasAny(['animo']) ? (data.animo == null || (data.animo is string && data.animo.size() <= 50)) : true)
+        && (data.keys().hasAny(['horasSueno']) ? (data.horasSueno == null || data.horasSueno is number) : true)
+        && (data.keys().hasAny(['nivelEnergia']) ? (data.nivelEnergia == null || data.nivelEnergia is number) : true)
+        && (data.keys().hasAny(['bullets']) ? (data.bullets == null || data.bullets is list) : true);
+    }
+
+    function isValidRetoEntry(data) {
+      return data.keys().hasAll(['dia', 'fechaCompletado'])
+        && data.dia is number
+        && data.fechaCompletado is number
+        && (data.keys().hasAny(['reflexion']) ? (data.reflexion == null || (data.reflexion is string && data.reflexion.size() <= 10000)) : true);
+    }
+
+    function isValidEmocionEntry(data) {
+      return data.keys().hasAll(['id', 'fecha'])
+        && data.id is string && data.id.size() <= 128
+        && data.fecha is number
+        && (data.keys().hasAny(['historia']) ? (data.historia == null || (data.historia is string && data.historia.size() <= 10000)) : true)
+        && (data.keys().hasAny(['fisica']) ? (data.fisica == null || (data.fisica is string && data.fisica.size() <= 10000)) : true)
+        && (data.keys().hasAny(['emocion']) ? (data.emocion == null || data.emocion is list) : true);
+    }
+
+    function isValidProgresoEntry(data) {
+      return data.keys().hasAll(['id', 'fecha', 'tipoPractica'])
+        && data.id is string && data.id.size() <= 128
+        && data.fecha is number
+        && data.tipoPractica is string && data.tipoPractica.size() <= 100
+        && (data.keys().hasAny(['descripcion']) ? (data.descripcion == null || (data.descripcion is string && data.descripcion.size() <= 1000)) : true);
+    }
+
+    function isValidAnalisis21DiasEntry(data) {
+      return data.keys().hasAll(['id', 'fecha', 'diasCompletados', 'patronEscritura', 'emocionDominante'])
+        && data.id is string && data.id.size() <= 128
+        && data.fecha is number
+        && data.diasCompletados is number
+        && data.patronEscritura is string
+        && data.emocionDominante is string
+        && (data.keys().hasAny(['analisisPalabras']) ? (data.analisisPalabras == null || data.analisisPalabras is map) : true)
+        && (data.keys().hasAny(['recomendacionesExpresion']) ? (data.recomendacionesExpresion == null || data.recomendacionesExpresion is list) : true)
+        && (data.keys().hasAny(['recomendacionesEntorno']) ? (data.recomendacionesEntorno == null || data.recomendacionesEntorno is list) : true);
+    }
+
+    function isValidConstelacion(data) {
+      return data.keys().hasAll(['familia', 'fechaActualizacion'])
+        && data.familia is list
+        && data.fechaActualizacion is number;
+    }
+
+    function isValidCNVExercise(data) {
+      return data.keys().hasAll(['id', 'tipo', 'fecha', 'entradasUsuario', 'resultadoAnalisis'])
+        && data.id is string && data.id.size() <= 128
+        && data.tipo is string && (data.tipo == "deconstruccion" || data.tipo == "empatia_profunda")
+        && data.fecha is number
+        && data.entradasUsuario is map
+        && data.resultadoAnalisis is map;
+    }
+
+    match /specialists/{specialistId} {
+      allow read: if true;
+      allow delete: if isAdmin();
+      allow create, update: if isAdmin() && isValidId(specialistId) && isValidSpecialist(request.resource.data);
+    }
+
+    match /vip_emails/{emailDoc} {
+      allow read, write: if true;
+    }
+
+    match /users/{userId} {
+      allow read, write: if true;
+
+      match /diario/{entradaId} {
+        allow read, write: if true;
+      }
+
+      match /reto/{diaId} {
+        allow read, write: if true;
+      }
+
+      match /emociones/{emocionId} {
+        allow read, write: if true;
+      }
+
+      match /progreso/{progresoId} {
+        allow read, write: if true;
+      }
+
+      match /analisis21Dias/{analisisId} {
+        allow read, write: if true;
+      }
+
+      match /constelaciones/{constelacionId} {
+        allow read, write: if true;
+      }
+
+      match /comunicacion_no_violenta/{cnvId} {
+        allow read, write: if true;
+      }
+
+      match /purchases/{purchaseId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "appId": "com.suelta.app",
+  "appName": "Suelta",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "*.firebaseapp.com",
+      "*.googleapis.com",
+      "accounts.google.com",
+      "*.google.com"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true
+  },
+  "plugins": {
+    "GoogleAuth": {
+      "providers": ["google"],
+      "serverClientId": "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com",
+      "scopes": ["profile", "email"],
+      "forceCodeForRefreshToken": false
+    }
+  }
+}

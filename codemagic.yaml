@@ -1,0 +1,70 @@
+workflows:
+  ios-release:
+    name: iOS App Store & TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - apple_credentials # Opcional: Si usas variables de grupo en Codemagic
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.suelta.app
+      vars:
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+      node: 20
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - tag
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    scripts:
+      - name: Instalar dependencias Node
+        script: |
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+
+      - name: Compilar frontend (Vite)
+        script: |
+          npm run build
+
+      - name: Sincronizar Capacitor con iOS
+        script: |
+          npx cap sync ios
+
+      - name: Instalar pods de CocoaPods
+        script: |
+          cd ios/App && pod install
+
+      - name: Configurar firma de código (Code Signing)
+        script: |
+          xcode-project use-profiles
+
+      - name: Incrementar número de compilación (Build Number)
+        script: |
+          cd ios/App
+          # Asigna el número de build secuencial de Codemagic
+          BUILD_NUMBER=${BUILD_NUMBER:-$CODEMAGIC_BUILD_NUMBER}
+          agvtool new-version -all $BUILD_NUMBER
+
+      - name: Compilar paquete IPA de iOS
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - "*.dSYM.zip"
+
+    publishing:
+      # Sube automáticamente el .ipa a TestFlight en App Store Connect
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false

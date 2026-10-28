@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Suelta</string>
+    <string name="title_activity_main">Suelta</string>
+    <string name="package_name">suelta_app.com</string>
+    <string name="custom_url_scheme">suelta_app.com</string>
+    <string name="widget_name">¡Suelta! — Consciencia y Reflexión</string>
+    <string name="widget_description">Recordatorio diario de bienestar, consciencia y reflexión emocional en tu pantalla de inicio.</string>
+    <string name="widget_title">¡Suelta!</string>
+    <string name="widget_category">HÁBITO DE CONSCIENCIA</string>
+    <string name="widget_default_quote">¿Qué emoción o tensión pide hoy tu permiso para ser liberada?</string>
+    <string name="widget_default_sub">Toca para abrir tu práctica diaria o reto de 21 días</string>
+    <string name="widget_action_btn">Soltar hoy</string>
+    <string name="widget_leaf_emoji">🌱</string>
+    <string name="server_client_id">706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com</string>
+</resources>

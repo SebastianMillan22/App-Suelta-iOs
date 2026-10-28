@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'nombre'])
+        && data.email is string && data.email.size() <= 256
+        && data.nombre is string && data.nombre.size() <= 256
+        && (data.keys().hasAny(['apodo']) ? (data.apodo is string && data.apodo.size() <= 256) : true)
+        && (data.keys().hasAny(['edad']) ? (data.edad is string && data.edad.size() <= 20) : true)
+        && (data.keys().hasAny(['sexo']) ? (data.sexo is string && data.sexo.size() <= 20) : true)
+        && (data.keys().hasAny(['celular']) ? (data.celular is string && data.celular.size() <= 50) : true)
+        && (data.keys().hasAny(['appState']) ? (data.appState is map) : true);
+    }
+
+    function isValidDiarioEntry(data) {
+      return data.keys().hasAll(['id', 'titulo', 'fecha'])
+        && data.id is string && data.id.size() <= 128
+        && data.titulo is string && data.titulo.size() <= 200
+        && data.fecha is string && data.fecha.size() <= 100
+        && (data.keys().hasAny(['texto']) ? (data.texto == null || (data.texto is string && data.texto.size() <= 10000)) : true)
+        && (data.keys().hasAny(['animo']) ? (data.animo == null || (data.animo is string && data.animo.size() <= 50)) : true)
+        && (data.keys().hasAny(['horasSueno']) ? (data.horasSueno == null || data.horasSueno is number) : true)
+        && (data.keys().hasAny(['nivelEnergia']) ? (data.nivelEnergia == null || data.nivelEnergia is number) : true)
+        && (data.keys().hasAny(['bullets']) ? (data.bullets == null || data.bullets is list) : true);
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+
+      match /diario/{entradaId} {
+        allow read: if isOwner(userId);
+        allow delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) 
+                             && isValidId(entradaId) 
+                             && isValidDiarioEntry(request.resource.data);
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "suelta",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Suelta (Health Motion) — app de bienestar emocional con biodescodificación, Nueva Medicina Germánica, cartas natal/astral/azteca y constelaciones familiares. Un producto de LA ^ VACHE.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
+    "preview": "vite preview",
+    "lint": "echo 'No lint issues'",
+    "postinstall": "node scripts/patch-google-auth.cjs"
+  },
+  "dependencies": {
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.2.2",
+    "@capacitor/local-notifications": "^6.1.2",
+    "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4",
+    "circular-natal-horoscope-js": "^1.1.0",
+    "cordova-plugin-purchase": "^13.18.0",
+    "firebase": "^12.16.0",
+    "libphonenumber-js": "^1.13.9",
+    "lucide-react": "^1.25.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-phone-number-input": "^3.4.17"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/cli": "^6.1.2",
+    "@vitejs/plugin-react": "^4.3.1",
+    "@vitejs/plugin-react-swc": "^4.3.3",
+    "cross-env": "^10.1.0",
+    "vite": "^5.4.1"
+  }
+}

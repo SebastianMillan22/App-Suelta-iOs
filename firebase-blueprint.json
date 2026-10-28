@@ -1,0 +1,193 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "El perfil y estado de la ficha de usuario",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 256 },
+        "nombre": { "type": "string", "maxLength": 256 },
+        "apodo": { "type": "string", "maxLength": 256 },
+        "edad": { "type": "string", "maxLength": 20 },
+        "sexo": { "type": "string", "maxLength": 20 },
+        "celular": { "type": "string", "maxLength": 50 },
+        "fechaRegistro": { "type": "number", "description": "Timestamp de fecha de registro para control de 3 días de prueba" },
+        "esVip": { "type": "boolean", "description": "Acceso total permanente otorgado por administrador" },
+        "esPremium": { "type": "boolean", "description": "Acceso activo a la suscripción Premium" },
+        "accesoTotal": { "type": "boolean", "description": "Acceso desbloqueado a todos los módulos" },
+        "subscription": { "type": "object", "description": "Información de suscripción activa o prueba" },
+        "planPago": { "type": "string", "description": "Plan actual: prueba, mensual, anual" },
+        "datosPagoBasico": { "type": "object", "description": "Datos de la transacción de pago y recibo de tienda" },
+        "rol": { "type": "string", "description": "Rol de usuario: user o admin" },
+        "fotoPerfil": { "type": "string", "description": "URL o DataURI de la foto de perfil" },
+        "appState": { "type": "object", "description": "Copia de seguridad del estado completo de la app para sincronización de sesión" }
+      },
+      "required": []
+    },
+    "PurchaseEntry": {
+      "title": "PurchaseEntry",
+      "description": "Comprobante de compra o suscripción procesada a través de Google Play u otra pasarela",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "maxLength": 128 },
+        "productId": { "type": "string", "maxLength": 128 },
+        "planId": { "type": "string", "maxLength": 50 },
+        "purchaseToken": { "type": "string", "maxLength": 500 },
+        "plataforma": { "type": "string", "maxLength": 100 },
+        "gateway": { "type": "string", "maxLength": 50 },
+        "fechaTransaccion": { "type": "string", "maxLength": 100 },
+        "createdAt": { "type": "number" },
+        "acknowledged": { "type": "boolean" }
+      },
+      "required": ["orderId", "productId"]
+    },
+    "DiarioEntry": {
+      "title": "DiarioEntry",
+      "description": "Una página o entrada diaria en el diario de bienestar en formato Bullet Journal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "titulo": { "type": "string", "maxLength": 200 },
+        "texto": { "type": "string", "maxLength": 10000 },
+        "fecha": { "type": "string", "format": "date-time" },
+        "animo": { "type": "string", "enum": ["alegre", "sereno", "triste", "ansioso", "cansado", "inspirado"] },
+        "horasSueno": { "type": "number" },
+        "nivelEnergia": { "type": "number" },
+        "bullets": { "type": "array", "description": "Lista de viñetas rápidas (tareas, gratitudes, ideas, notas)" }
+      },
+      "required": ["id", "titulo", "fecha"]
+    },
+    "RetoEntry": {
+      "title": "RetoEntry",
+      "description": "Un día completado en el reto de 21 días de bienestar",
+      "type": "object",
+      "properties": {
+        "dia": { "type": "number" },
+        "reflexion": { "type": "string", "maxLength": 10000 },
+        "fechaCompletado": { "type": "number" }
+      },
+      "required": ["dia", "fechaCompletado"]
+    },
+    "EmocionEntry": {
+      "title": "EmocionEntry",
+      "description": "Un registro de captura emocional o diagnóstico de bienestar",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fecha": { "type": "number" },
+        "historia": { "type": "string", "maxLength": 10000 },
+        "fisica": { "type": "string", "maxLength": 10000 },
+        "emocion": { "type": "array", "description": "Lista de emociones seleccionadas" }
+      },
+      "required": ["id", "fecha"]
+    },
+    "ProgresoEntry": {
+      "title": "ProgresoEntry",
+      "description": "Un registro de progreso de práctica realizada por el usuario",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fecha": { "type": "number" },
+        "tipoPractica": { "type": "string", "maxLength": 100 },
+        "descripcion": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["id", "fecha", "tipoPractica"]
+    },
+    "Analisis21DiasEntry": {
+      "title": "Analisis21DiasEntry",
+      "description": "Un reporte de análisis de patrones de escritura y recomendaciones de 21 días",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "fecha": { "type": "number" },
+        "diasCompletados": { "type": "number" },
+        "patronEscritura": { "type": "string" },
+        "emocionDominante": { "type": "string" },
+        "analisisPalabras": { "type": "object", "description": "Conteo de palabras clave y métricas de escritura" },
+        "recomendacionesExpresion": { "type": "array", "description": "Recomendaciones personalizadas sobre expresión emocional" },
+        "recomendacionesEntorno": { "type": "array", "description": "Recomendaciones personalizadas sobre entorno personal" }
+      },
+      "required": ["id", "fecha", "diasCompletados", "patronEscritura", "emocionDominante"]
+    },
+    "Specialist": {
+      "title": "Specialist",
+      "description": "Datos de un especialista o terapeuta de la red Suelta",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "nombre": { "type": "string", "maxLength": 256 },
+        "especialidad": { "type": "string", "maxLength": 256 },
+        "descripcion": { "type": "string", "maxLength": 10000 },
+        "email": { "type": "string", "maxLength": 256 },
+        "celular": { "type": "string", "maxLength": 50 },
+        "imagenUrl": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["id", "nombre", "especialidad", "descripcion", "email", "celular"]
+    },
+    "ConstelacionEntry": {
+      "title": "ConstelacionEntry",
+      "description": "Almacena el árbol genealógico del usuario para análisis sistémico profundo",
+      "type": "object",
+      "properties": {
+        "familia": { "type": "array", "description": "Lista de miembros agregados del clan familiar" },
+        "fechaActualizacion": { "type": "number", "description": "Marca de tiempo Unix de la última actualización" }
+      },
+      "required": ["familia", "fechaActualizacion"]
+    },
+    "CNVExerciseEntry": {
+      "title": "CNVExerciseEntry",
+      "description": "Un ejercicio interactivo y reflexivo de Comunicación No Violenta completado",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "tipo": { "type": "string", "enum": ["deconstruccion", "empatia_profunda"] },
+        "fecha": { "type": "number" },
+        "entradasUsuario": { "type": "object", "description": "Campos rellenados por el usuario durante la introspección" },
+        "resultadoAnalisis": { "type": "object", "description": "Resultados estructurados generados por los algoritmos de análisis personal" }
+      },
+      "required": ["id", "tipo", "fecha", "entradasUsuario", "resultadoAnalisis"]
+    }
+  },
+  "firestore": {
+    "/specialists/{specialistId}": {
+      "schema": "Specialist",
+      "description": "Colección global de especialistas y terapeutas recomendados"
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Colección de perfiles de usuario"
+    },
+    "/users/{userId}/diario/{entradaId}": {
+      "schema": "DiarioEntry",
+      "description": "Subcolección que almacena robustamente cada página del diario de bienestar de manera individual"
+    },
+    "/users/{userId}/reto/{diaId}": {
+      "schema": "RetoEntry",
+      "description": "Subcolección que almacena robustamente cada día completado del reto de 21 días"
+    },
+    "/users/{userId}/emociones/{emocionId}": {
+      "schema": "EmocionEntry",
+      "description": "Subcolección que almacena cada captura o evaluación emocional del usuario"
+    },
+    "/users/{userId}/progreso/{progresoId}": {
+      "schema": "ProgresoEntry",
+      "description": "Subcolección que almacena registros de actividades de bienestar completadas"
+    },
+    "/users/{userId}/analisis21Dias/{analisisId}": {
+      "schema": "Analisis21DiasEntry",
+      "description": "Subcolección que almacena el reporte del algoritmo de análisis de patrones y recomendaciones"
+    },
+    "/users/{userId}/constelaciones/{constelacionId}": {
+      "schema": "ConstelacionEntry",
+      "description": "Subcolección para guardar copias detalladas de la constelación familiar"
+    },
+    "/users/{userId}/comunicacion_no_violenta/{cnvId}": {
+      "schema": "CNVExerciseEntry",
+      "description": "Subcolección que almacena los ejercicios y análisis de comunicación no violenta de cada sesión"
+    },
+    "/users/{userId}/purchases/{purchaseId}": {
+      "schema": "PurchaseEntry",
+      "description": "Subcolección que almacena los recibos y comprobantes de compras y suscripciones de Google Play"
+    }
+  }
+}
