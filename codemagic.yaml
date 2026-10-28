@@ -6,12 +6,10 @@ workflows:
     integrations:
       app_store_connect: suelta_apple_key
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.suelta.app
       vars:
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
+        BUNDLE_ID: "com.suelta.app"
       node: 20
       xcode: latest
       cocoapods: default
@@ -40,14 +38,27 @@ workflows:
         script: |
           cd ios/App && pod install
 
-      - name: Configurar firma de código (Code Signing)
+      - name: Inicializar Llavero (Keychain)
+        script: |
+          keychain initialize
+
+      - name: Obtener o crear certificados y perfiles de Apple
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+
+      - name: Agregar certificados al Llavero
+        script: |
+          keychain add-certificates
+
+      - name: Configurar firma de código en Xcode
         script: |
           xcode-project use-profiles
 
       - name: Incrementar número de compilación (Build Number)
         script: |
           cd ios/App
-          # Asigna el número de build secuencial de Codemagic
           BUILD_NUMBER=${BUILD_NUMBER:-$CODEMAGIC_BUILD_NUMBER}
           agvtool new-version -all $BUILD_NUMBER
 
