@@ -23,6 +23,7 @@
     "GoogleAuth": {
       "providers": ["google"],
       "serverClientId": "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com",
+      "iosClientId": "706031612034-7rcv45h5jms5l32g32utivgarpaqhsup.apps.googleusercontent.com",
       "scopes": ["profile", "email"],
       "forceCodeForRefreshToken": false
     }

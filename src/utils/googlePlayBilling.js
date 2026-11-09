@@ -1,21 +1,27 @@
 /**
  * googlePlayBilling.js
- * Integración nativa oficial de Google Play Billing (BillingClient) para Suelta & Sana.
+ * Integración nativa oficial de compras y suscripciones para Suelta & Sana.
  * 
- * Lanza directamente la hoja nativa oficial de Google Play ("Comprar con 1 toque"):
- * - cordova-plugin-purchase (CdvPurchase / Google Play BillingClient nativo en Android)
- * - @capgo/capacitor-purchases (Capacitor Purchases)
- * - Digital Goods API oficial (TWA / Chrome Android)
- * - Persistencia y acuse de recibo (Acknowledge) en Firebase Firestore
+ * Soporta de manera fluida y nativa:
+ * - Apple App Store (In-App Purchases / StoreKit vía cordova-plugin-purchase en iOS)
+ * - Google Play Billing (BillingClient vía cordova-plugin-purchase en Android)
+ * - Persistencia y acuse de recibo obligatorio en Firebase Firestore y localStorage
  */
 
 import { doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { t } from "../data/translations.js";
 
-// Configuración oficial de Google Play Console (com.suelta_app) sincronizada con tus planes base y ofertas activas
+export function esPlataformaIos() {
+  if (typeof window === "undefined") return false;
+  const platform = window.Capacitor?.getPlatform?.();
+  if (platform === "ios") return true;
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+}
+
+// Configuración oficial de SKUs sincronizada con Google Play Console y App Store Connect
 export const GOOGLE_PLAY_CONFIG = {
-  packageName: "suelta_app.com",
+  packageName: "com.suelta.app",
   serviceUrl: "https://play.google.com/billing",
   skus: {
     mensual: {
@@ -53,34 +59,58 @@ let storeInicializado = false;
 let storeListenersConfigurados = false;
 
 /**
- * Inicializa el catálogo de productos con la pasarela oficial de Google Play (BillingClient)
+ * Inicializa el catálogo de productos con la pasarela oficial de Apple App Store o Google Play
  */
 export async function inicializarGooglePlayBillingStore(onCompraExitosaCallback = null) {
   if (typeof window === "undefined" || storeInicializado) return;
 
-  // 1. CdvPurchase (Google Play BillingClient nativo en Android)
   if (window.CdvPurchase && window.CdvPurchase.store) {
     try {
       const store = window.CdvPurchase.store;
+      const isIos = esPlataformaIos();
 
-      store.register([
-        {
-          type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
-          id: GOOGLE_PLAY_CONFIG.skus.mensual.productId,
-          platform: window.CdvPurchase.Platform.GOOGLE_PLAY
-        },
-        {
-          type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
-          id: GOOGLE_PLAY_CONFIG.skus.anual.productId,
-          platform: window.CdvPurchase.Platform.GOOGLE_PLAY
-        }
-      ]);
+      const productosARegistrar = [];
+
+      // Google Play
+      if (window.CdvPurchase.Platform?.GOOGLE_PLAY) {
+        productosARegistrar.push(
+          {
+            type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
+            id: GOOGLE_PLAY_CONFIG.skus.mensual.productId,
+            platform: window.CdvPurchase.Platform.GOOGLE_PLAY
+          },
+          {
+            type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
+            id: GOOGLE_PLAY_CONFIG.skus.anual.productId,
+            platform: window.CdvPurchase.Platform.GOOGLE_PLAY
+          }
+        );
+      }
+
+      // Apple App Store (iOS)
+      if (window.CdvPurchase.Platform?.APPLE_APPSTORE) {
+        productosARegistrar.push(
+          {
+            type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
+            id: GOOGLE_PLAY_CONFIG.skus.mensual.productId,
+            platform: window.CdvPurchase.Platform.APPLE_APPSTORE
+          },
+          {
+            type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
+            id: GOOGLE_PLAY_CONFIG.skus.anual.productId,
+            platform: window.CdvPurchase.Platform.APPLE_APPSTORE
+          }
+        );
+      }
+
+      if (productosARegistrar.length > 0) {
+        store.register(productosARegistrar);
+      }
 
       if (!storeListenersConfigurados) {
         store.when()
           .approved(async (transaction) => {
-            console.log("Transacción de Google Play aprobada con éxito:", transaction);
-            // Acuse de recibo oficial obligatorio (Acknowledge)
+            console.log("Transacción de suscripción aprobada con éxito:", transaction);
             try {
               await transaction.finish();
             } catch (finErr) {
@@ -89,17 +119,19 @@ export async function inicializarGooglePlayBillingStore(onCompraExitosaCallback 
 
             const productId = transaction.products?.[0]?.id || transaction.id;
             const planId = productId?.includes("annual") ? "anual" : "mensual";
-            const orderId = transaction.transactionId || `GPA.${Date.now()}`;
+            const esTransaccionApple = transaction.platform === window.CdvPurchase.Platform?.APPLE_APPSTORE || isIos;
+            const prefix = esTransaccionApple ? "APL" : "GPA";
+            const orderId = transaction.transactionId || `${prefix}.${Date.now()}`;
             const token = transaction.purchaseToken || transaction.receipt || "";
 
-            let datos = null;
             const targetUser = auth?.currentUser;
-            datos = await registrarCompraExitosa({
+            const datos = await registrarCompraExitosa({
               orderId,
               purchaseToken: token,
               planId,
               productId,
-              currentUser: targetUser
+              currentUser: targetUser,
+              esApple: esTransaccionApple
             });
 
             if (onCompraExitosaCallback) {
@@ -110,14 +142,16 @@ export async function inicializarGooglePlayBillingStore(onCompraExitosaCallback 
             if (product && product.owned) {
               const productId = product.id;
               const planId = productId?.includes("annual") ? "anual" : "mensual";
-              console.log("Membresía activa de Google Play confirmada:", productId);
+              const esApple = product.platform === window.CdvPurchase.Platform?.APPLE_APPSTORE || isIos;
+              console.log("Membresía activa confirmada:", productId);
               const targetUser = auth?.currentUser;
               const datos = await registrarCompraExitosa({
-                orderId: `GPA.ACTIVE.${Date.now()}`,
-                purchaseToken: "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
+                orderId: `${esApple ? "APL" : "GPA"}.ACTIVE.${Date.now()}`,
+                purchaseToken: esApple ? "APPLE_APPSTORE_ACTIVE_OWNED_TOKEN" : "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
                 planId,
                 productId,
-                currentUser: targetUser
+                currentUser: targetUser,
+                esApple
               });
               if (onCompraExitosaCallback) {
                 onCompraExitosaCallback({ planId, datosPago: datos });
@@ -125,18 +159,29 @@ export async function inicializarGooglePlayBillingStore(onCompraExitosaCallback 
             }
           })
           .receiptUpdated((receipt) => {
-            console.log("Recibo de Google Play actualizado:", receipt);
+            console.log("Recibo de tienda actualizado:", receipt);
           })
           .error((err) => {
-            console.warn("Error en Google Play Billing:", err);
+            console.warn("Aviso en pasarela de suscripciones:", err);
           });
 
         storeListenersConfigurados = true;
       }
 
-      await store.initialize([window.CdvPurchase.Platform.GOOGLE_PLAY]);
+      const plataformasAInicializar = [];
+      if (window.CdvPurchase.Platform?.GOOGLE_PLAY && !isIos) {
+        plataformasAInicializar.push(window.CdvPurchase.Platform.GOOGLE_PLAY);
+      }
+      if (window.CdvPurchase.Platform?.APPLE_APPSTORE) {
+        plataformasAInicializar.push(window.CdvPurchase.Platform.APPLE_APPSTORE);
+      }
+      if (plataformasAInicializar.length === 0 && window.CdvPurchase.Platform?.GOOGLE_PLAY) {
+        plataformasAInicializar.push(window.CdvPurchase.Platform.GOOGLE_PLAY);
+      }
+
+      await store.initialize(plataformasAInicializar);
       storeInicializado = true;
-      console.log("Google Play BillingClient Store inicializado con éxito.");
+      console.log("Store de suscripciones inicializado con éxito.");
     } catch (e) {
       console.warn("Aviso inicializando CdvPurchase store:", e);
     }
@@ -144,14 +189,14 @@ export async function inicializarGooglePlayBillingStore(onCompraExitosaCallback 
 }
 
 /**
- * Detecta qué método nativo de Google Play está activo en el dispositivo
+ * Detecta qué método nativo de compras está activo en el dispositivo
  */
 export async function detectarSoporteGooglePlay() {
   if (typeof window === "undefined") {
     return { disponible: false, metodo: "ninguno" };
   }
 
-  // 1. CdvPurchase oficial (BillingClient nativo)
+  // 1. CdvPurchase oficial (In-App Purchases en iOS / BillingClient en Android)
   if (window.CdvPurchase && window.CdvPurchase.store) {
     return { disponible: true, metodo: "cdv_purchase", store: window.CdvPurchase.store };
   }
@@ -161,7 +206,7 @@ export async function detectarSoporteGooglePlay() {
     return { disponible: true, metodo: "capacitor_purchases", plugin: window.Capacitor.Plugins.CapacitorPurchases };
   }
 
-  // 3. Digital Goods API oficial de Google Play (Chrome Android / TWA)
+  // 3. Digital Goods API (Chrome / TWA)
   if ("getDigitalGoodsService" in window) {
     try {
       const service = await window.getDigitalGoodsService(GOOGLE_PLAY_CONFIG.serviceUrl);
@@ -173,10 +218,12 @@ export async function detectarSoporteGooglePlay() {
     }
   }
 
+  const esIos = esPlataformaIos();
   const esAndroid = /Android/i.test(navigator.userAgent);
   return {
     disponible: true,
-    metodo: esAndroid ? "android_webview" : "web_browser",
+    metodo: esIos ? "ios_webview" : (esAndroid ? "android_webview" : "web_browser"),
+    esIos,
     esAndroid
   };
 }
@@ -184,20 +231,21 @@ export async function detectarSoporteGooglePlay() {
 /**
  * Registra la compra completada en Firestore y localStorage
  */
-async function registrarCompraExitosa({ orderId, purchaseToken, planId, productId, currentUser }) {
+async function registrarCompraExitosa({ orderId, purchaseToken, planId, productId, currentUser, esApple = null }) {
   const now = Date.now();
   const duracionDias = planId === "anual" ? 365 : 30;
   const fechaFin = now + (duracionDias * 24 * 60 * 60 * 1000);
+  const esIos = esApple !== null ? esApple : esPlataformaIos();
 
   const datosPago = {
-    plataforma: "Google Play Store",
-    gateway: "google_play",
+    plataforma: esIos ? "Apple App Store" : "Google Play Store",
+    gateway: esIos ? "apple_app_store" : "google_play",
     orderId,
     transaccionId: orderId,
     purchaseToken: purchaseToken || "",
     productId,
     planId,
-    medioPago: "Google Play Billing",
+    medioPago: esIos ? "Apple In-App Purchase" : "Google Play Billing",
     fechaTransaccion: new Date(now).toLocaleDateString() + " " + new Date(now).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     fechaInicio: now,
     fechaExpiracion: fechaFin,
@@ -230,7 +278,7 @@ async function registrarCompraExitosa({ orderId, purchaseToken, planId, productI
         subscription: {
           isActive: true,
           plan: planId,
-          gateway: "google_play",
+          gateway: esIos ? "apple_app_store" : "google_play",
           orderId,
           productId,
           purchaseToken,
@@ -254,7 +302,7 @@ async function registrarCompraExitosa({ orderId, purchaseToken, planId, productI
 }
 
 /**
- * Inicia la pasarela nativa oficial de Google Play ("Comprar con 1 toque").
+ * Inicia la pasarela nativa oficial (Apple App Store o Google Play).
  */
 export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "es", onEstadoChange = () => {} }) {
   const activeAuth = auth?.currentUser;
@@ -264,36 +312,52 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
     throw new Error(t("Debes registrarte o iniciar sesión con tu cuenta antes de proceder al pago o activar tu prueba.", idioma));
   }
 
+  const isIos = esPlataformaIos();
   const skuInfo = GOOGLE_PLAY_CONFIG.skus[planId] || GOOGLE_PLAY_CONFIG.skus.anual;
-  onEstadoChange({ paso: "verificando", mensaje: t("Conectando con Google Play Store...", idioma) });
+  const nombreTienda = isIos ? "App Store" : "Google Play Store";
+
+  onEstadoChange({
+    paso: "verificando",
+    mensaje: isIos
+      ? (t("Conectando con Apple App Store...", idioma) || "Conectando con Apple App Store...")
+      : (t("Conectando con Google Play Store...", idioma) || "Conectando con Google Play Store...")
+  });
 
   // Asegurar inicialización de la tienda nativa
   await inicializarGooglePlayBillingStore();
   const soporte = await detectarSoporteGooglePlay();
 
-  // 1. CdvPurchase nativo (Google Play BillingClient directo en Android)
+  // 1. CdvPurchase nativo (Apple In-App Purchase en iOS / Google Play en Android)
   if (soporte.metodo === "cdv_purchase" && soporte.store) {
     const store = soporte.store;
-    onEstadoChange({ paso: "hoja_nativa", mensaje: t("Abriendo pasarela oficial de Google Play...", idioma) });
+    onEstadoChange({
+      paso: "hoja_nativa",
+      mensaje: isIos
+        ? (t("Abriendo pasarela oficial de Apple App Store...", idioma) || "Abriendo pasarela oficial de Apple App Store...")
+        : (t("Abriendo pasarela oficial de Google Play...", idioma) || "Abriendo pasarela oficial de Google Play...")
+    });
 
-    const product = store.get(skuInfo.productId, window.CdvPurchase.Platform.GOOGLE_PLAY);
-    // Buscar la oferta exacta, el plan base o la primera oferta disponible
+    const plataformaTarget = isIos ? window.CdvPurchase.Platform?.APPLE_APPSTORE : window.CdvPurchase.Platform?.GOOGLE_PLAY;
+    const product = (plataformaTarget ? store.get(skuInfo.productId, plataformaTarget) : null) || store.get(skuInfo.productId);
+
     const offer = product?.getOffer?.(skuInfo.offerId) ||
                   product?.getOffer?.(skuInfo.basePlanId) ||
                   product?.getOffer?.() ||
                   product?.offers?.[0];
 
-    if (offer) {
+    const itemAComprar = offer || product;
+
+    if (itemAComprar) {
       return new Promise((resolve, reject) => {
         let resuelto = false;
 
         const timeoutSeguridad = setTimeout(() => {
           if (resuelto) return;
           resuelto = true;
-          reject(new Error(t("La pasarela de Google Play tardó demasiado en responder. Puedes reintentar o volver al inicio.", idioma)));
-        }, 12000);
+          reject(new Error(t(`La pasarela de ${nombreTienda} tardó demasiado en responder. Puedes reintentar o volver al inicio.`, idioma)));
+        }, 15000);
 
-        const approvedListener = store.when().approved(async (transaction) => {
+        store.when().approved(async (transaction) => {
           if (resuelto) return;
           resuelto = true;
           clearTimeout(timeoutSeguridad);
@@ -301,20 +365,21 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
             await transaction.finish();
           } catch (_) {}
 
-          const orderId = transaction.transactionId || `GPA.${Date.now()}`;
+          const orderId = transaction.transactionId || `${isIos ? "APL" : "GPA"}.${Date.now()}`;
           const token = transaction.purchaseToken || transaction.receipt || "";
           const datos = await registrarCompraExitosa({
             orderId,
             purchaseToken: token,
             planId,
             productId: skuInfo.productId,
-            currentUser: targetUser
+            currentUser: targetUser,
+            esApple: isIos
           });
           resolve({ ok: true, datosPago: datos });
         });
 
-        // Lanzar la hoja nativa oficial de Google Play ("Comprar con 1 toque")
-        store.order(offer)
+        // Lanzar la hoja nativa oficial
+        store.order(itemAComprar)
           .then(async (res) => {
             if (res && res.isError) {
               if (resuelto) return;
@@ -328,23 +393,24 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
 
               if (esYaComprado) {
                 resuelto = true;
-                const orderId = `GPA.OWNED.${Date.now()}`;
+                const orderId = `${isIos ? "APL" : "GPA"}.OWNED.${Date.now()}`;
                 const datos = await registrarCompraExitosa({
                   orderId,
-                  purchaseToken: "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
+                  purchaseToken: isIos ? "APPLE_APPSTORE_ACTIVE_OWNED_TOKEN" : "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
                   planId,
                   productId: skuInfo.productId,
-                  currentUser: targetUser
+                  currentUser: targetUser,
+                  esApple: isIos
                 });
                 resolve({ ok: true, datosPago: datos, yaComprado: true });
                 return;
               }
 
               resuelto = true;
-              if (res.code === window.CdvPurchase?.ErrorCode?.PAYMENT_CANCELLED || res.code === 6777006) {
-                reject(new Error(t("Proceso de suscripción cancelado en Google Play.", idioma)));
+              if (res.code === window.CdvPurchase?.ErrorCode?.PAYMENT_CANCELLED || res.code === 6777006 || res.code === 2) {
+                reject(new Error(t(`Proceso de suscripción cancelado en ${nombreTienda}.`, idioma)));
               } else {
-                reject(new Error(res.message || t("Error al procesar la compra en Google Play.", idioma)));
+                reject(new Error(res.message || t(`Error al procesar la compra en ${nombreTienda}.`, idioma)));
               }
             }
           })
@@ -359,23 +425,24 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
 
             if (esYaComprado) {
               resuelto = true;
-              const orderId = `GPA.OWNED.${Date.now()}`;
+              const orderId = `${isIos ? "APL" : "GPA"}.OWNED.${Date.now()}`;
               const datos = await registrarCompraExitosa({
                 orderId,
-                purchaseToken: "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
+                purchaseToken: isIos ? "APPLE_APPSTORE_ACTIVE_OWNED_TOKEN" : "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
                 planId,
                 productId: skuInfo.productId,
-                currentUser: targetUser
+                currentUser: targetUser,
+                esApple: isIos
               });
               resolve({ ok: true, datosPago: datos, yaComprado: true });
               return;
             }
 
             resuelto = true;
-            if (errMsg.includes("cancel") || err?.code === 6777006) {
-              reject(new Error(t("Proceso de suscripción cancelado en Google Play.", idioma)));
+            if (errMsg.includes("cancel") || err?.code === 6777006 || err?.code === 2) {
+              reject(new Error(t(`Proceso de suscripción cancelado en ${nombreTienda}.`, idioma)));
             } else {
-              reject(new Error(err?.message || t("No se pudo iniciar la compra en Google Play.", idioma)));
+              reject(new Error(err?.message || t(`No se pudo iniciar la compra en ${nombreTienda}.`, idioma)));
             }
           });
       });
@@ -385,36 +452,37 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
         store.register([{
           type: window.CdvPurchase.ProductType.PAID_SUBSCRIPTION,
           id: skuInfo.productId,
-          platform: window.CdvPurchase.Platform.GOOGLE_PLAY
+          platform: isIos ? window.CdvPurchase.Platform?.APPLE_APPSTORE : window.CdvPurchase.Platform?.GOOGLE_PLAY
         }]);
-        await store.initialize([window.CdvPurchase.Platform.GOOGLE_PLAY]);
+        await store.initialize([isIos ? window.CdvPurchase.Platform?.APPLE_APPSTORE : window.CdvPurchase.Platform?.GOOGLE_PLAY]);
         const p2 = store.get(skuInfo.productId);
-        const off2 = p2?.getOffer?.(skuInfo.offerId) || p2?.getOffer?.(skuInfo.basePlanId) || p2?.getOffer?.() || p2?.offers?.[0];
+        const off2 = p2?.getOffer?.(skuInfo.offerId) || p2?.getOffer?.(skuInfo.basePlanId) || p2?.getOffer?.() || p2?.offers?.[0] || p2;
         if (off2) {
           const resOrder = await store.order(off2);
           if (resOrder?.isError) {
-            throw new Error(resOrder.message || t("Error al solicitar el producto en Google Play.", idioma));
+            throw new Error(resOrder.message || t(`Error al solicitar el producto en ${nombreTienda}.`, idioma));
           }
-          const orderId = `GPA.${Date.now()}`;
+          const orderId = `${isIos ? "APL" : "GPA"}.${Date.now()}`;
           const datos = await registrarCompraExitosa({
             orderId,
-            purchaseToken: "GOOGLE_PLAY_TOKEN_" + Date.now(),
+            purchaseToken: `${isIos ? "APPLE" : "GOOGLE_PLAY"}_TOKEN_` + Date.now(),
             planId,
             productId: skuInfo.productId,
-            currentUser: targetUser
+            currentUser: targetUser,
+            esApple: isIos
           });
           return { ok: true, datosPago: datos };
         }
       } catch (err) {
         console.warn("Reintento de oferta falló:", err);
       }
-      throw new Error(t("No se encontró el plan de suscripción en Google Play Store. Verifica tu conexión o reintenta.", idioma));
+      throw new Error(t(`No se encontró el plan de suscripción en ${nombreTienda}. Verifica tu conexión o reintenta.`, idioma));
     }
   }
 
   // 2. Capacitor Purchases
   if (soporte.metodo === "capacitor_purchases" && soporte.plugin) {
-    onEstadoChange({ paso: "hoja_nativa", mensaje: t("Abriendo pasarela oficial de Google Play...", idioma) });
+    onEstadoChange({ paso: "hoja_nativa", mensaje: t(`Abriendo pasarela oficial de ${nombreTienda}...`, idioma) });
     try {
       let res;
       try {
@@ -428,38 +496,40 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
       }
 
       if (res && (res.orderId || res.purchaseToken || res.transactionId)) {
-        const orderId = res.orderId || res.transactionId || `GPA.${Date.now()}`;
+        const orderId = res.orderId || res.transactionId || `${isIos ? "APL" : "GPA"}.${Date.now()}`;
         const token = res.purchaseToken || res.receipt || "";
         const datos = await registrarCompraExitosa({
           orderId,
           purchaseToken: token,
           planId,
           productId: skuInfo.productId,
-          currentUser: targetUser
+          currentUser: targetUser,
+          esApple: isIos
         });
         return { ok: true, datosPago: datos };
       }
     } catch (e) {
       const errMsg = e?.message || "";
       if (errMsg.includes("ITEM_ALREADY_OWNED") || errMsg.includes("Ya te suscribiste") || e?.code === 7) {
-        const orderId = `GPA.OWNED.${Date.now()}`;
+        const orderId = `${isIos ? "APL" : "GPA"}.OWNED.${Date.now()}`;
         const datos = await registrarCompraExitosa({
           orderId,
-          purchaseToken: "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
+          purchaseToken: isIos ? "APPLE_APPSTORE_ACTIVE_OWNED_TOKEN" : "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
           planId,
           productId: skuInfo.productId,
-          currentUser: targetUser
+          currentUser: targetUser,
+          esApple: isIos
         });
         return { ok: true, datosPago: datos, yaComprado: true };
       }
       if (errMsg.includes("cancel") || errMsg.includes("USER_CANCELED") || e?.code === 1) {
-        throw new Error(t("Proceso de suscripción cancelado en Google Play.", idioma));
+        throw new Error(t(`Proceso de suscripción cancelado en ${nombreTienda}.`, idioma));
       }
-      throw new Error(e.message || t("Error en Google Play Billing al procesar la compra.", idioma));
+      throw new Error(e.message || t(`Error en ${nombreTienda} al procesar la compra.`, idioma));
     }
   }
 
-  // 3. Digital Goods API oficial (TWA)
+  // 3. Digital Goods API oficial (TWA / Chrome)
   if (soporte.metodo === "digital_goods_api" && soporte.service && window.PaymentRequest) {
     onEstadoChange({ paso: "hoja_nativa", mensaje: t("Abriendo pasarela oficial de Google Play...", idioma) });
     try {
@@ -489,7 +559,8 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
           purchaseToken: purchaseToken,
           planId,
           productId: skuInfo.productId,
-          currentUser: targetUser
+          currentUser: targetUser,
+          esApple: false
         });
         return { ok: true, datosPago: datos };
       } else {
@@ -504,14 +575,22 @@ export async function procesarCompraGooglePlay({ planId, currentUser, idioma = "
     }
   }
 
-  // Fallback si la librería nativa de Android aún no está sincronizada en Android Studio:
-  throw new Error(t("La pasarela de Google Play Billing requiere compilar el proyecto en Android Studio con 'npx cap sync android'.", idioma));
+  // Mensaje descriptivo para entornos de desarrollo
+  throw new Error(t(
+    isIos
+      ? "La pasarela de Apple In-App Purchase requiere compilar y sincronizar en Xcode con 'npx cap sync ios'."
+      : "La pasarela de Google Play Billing requiere compilar el proyecto en Android Studio con 'npx cap sync android'.",
+    idioma
+  ));
 }
 
 /**
- * Restaura compras anteriores de Google Play
+ * Restaura compras anteriores de Apple App Store o Google Play
  */
 export async function restaurarComprasGooglePlay(currentUser, idioma = "es") {
+  const isIos = esPlataformaIos();
+  const nombreTienda = isIos ? "App Store" : "Google Play";
+
   if (!currentUser?.uid) {
     return { restaurado: false, mensaje: t("Inicia sesión con tu cuenta para restaurar tus compras.", idioma) };
   }
@@ -535,19 +614,19 @@ export async function restaurarComprasGooglePlay(currentUser, idioma = "es") {
         return {
           restaurado: true,
           datosPago: data.datosPagoBasico || {
-            plataforma: "Google Play Store",
-            orderId: sub.orderId || "GPA.RESTORED",
-            medioPago: "Google Play Store",
-            transaccionId: sub.orderId || "GPA.RESTORED",
+            plataforma: isIos ? "Apple App Store" : "Google Play Store",
+            orderId: sub.orderId || `${isIos ? "APL" : "GPA"}.RESTORED`,
+            medioPago: isIos ? "Apple In-App Purchase" : "Google Play Store",
+            transaccionId: sub.orderId || `${isIos ? "APL" : "GPA"}.RESTORED`,
             fechaTransaccion: new Date().toLocaleDateString()
           },
           compra: {
-            orderId: sub.orderId || "GPA.RESTORED",
+            orderId: sub.orderId || `${isIos ? "APL" : "GPA"}.RESTORED`,
             planId: sub.plan || "anual",
-            medioPago: "Google Play Store"
+            medioPago: isIos ? "Apple In-App Purchase" : "Google Play Store"
           },
           plan: sub.plan || "anual",
-          mensaje: t("¡Suscripción de Google Play encontrada y restaurada con éxito!", idioma)
+          mensaje: t(`¡Suscripción de ${nombreTienda} encontrada y restaurada con éxito!`, idioma)
         };
       }
     }
@@ -565,7 +644,7 @@ export async function restaurarComprasGooglePlay(currentUser, idioma = "es") {
         subscription: {
           isActive: true,
           plan: plan,
-          gateway: "google_play",
+          gateway: lastPurchase.gateway || (isIos ? "apple_app_store" : "google_play"),
           orderId: lastPurchase.orderId,
           restoredAt: Date.now()
         },
@@ -577,7 +656,7 @@ export async function restaurarComprasGooglePlay(currentUser, idioma = "es") {
         datosPago: lastPurchase,
         compra: lastPurchase,
         plan: plan,
-        mensaje: t("¡Suscripción de Google Play encontrada y restaurada con éxito!", idioma)
+        mensaje: t(`¡Suscripción de ${nombreTienda} encontrada y restaurada con éxito!`, idioma)
       };
     }
   } catch (e) {
@@ -586,13 +665,16 @@ export async function restaurarComprasGooglePlay(currentUser, idioma = "es") {
 
   return {
     restaurado: false,
-    mensaje: t("No se encontraron compras activas de Google Play asociadas a tu cuenta. Puedes iniciar una nueva suscripción.", idioma)
+    mensaje: t(`No se encontraron compras activas de ${nombreTienda} asociadas a tu cuenta. Puedes iniciar una nueva suscripción.`, idioma)
   };
 }
 
 /**
- * URL de gestión directa
+ * URL de gestión directa de suscripciones según la plataforma
  */
 export function obtenerUrlGestionGooglePlay(productId = "suelta_sub_annual") {
+  if (esPlataformaIos()) {
+    return "https://apps.apple.com/account/subscriptions";
+  }
   return `https://play.google.com/store/account/subscriptions?sku=${productId}&package=${GOOGLE_PLAY_CONFIG.packageName}`;
 }

@@ -9,10 +9,10 @@ import SideNavDrawer from "./components/SideNavDrawer.jsx";
 import HamburgerButton from "./components/HamburgerButton.jsx";
 import { ScreenRecordatoriosWidget } from "./components/ScreenRecordatoriosWidget.jsx";
 import { App as CapacitorApp } from "./utils/capacitorApp.js";
-import { 
-  registrarServiceWorker, 
-  enviarNotificacionNativa, 
-  reproducirChimeCalmante, 
+import {
+  registrarServiceWorker,
+  enviarNotificacionNativa,
+  reproducirChimeCalmante,
   vibrarDispositivo,
   AFIRMACIONES_RECORDATORIOS,
   CONFIG_RECORDATORIOS_INICIAL
@@ -44,11 +44,11 @@ import {
 } from "./utils/constelaciones.js";
 import { getLocalizedPasosLugarSeguro, getLocalizedLugarSeguroUI } from "./utils/lugarSeguro.js";
 import { getLocalizedEspecialistas, getLocalizedCategorias, getLocalizedEspecialistasUI } from "./data/translationsEspecialistas.js";
-import { 
-  procesarCompraGooglePlay, 
-  restaurarComprasGooglePlay, 
-  obtenerUrlGestionGooglePlay, 
-  GOOGLE_PLAY_CONFIG, 
+import {
+  procesarCompraGooglePlay,
+  restaurarComprasGooglePlay,
+  obtenerUrlGestionGooglePlay,
+  GOOGLE_PLAY_CONFIG,
   detectarSoporteGooglePlay,
   inicializarGooglePlayBillingStore
 } from "./utils/googlePlayBilling.js";
@@ -88,7 +88,7 @@ function ssCargarEstadoGuardado() {
     if (localEsPremium) parsed.esPremium = true;
     if (localPlanPago) parsed.planPago = localPlanPago;
     if (localDatosPago && !parsed.datosPagoBasico) {
-      try { parsed.datosPagoBasico = JSON.parse(localDatosPago); } catch(_) {}
+      try { parsed.datosPagoBasico = JSON.parse(localDatosPago); } catch (_) { }
     }
 
     return parsed;
@@ -143,11 +143,11 @@ const FONT_LOGO = "'Archivo Black', sans-serif";
 
 function ResaltarMarca({ children }) {
   if (!children || typeof children !== "string") return children;
-  
+
   // Expresión regular que captura "¡Suelta!" o "Suelta" o versiones en otros idiomas (Let Go, Release, Lâche prise, Lascia andare)
   const regex = /(¡?suelta!?|let\s+go!?|release!?|lâche\s+prise!?|relâche!?|lascia\s+andare!?)/gi;
   const parts = children.split(regex);
-  
+
   return (
     <>
       {parts.map((part, index) => {
@@ -273,11 +273,24 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
       @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
       
       html, body {
-        overscroll-behavior-y: contain;
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      #root {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
       }
 
       body.modal-scroll-locked,
@@ -312,13 +325,9 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
         user-select: none;
       }
       
-      input, textarea {
-        -webkit-user-select: text;
-        user-select: text;
-      }
-      
-      input[type="text"], input[type="search"], textarea {
-        -webkit-spellcheck: default;
+      input, textarea, [contenteditable="true"] {
+        -webkit-user-select: text !important;
+        user-select: text !important;
       }
       
       .ss-btn {
@@ -635,21 +644,23 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
 
       .ss-phone-outer {
         width: 100%;
-        min-height: 100vh;
+        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
         display: flex;
         flex-direction: column;
         padding: 0;
+        margin: 0;
+        overflow: hidden;
         font-family: ${FONT_BODY};
         transition: background 0.4s ease;
       }
-      .ss-phone-outer.device-desktop {
+      .ss-phone-outer.device-desktop,
+      .ss-phone-outer.device-mobile,
+      .ss-phone-outer.device-tablet {
         align-items: stretch;
         padding: 0;
-      }
-      .ss-phone-outer.device-mobile, .ss-phone-outer.device-tablet {
-        align-items: center;
-        justify-content: flex-start;
-        padding: 24px 12px 40px;
+        margin: 0;
       }
       .ss-phone-wrapper {
         align-items: stretch;
@@ -815,24 +826,28 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
         display: flex;
         flex-direction: column;
         transition: all 0.4s ease;
-      }
-      .ss-phone-frame {
         width: 100% !important;
-        height: 100dvh !important;
-        max-height: none !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        max-height: 100% !important;
         border-radius: 0 !important;
         border: none !important;
         box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
       .ss-phone-frame.device-desktop,
       .ss-phone-frame.device-mobile,
       .ss-phone-frame.device-tablet {
         width: 100% !important;
-        height: 100dvh !important;
-        max-height: none !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        max-height: 100% !important;
         border-radius: 0 !important;
         border: none !important;
         box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
       .proto-frame-proto-1 {
         background: #111d18;
@@ -913,8 +928,12 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
       .ss-phone-content {
         flex: 1;
         overflow-y: auto;
-        padding-top: 0;
+        -webkit-overflow-scrolling: touch;
+        padding-top: env(safe-area-inset-top, 0px);
         overflow-x: hidden;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
       }
 
       /* PROTOTIPO 1: PROFUNDIDAD NOCTURNA (OVERRIDE INTERNO) */
@@ -1051,8 +1070,7 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
         color: #ffffff !important;
       }
 
-      /* Responsive: en pantallas de móvil real, la app ocupa toda la pantalla, */
-      /* sin marco decorativo de teléfono ni muescas — se comporta como una app real. */
+      /* Responsive: en pantallas de móvil y tablets, la app ocupa toda la pantalla de forma fluida */
       @media (max-width: 480px) {
         .ss-phone-outer {
           padding: 0;
@@ -1064,20 +1082,25 @@ function GlobalStyle({ protoTheme = "proto-2" }) {
           margin-bottom: 0;
         }
         .ss-phone-frame {
-          width: 100%;
-          height: 100dvh;
-          max-height: none;
-          border-radius: 0;
-          border: none;
-          box-shadow: none;
+          width: 100% !important;
+          height: 100% !important;
+          max-height: none !important;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
         }
         .ss-phone-notch { display: none; }
-        .ss-phone-content { padding-top: 0; }
       }
 
-      /* Tablets: marco un poco más ancho para aprovechar el espacio sin llegar al layout de escritorio */
-      @media (min-width: 481px) and (max-width: 900px) {
-        .ss-phone-frame { width: 420px; height: 844px; }
+      @media (min-width: 481px) {
+        .ss-phone-frame {
+          width: 100% !important;
+          height: 100% !important;
+          max-height: none !important;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
       }
 
       /* Evita que iOS Safari haga zoom automático al enfocar inputs con fuente menor a 16px */
@@ -1230,8 +1253,8 @@ function PhoneFrame({
   const themeInfo = THEMES_DATA[protoTheme] || THEMES_DATA["proto-1"];
 
   return (
-    <div className={`ss-phone-outer proto-outer-${protoTheme} device-${deviceMode}`}>
-      <div className="ss-phone-wrapper" style={{ width: "100%", display: "flex", flexDirection: "column", flex: 1 }}>
+    <div className={`ss-phone-outer proto-outer-${protoTheme} device-${deviceMode}`} style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
+      <div className="ss-phone-wrapper" style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", flex: 1, overflow: "hidden" }}>
 
         <div
           className={`ss-phone-frame proto-frame-${protoTheme} device-${deviceMode}`}
@@ -1239,6 +1262,11 @@ function PhoneFrame({
           onTouchEnd={handleTouchEnd}
           style={{
             position: 'relative',
+            width: "100%",
+            height: "100%",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
             overflow: 'hidden',
             backgroundColor: isDrawerOpen ? '#3f6b5b' : undefined
           }}
@@ -1274,8 +1302,12 @@ function PhoneFrame({
               zIndex: 10,
               display: "flex",
               flexDirection: "column",
+              flex: 1,
               height: "100%",
               width: "100%",
+              minHeight: 0,
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
               backgroundColor: "#faf8f3",
               transform: isDrawerOpen ? "translateX(78%) scale(0.86)" : "translateX(0) scale(1)",
               transformOrigin: "left center",
@@ -1286,10 +1318,10 @@ function PhoneFrame({
               pointerEvents: isDrawerOpen ? "none" : "auto"
             }}
           >
-            <div style={{ flex: "1 0 auto", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: "1 0 auto", display: "flex", flexDirection: "column", minHeight: "100%" }}>
               {children}
             </div>
-            {bottomNav && <div style={{ minHeight: 110, flexShrink: 0 }} />}
+            {bottomNav && <div style={{ minHeight: "calc(env(safe-area-inset-bottom, 0px) + 85px)", flexShrink: 0 }} />}
           </div>
 
           {/* Overlay interactivo para cerrar el menú tocando la pantalla desplazada */}
@@ -1318,64 +1350,64 @@ function PhoneFrame({
 }
 
 const NAV_ITEMS = [
-  { 
-    id: "inicio", 
+  {
+    id: "inicio",
     label: "Inicio",
     shortLabel: "Inicio",
     icon: (activo) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={activo ? "rgba(63, 107, 91, 0.2)" : "none"} stroke="currentColor" strokeWidth={activo ? "2.3" : "1.85"} strokeLinecap="round" strokeLinejoin="round">
-        <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
+        <path d="m3 9.5 9-7 9 7v10.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
     )
   },
-  { 
-    id: "reto", 
+  {
+    id: "reto",
     label: "Mi reto",
     shortLabel: "Mi Reto",
-    premium: true, 
+    premium: true,
     icon: (activo) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={activo ? "rgba(63, 107, 91, 0.2)" : "none"} stroke="currentColor" strokeWidth={activo ? "2.3" : "1.85"} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <circle cx="12" cy="12" r="6"/>
-        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="6" />
+        <circle cx="12" cy="12" r="2" fill="currentColor" />
       </svg>
     )
   },
-  { 
-    id: "herramientas", 
+  {
+    id: "herramientas",
     label: "Calma",
     shortLabel: "Calma",
     icon: (activo) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={activo ? "rgba(63, 107, 91, 0.2)" : "none"} stroke="currentColor" strokeWidth={activo ? "2.3" : "1.85"} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
       </svg>
     )
   },
-  { 
-    id: "hub", 
+  {
+    id: "hub",
     label: "Perspectivas",
     shortLabel: "Perspectivas",
-    premium: true, 
+    premium: true,
     icon: (activo) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={activo ? "rgba(63, 107, 91, 0.25)" : "none"} stroke="currentColor" strokeWidth={activo ? "2.3" : "1.85"} strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill={activo ? "currentColor" : "none"}/>
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill={activo ? "currentColor" : "none"} />
       </svg>
     )
   },
-  { 
-    id: "especialistas", 
+  {
+    id: "especialistas",
     label: "Expertos",
     shortLabel: "Expertos",
-    premium: true, 
+    premium: true,
     icon: (activo) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill={activo ? "rgba(63, 107, 91, 0.25)" : "none"} stroke="currentColor" strokeWidth={activo ? "2.3" : "1.85"} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     )
   },
@@ -1391,7 +1423,7 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
         right: 0,
         display: "flex",
         justifyContent: "center",
-        padding: "0 8px calc(env(safe-area-inset-bottom, 0px) + 6px)",
+        padding: "0 8px max(10px, calc(env(safe-area-inset-bottom, 0px) + 8px))",
         pointerEvents: "none",
         zIndex: 100,
         boxSizing: "border-box",
@@ -1411,7 +1443,7 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
           borderRadius: 999,
           padding: "4px 5px",
           width: "100%",
-          maxWidth: 410,
+          maxWidth: "min(410px, calc(100vw - 16px))",
           boxShadow: "0 12px 36px -4px rgba(37, 51, 46, 0.2), 0 4px 12px rgba(37, 51, 46, 0.08), inset 0 1px 2px rgba(255, 255, 255, 0.95)",
           border: "1.2px solid rgba(111, 168, 146, 0.35)",
           pointerEvents: "auto",
@@ -1429,18 +1461,18 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
             item.id === "especialistas"
               ? esEspecialistasActivo
               : item.id === "hub"
-              ? esHubActivo
-              : item.id === "herramientas"
-              ? esHerramientasActivo
-              : current === item.id;
+                ? esHubActivo
+                : item.id === "herramientas"
+                  ? esHerramientasActivo
+                  : current === item.id;
 
           const tieneAccesoModulos = tieneAccesoTotal || esPremium || enPruebaActiva;
           const bloqueado =
             item.id === "especialistas"
               ? (!tieneAccesoTotal && planPago !== "anual")
               : (item.premium && !tieneAccesoModulos);
-          
-          const debaResaltar = 
+
+          const debaResaltar =
             (tutorialStep === 4 && item.id === "reto") ||
             (tutorialStep === 7 && item.id === "herramientas") ||
             (tutorialStep === 10 && item.id === "hub") ||
@@ -1464,8 +1496,8 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
                 minWidth: activo ? 0 : 34,
                 maxWidth: activo ? 152 : 42,
                 height: 38,
-                background: activo 
-                  ? "linear-gradient(135deg, rgba(63, 107, 91, 0.18) 0%, rgba(111, 168, 146, 0.32) 100%)" 
+                background: activo
+                  ? "linear-gradient(135deg, rgba(63, 107, 91, 0.18) 0%, rgba(111, 168, 146, 0.32) 100%)"
                   : "transparent",
                 border: activo ? "1.4px solid rgba(63, 107, 91, 0.45)" : "1.4px solid transparent",
                 cursor: "pointer",
@@ -1480,8 +1512,8 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
                 position: "relative",
                 transition: "all 0.28s cubic-bezier(0.34, 1.45, 0.64, 1)",
                 color: activo ? SAGE_DARK : "#6f827a",
-                boxShadow: debaResaltar 
-                  ? "0 0 0 3px #dfa15f, 0 0 16px rgba(223,161,95,0.75)" 
+                boxShadow: debaResaltar
+                  ? "0 0 0 3px #dfa15f, 0 0 16px rgba(223,161,95,0.75)"
                   : (activo ? "0 4px 14px rgba(63,107,91,0.18), inset 0 1px 2px rgba(255,255,255,0.9)" : "none"),
                 transform: activo ? "translateY(-1px)" : "none",
                 boxSizing: "border-box",
@@ -1517,7 +1549,7 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
                   }}>{t("¡Aquí!", idioma)}</span>
                 </div>
               )}
-              
+
               {/* Contenedor del ícono */}
               <div style={{
                 position: "relative",
@@ -1534,10 +1566,10 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
               }}>
                 {typeof item.icon === "function" ? item.icon(activo) : item.icon}
                 {bloqueado && (
-                  <span style={{ 
-                    position: "absolute", 
-                    top: activo ? -2 : 2, 
-                    right: activo ? -2 : 2, 
+                  <span style={{
+                    position: "absolute",
+                    top: activo ? -2 : 2,
+                    right: activo ? -2 : 2,
                     fontSize: 8,
                     background: "rgba(255,255,255,0.95)",
                     borderRadius: "50%",
@@ -1564,9 +1596,9 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
                   minWidth: 0,
                   flexShrink: 1
                 }}>
-                  <span style={{ 
-                    fontSize: "clamp(10.5px, 2.7vw, 12px)", 
-                    fontWeight: 700, 
+                  <span style={{
+                    fontSize: "clamp(10.5px, 2.7vw, 12px)",
+                    fontWeight: 700,
                     lineHeight: 1,
                     letterSpacing: "-0.2px",
                     color: "#1d382f",
@@ -1598,7 +1630,7 @@ function BottomNav({ current, hubItemId = null, onNavigate, esPremium, enPruebaA
   );
 }
 
-export const MenuContext = React.createContext({ onOpenMenu: () => {} });
+export const MenuContext = React.createContext({ onOpenMenu: () => { } });
 
 export function TopBar({ title, onBack, onOpenMenu: onOpenMenuProp, step, totalSteps, conLogo, pasos, onIrPaso, theme = "light", rightAction, idioma }) {
   const menuCtx = React.useContext(MenuContext);
@@ -1668,18 +1700,18 @@ export function TopBar({ title, onBack, onOpenMenu: onOpenMenuProp, step, totalS
       {pasos && (
         <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
           {pasos.map((p, i) => (
-             <div 
-               key={i} 
-               onClick={() => p.id === "comenzar" ? null : onIrPaso(i)}
-               style={{ 
-                 flex: 1, 
-                 height: 3, 
-                 background: i <= step ? SAGE_DARK : LINE, 
-                 borderRadius: 1.5,
-                 transition: "background 0.4s cubic-bezier(0.22,1,0.36,1)",
-                 cursor: p.id === "comenzar" ? "default" : "pointer"
-               }} 
-             />
+            <div
+              key={i}
+              onClick={() => p.id === "comenzar" ? null : onIrPaso(i)}
+              style={{
+                flex: 1,
+                height: 3,
+                background: i <= step ? SAGE_DARK : LINE,
+                borderRadius: 1.5,
+                transition: "background 0.4s cubic-bezier(0.22,1,0.36,1)",
+                cursor: p.id === "comenzar" ? "default" : "pointer"
+              }}
+            />
           ))}
         </div>
       )}
@@ -1843,7 +1875,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
       {/* Elementos decorativos de fondo */}
       <div style={{ position: "absolute", top: "-10%", left: "-20%", width: "70%", height: "40%", background: "radial-gradient(ellipse at center, rgba(138,107,184,0.15) 0%, rgba(255,255,255,0) 70%)", borderRadius: "50%", filter: "blur(40px)", zIndex: 0 }} aria-hidden="true" />
       <div style={{ position: "absolute", bottom: "-10%", right: "-20%", width: "80%", height: "50%", background: "radial-gradient(ellipse at center, rgba(111,168,146,0.18) 0%, rgba(255,255,255,0) 70%)", borderRadius: "50%", filter: "blur(50px)", zIndex: 0 }} aria-hidden="true" />
-      
+
       <div style={{ padding: "24px 22px 26px", flex: 1, display: "flex", flexDirection: "column", position: "relative", zIndex: 10 }}>
         {/* Cabecera con menú lateral e idioma */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: 4 }}>
@@ -1887,10 +1919,10 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
             </div>
           </div>
         </div>
-        
+
         <div className="ss-bienvenida-titulo ss-dash-stagger" style={{ textAlign: "center", marginBottom: 18 }}>
           <h1 style={{ fontFamily: FONT_LOGO, fontWeight: 900, fontSize: 38, color: SAGE_DARK, margin: 0, letterSpacing: "-0.5px" }}>{t("¡SUELTA!", idioma)}</h1>
-          
+
           <div style={{
             fontFamily: FONT_BODY,
             fontWeight: 500,
@@ -1985,7 +2017,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                     {slides[pasoOnboarding].desc}
                   </p>
                 </div>
-                
+
                 {/* Paginación Dots */}
                 <div style={{ display: "flex", gap: 8, marginTop: 22, justifyContent: "center" }}>
                   {slides.map((_, i) => (
@@ -2007,6 +2039,64 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
               >
                 {pasoOnboarding < slides.length - 1 ? t("Siguiente", idioma) : t("Comenzar", idioma)}
               </button>
+
+              {/* Botón directo de Google y acceso para iniciar sesión sin tener que pasar todos los slides */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      setErrorLogin("");
+                      await onLogin(false);
+                    } catch (err) {
+                      setErrorLogin("ERROR: " + formatAuthError(err));
+                    }
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                    width: "100%",
+                    padding: "13px 16px",
+                    borderRadius: "20px",
+                    border: "1.5px solid #d8eae1",
+                    background: "#FFFFFF",
+                    color: "#25332e",
+                    fontFamily: FONT_BODY,
+                    fontSize: "14px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <svg width="18" height="18" viewBox="0 0 18 18">
+                    <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.7-1.57 2.69-3.88 2.69-6.57z" />
+                    <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.72H.95v2.3C2.43 15.89 5.5 18 9 18z" />
+                    <path fill="#FBBC05" d="M3.95 10.68c-.18-.54-.28-1.12-.28-1.68s.1-1.14.28-1.68V5.02H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.98l3-2.3z" />
+                    <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z" />
+                  </svg>
+                  {t("Continuar con Google", idioma)}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setTab("login")}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: SAGE_DARK,
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    padding: "6px 0",
+                    textDecoration: "underline"
+                  }}
+                >
+                  {t("¿Ya tienes una cuenta? Iniciar sesión", idioma)}
+                </button>
+              </div>
             </div>
           )}
 
@@ -2046,10 +2136,10 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 18 18">
-                  <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.7-1.57 2.69-3.88 2.69-6.57z"/>
-                  <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.72H.95v2.3C2.43 15.89 5.5 18 9 18z"/>
-                  <path fill="#FBBC05" d="M3.95 10.68c-.18-.54-.28-1.12-.28-1.68s.1-1.14.28-1.68V5.02H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.98l3-2.3z"/>
-                  <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z"/>
+                  <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.7-1.57 2.69-3.88 2.69-6.57z" />
+                  <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.72H.95v2.3C2.43 15.89 5.5 18 9 18z" />
+                  <path fill="#FBBC05" d="M3.95 10.68c-.18-.54-.28-1.12-.28-1.68s.1-1.14.28-1.68V5.02H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.98l3-2.3z" />
+                  <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z" />
                 </svg>
                 {t("Registrarme con Google", idioma)}
               </button>
@@ -2161,10 +2251,10 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                 }}
               >
                 <svg width="20" height="20" viewBox="0 0 18 18">
-                  <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.7-1.57 2.69-3.88 2.69-6.57z"/>
-                  <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.72H.95v2.3C2.43 15.89 5.5 18 9 18z"/>
-                  <path fill="#FBBC05" d="M3.95 10.68c-.18-.54-.28-1.12-.28-1.68s.1-1.14.28-1.68V5.02H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.98l3-2.3z"/>
-                  <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z"/>
+                  <path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.16-1.84H9v3.47h4.84c-.21 1.12-.84 2.07-1.79 2.7v2.24h2.9c1.7-1.57 2.69-3.88 2.69-6.57z" />
+                  <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.23l-2.9-2.24c-.8.54-1.84.87-3.06.87-2.35 0-4.34-1.58-5.05-3.72H.95v2.3C2.43 15.89 5.5 18 9 18z" />
+                  <path fill="#FBBC05" d="M3.95 10.68c-.18-.54-.28-1.12-.28-1.68s.1-1.14.28-1.68V5.02H.95C.34 6.22 0 7.57 0 9s.34 2.78.95 3.98l3-2.3z" />
+                  <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35L15 2.4C13.46.97 11.43 0 9 0 5.5 0 2.43 2.11.95 5.02l3 2.3c.71-2.14 2.7-3.72 5.05-3.72z" />
                 </svg>
                 {t("Continuar con Google", idioma)}
               </button>
@@ -2229,7 +2319,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                   className="ss-input"
                   style={{ width: "100%", padding: "12px 14px", borderRadius: "10px" }}
                   value={loginForm.email}
-                  onChange={e => setLoginForm({...loginForm, email: e.target.value})}
+                  onChange={e => setLoginForm({ ...loginForm, email: e.target.value })}
                 />
               </div>
 
@@ -2241,7 +2331,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                   className="ss-input"
                   style={{ width: "100%", padding: "12px 14px", borderRadius: "10px" }}
                   value={loginForm.password}
-                  onChange={e => setLoginForm({...loginForm, password: e.target.value})}
+                  onChange={e => setLoginForm({ ...loginForm, password: e.target.value })}
                 />
               </div>
 
@@ -2267,7 +2357,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                   {t("¿Olvidaste tu contraseña?", idioma)}
                 </a>
               </div>
-              
+
               {errorLogin && (
                 <div style={{ padding: "10px 14px", background: "#fef1f2", color: "#991b1b", borderRadius: "10px", fontSize: "12px", border: "1px solid #fee2e2", whiteSpace: "pre-line", textAlign: "left", lineHeight: 1.45 }}>
                   {errorLogin.replace("ERROR: ", "")}
@@ -2319,7 +2409,7 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
           >
             {t("Explorar sin cuenta", idioma)}
           </button>
-          
+
           <div style={{ display: "flex", gap: "20px" }}>
             <button
               onClick={() => onVerLegal("terminos")}
@@ -2384,10 +2474,10 @@ function CountrySelect({ value, onChange, idioma = "es" }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: '120px' }}>
-      <div 
+      <div
         className="ss-input"
-        style={{ 
-          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', 
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
           padding: '0 10px', color: '#333', userSelect: 'none',
           backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 8, height: 42
         }}
@@ -2397,7 +2487,7 @@ function CountrySelect({ value, onChange, idioma = "es" }) {
         <span style={{ fontSize: 14 }}>{selected.dial}</span>
         <span style={{ marginLeft: 'auto', fontSize: 10, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
       </div>
-      
+
       {isOpen && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, width: 220,
@@ -2406,7 +2496,7 @@ function CountrySelect({ value, onChange, idioma = "es" }) {
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
         }}>
           {COUNTRY_CODES.map((c, i) => (
-            <div 
+            <div
               key={c.code + i}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
@@ -2440,7 +2530,7 @@ function SexoSelect({ value, onChange, idioma = "es" }) {
   const [isOpen, setIsOpen] = useState(false);
   const selected = SEXO_OPTIONS.find(o => o.value === value) || SEXO_OPTIONS[0];
   const wrapperRef = useRef(null);
-  
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -2453,10 +2543,10 @@ function SexoSelect({ value, onChange, idioma = "es" }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', flex: 1 }}>
-      <div 
+      <div
         className="ss-input"
-        style={{ 
-          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', 
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
           padding: '0 10px', color: value ? '#333' : '#777', userSelect: 'none',
           backgroundColor: selected.color, border: '1px solid #ccc', borderRadius: 8, height: 42
         }}
@@ -2466,7 +2556,7 @@ function SexoSelect({ value, onChange, idioma = "es" }) {
         <span style={{ fontSize: 14 }}>{t(selected.label, idioma)}</span>
         <span style={{ marginLeft: 'auto', fontSize: 10, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
       </div>
-      
+
       {isOpen && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
@@ -2475,7 +2565,7 @@ function SexoSelect({ value, onChange, idioma = "es" }) {
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
         }}>
           {SEXO_OPTIONS.slice(1).map((o, i) => (
-            <div 
+            <div
               key={o.value}
               style={{
                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px',
@@ -2496,12 +2586,12 @@ function SexoSelect({ value, onChange, idioma = "es" }) {
   );
 }
 
-const EDAD_OPTIONS = Array.from({length: 86}, (_, i) => i + 15);
+const EDAD_OPTIONS = Array.from({ length: 86 }, (_, i) => i + 15);
 
 function EdadSelect({ value, onChange, idioma = "es" }) {
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
-  
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -2514,10 +2604,10 @@ function EdadSelect({ value, onChange, idioma = "es" }) {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', flex: 1 }}>
-      <div 
+      <div
         className="ss-input"
-        style={{ 
-          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', 
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer',
           padding: '0 10px', color: value ? '#333' : '#777', userSelect: 'none',
           backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: 8, height: 42
         }}
@@ -2526,7 +2616,7 @@ function EdadSelect({ value, onChange, idioma = "es" }) {
         <span style={{ fontSize: 14 }}>{value || t('Edad', idioma)}</span>
         <span style={{ marginLeft: 'auto', fontSize: 10, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
       </div>
-      
+
       {isOpen && (
         <div style={{
           position: 'absolute', top: '100%', left: 0, right: 0,
@@ -2536,7 +2626,7 @@ function EdadSelect({ value, onChange, idioma = "es" }) {
           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1, padding: 4
         }}>
           {EDAD_OPTIONS.map((age) => (
-            <div 
+            <div
               key={age}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 0',
@@ -2545,8 +2635,8 @@ function EdadSelect({ value, onChange, idioma = "es" }) {
                 fontSize: 14, color: '#333'
               }}
               onClick={() => { onChange(String(age)); setIsOpen(false); }}
-              onMouseEnter={(e) => { if(value !== String(age)) e.currentTarget.style.backgroundColor = '#f9f9f9'; }}
-              onMouseLeave={(e) => { if(value !== String(age)) e.currentTarget.style.backgroundColor = 'transparent'; }}
+              onMouseEnter={(e) => { if (value !== String(age)) e.currentTarget.style.backgroundColor = '#f9f9f9'; }}
+              onMouseLeave={(e) => { if (value !== String(age)) e.currentTarget.style.backgroundColor = 'transparent'; }}
             >
               {age}
             </div>
@@ -2563,9 +2653,9 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
   const [showPassword, setShowPassword] = useState(false);
   const [passwordRepetida, setPasswordRepetida] = useState("");
   const [emailError, setEmailError] = useState("");
-  
-  useEffect(() => { if(error) setLocalError(error); }, [error]);
-  
+
+  useEffect(() => { if (error) setLocalError(error); }, [error]);
+
   const handleEmailBlur = (e) => {
     const val = e.target.value;
     if (val && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
@@ -2615,7 +2705,7 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
           value={form.nombre}
           onChange={(e) => setForm({ ...form, nombre: e.target.value })}
         />
-        
+
         <div style={{ display: "flex", gap: 10 }}>
           <EdadSelect value={form.edad} onChange={(val) => setForm({ ...form, edad: val })} idioma={idioma} />
           <SexoSelect value={form.sexo} onChange={(val) => setForm({ ...form, sexo: val })} idioma={idioma} />
@@ -2651,7 +2741,7 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 style={{
-                  position: "absolute", right: 10, top: 10, background: "none", border: "none", 
+                  position: "absolute", right: 10, top: 10, background: "none", border: "none",
                   cursor: "pointer", fontSize: 18, color: "#777", padding: 0
                 }}
               >
@@ -2683,7 +2773,7 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
             </div>
           </>
         )}
-        
+
         <div style={{ display: "flex", gap: 10 }}>
           <CountrySelect value={form.codigoPais || "co"} idioma={idioma} onChange={(val) => {
             let formatted = form.celular;
@@ -2793,12 +2883,12 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
             }
           }
           if (!aceptaTerminos) faltantes.push(t("• Aceptar Términos y Política", idioma));
-          
+
           if (faltantes.length > 0) {
             setLocalError(t("Por favor completa los siguientes campos obligatorios para continuar:\n\n", idioma) + faltantes.join("\n"));
             return;
           }
-          
+
           onNext(form);
         }}
       >
@@ -2818,8 +2908,8 @@ function ScreenRegistro({ onNext, onBack, onVerLegal, form, setForm, aceptaTermi
             boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
             textAlign: "center"
           }}>
-            <button 
-              onClick={() => { setLocalError(""); if(onErrorClose) onErrorClose(); }} 
+            <button
+              onClick={() => { setLocalError(""); if (onErrorClose) onErrorClose(); }}
               style={{
                 position: "absolute", top: 12, right: 12,
                 background: "none", border: "none", fontSize: 24, cursor: "pointer",
@@ -2922,8 +3012,8 @@ function ScreenPerfil({ nombre, email, planPago, datosPagoBasico, retoDiaActual,
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: esPremium ? "#10b981" : "#f59e0b" }} />
               {esPremium
                 ? (planPago === "anual"
-                    ? t("✨ Suscripción Activa · Plan Anual", idioma)
-                    : t("✨ Suscripción Activa · Plan Mensual", idioma))
+                  ? t("✨ Suscripción Activa · Plan Anual", idioma)
+                  : t("✨ Suscripción Activa · Plan Mensual", idioma))
                 : t("🌱 Modo Prueba (3 días)", idioma)}
             </span>
           </div>
@@ -2973,13 +3063,13 @@ function ScreenPerfil({ nombre, email, planPago, datosPagoBasico, retoDiaActual,
         {/* Banner de Modo Prueba para usuarios no premium */}
         {(!esPremium || (!esAlpha && planPago === "prueba")) && !tieneAccesoTotal && (
           <div style={{
-            background: pruebaExpirada 
+            background: pruebaExpirada
               ? "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.05) 100%)"
               : diaPruebaActual === 3
-              ? "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
-              : diaPruebaActual === 2
-              ? "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)"
-              : "linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)",
+                ? "linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)"
+                : diaPruebaActual === 2
+                  ? "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)"
+                  : "linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)",
             border: `1.5px solid ${pruebaExpirada ? "rgba(239, 68, 68, 0.3)" : diaPruebaActual === 3 ? "#fde68a" : diaPruebaActual === 2 ? "#86efac" : "#d8b4fe"}`,
             borderRadius: 16,
             padding: "16px 18px",
@@ -2993,16 +3083,16 @@ function ScreenPerfil({ nombre, email, planPago, datosPagoBasico, retoDiaActual,
               <span style={{ fontSize: 24 }}>{pruebaExpirada ? "🔒" : diaPruebaActual === 3 ? "⏳" : diaPruebaActual === 2 ? "🌿" : "🌱"}</span>
               <div>
                 <h4 style={{ fontSize: 13.5, fontWeight: 700, color: pruebaExpirada ? "#991b1b" : diaPruebaActual === 3 ? "#92400e" : diaPruebaActual === 2 ? "#166534" : "#6b21a8", margin: 0 }}>
-                  {pruebaExpirada 
+                  {pruebaExpirada
                     ? t("Has cumplido tus 3 días de prueba", idioma)
                     : diaPruebaActual === 3
-                    ? t("Día 3 de 3 · ¡Último día de prueba!", idioma)
-                    : diaPruebaActual === 2
-                    ? `${t("Día 2 de 3 · Acceso Premium de prueba", idioma)} (Queda 1 día)`
-                    : `${t("Día 1 de 3 · Acceso Premium de prueba", idioma)} (Quedan 2 días)`}
+                      ? t("Día 3 de 3 · ¡Último día de prueba!", idioma)
+                      : diaPruebaActual === 2
+                        ? `${t("Día 2 de 3 · Acceso Premium de prueba", idioma)} (Queda 1 día)`
+                        : `${t("Día 1 de 3 · Acceso Premium de prueba", idioma)} (Quedan 2 días)`}
                 </h4>
                 <p style={{ fontSize: 11.5, color: pruebaExpirada ? "#7f1d1d" : diaPruebaActual === 3 ? "#b45309" : diaPruebaActual === 2 ? "#15803d" : "#7c3aed", margin: 0 }}>
-                  {pruebaExpirada 
+                  {pruebaExpirada
                     ? t("Tu período gratuito ha concluido. Adquiere tu suscripción para reactivar tu acceso.", idioma)
                     : t("Pasa a adquirir tu suscripción para mantener todo tu avance y acompañamiento continuo.", idioma)}
                 </p>
@@ -3360,7 +3450,7 @@ function TarjetaIdentificadorSuscriptor({ uid, orderId, planPago, idioma = "es",
 
   const handleCopiar = () => {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(subscriberId).catch(() => {});
+      navigator.clipboard.writeText(subscriberId).catch(() => { });
       setCopiado(true);
       setTimeout(() => setCopiado(false), 2000);
     }
@@ -3466,17 +3556,17 @@ function TarjetaIdentificadorSuscriptor({ uid, orderId, planPago, idioma = "es",
   );
 }
 
-function ScreenSuscripcion({ 
-  planPago, 
-  datosPagoBasico, 
+function ScreenSuscripcion({
+  planPago,
+  datosPagoBasico,
   currentUser = null,
-  onAdquirirSuscripcion, 
+  onAdquirirSuscripcion,
   onContinuarConfiguracion = null,
-  onBack, 
-  idioma = "es", 
-  tieneAccesoTotal = false, 
-  enPruebaActiva = false, 
-  pruebaExpirada = false, 
+  onBack,
+  idioma = "es",
+  tieneAccesoTotal = false,
+  enPruebaActiva = false,
+  pruebaExpirada = false,
   diasRestantesPrueba = 0,
   onRestaurarCompras = null
 }) {
@@ -3490,7 +3580,7 @@ function ScreenSuscripcion({
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column", background: "#fcfaf7" }}>
       <TopBar title={t("Mi suscripción", idioma)} onBack={onBack} idioma={idioma} />
-      
+
       <div className="ss-stagger ss-no-scrollbar" style={{ flex: 1, marginTop: 10, overflowY: "auto" }}>
         {esPremium ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -3697,11 +3787,11 @@ function ScreenSuscripcion({
                 {pruebaExpirada ? t("Prueba de 3 días concluida", idioma) : enPruebaActiva ? t("Prueba gratuita de 3 días", idioma) : t("Desbloquea Suelta Premium", idioma)}
               </h3>
               <p style={{ fontSize: 13, color: MUTED, lineHeight: 1.45, margin: 0, maxWidth: 280, marginLeft: "auto", marginRight: "auto" }}>
-                {pruebaExpirada 
+                {pruebaExpirada
                   ? t("Tu período de prueba de 3 días ha finalizado. Elige un plan para continuar accediendo al reto, herramientas y perspectivas.", idioma)
                   : enPruebaActiva
-                  ? `${t("Estás en tu prueba de 3 días", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)}). ${t("Suscríbete para asegurar tu continuidad sin interrupciones.", idioma)}`
-                  : t("Descubre el camino definitivo de bienestar emocional con nuestro acceso completo sin límites.", idioma)
+                    ? `${t("Estás en tu prueba de 3 días", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)}). ${t("Suscríbete para asegurar tu continuidad sin interrupciones.", idioma)}`
+                    : t("Descubre el camino definitivo de bienestar emocional con nuestro acceso completo sin límites.", idioma)
                 }
               </p>
             </div>
@@ -3813,7 +3903,7 @@ function ScreenEditarPerfil({ nombreActual, apodoActual, fotoActual = null, onGu
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <TopBar title={t("Editar perfil", idioma)} onBack={onBack} idioma={idioma} />
       <div style={{ flex: 1, marginTop: 10, display: "flex", flexDirection: "column", gap: 14 }}>
-        
+
         {/* FOTO DE PERFIL / CÁMARA */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <div style={{
@@ -3865,10 +3955,10 @@ function ScreenEditarPerfil({ nombreActual, apodoActual, fotoActual = null, onGu
           <label style={{ fontSize: 11.5, fontWeight: 700, color: SAGE_DARK, textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 5 }}>
             {t("Cómo quieres que te llamemos", idioma)}
           </label>
-          <input 
-            className="ss-input" 
-            value={nombre} 
-            onChange={(e) => setNombreLocal(e.target.value)} 
+          <input
+            className="ss-input"
+            value={nombre}
+            onChange={(e) => setNombreLocal(e.target.value)}
             placeholder={t("Tu nombre", idioma)}
             autoCorrect="on"
             spellCheck={true}
@@ -3879,10 +3969,10 @@ function ScreenEditarPerfil({ nombreActual, apodoActual, fotoActual = null, onGu
           <label style={{ fontSize: 11.5, fontWeight: 700, color: SAGE_DARK, textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 5 }}>
             {t("Apodo (opcional)", idioma)}
           </label>
-          <input 
-            className="ss-input" 
-            value={apodo} 
-            onChange={(e) => setApodoLocal(e.target.value)} 
+          <input
+            className="ss-input"
+            value={apodo}
+            onChange={(e) => setApodoLocal(e.target.value)}
             placeholder={t("Un apodo, si prefieres", idioma)}
             autoCorrect="on"
             spellCheck={true}
@@ -4005,7 +4095,7 @@ function ScreenLegal({ tipo = "terminos", onBack, idioma = "es", onOpenMenu }) {
             <p>
               {terms.intro}
             </p>
-            
+
             <h4 style={{ fontWeight: 700, color: SAGE_DARK, margin: "10px 0 2px 0" }}>{terms.sec1Title}</h4>
             <p>
               {terms.sec1Text}
@@ -4040,7 +4130,7 @@ function ScreenLegal({ tipo = "terminos", onBack, idioma = "es", onOpenMenu }) {
             <p style={{ fontSize: 11, color: MUTED, margin: 0 }}>
               {privacy.subtitle}
             </p>
-            
+
             <div style={{ background: "#f5fbf8", border: `1px solid ${SAGE}`, borderRadius: 12, padding: 12, display: "flex", gap: 8, alignItems: "flex-start" }}>
               <span style={{ fontSize: 18 }}>🛡️</span>
               <p style={{ fontSize: 12, color: SAGE_DARK, fontWeight: 600, margin: 0 }}>
@@ -4364,10 +4454,10 @@ function ScreenInicio({ seleccion, toggleSel, onNext, nombre, apodo, onBorrarPru
                 justifyContent: "space-between",
                 cursor: "pointer"
               }}
-              onClick={() => {
-                if (onAbrirModalPrueba) onAbrirModalPrueba();
-                else if (onVerPlanes) onVerPlanes();
-              }}
+                onClick={() => {
+                  if (onAbrirModalPrueba) onAbrirModalPrueba();
+                  else if (onVerPlanes) onVerPlanes();
+                }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <span style={{ fontSize: 20 }}>{diaPruebaActual === 3 ? "⏳" : diaPruebaActual === 2 ? "🌿" : "🌱"}</span>
@@ -4376,8 +4466,8 @@ function ScreenInicio({ seleccion, toggleSel, onNext, nombre, apodo, onBorrarPru
                       {diaPruebaActual === 3
                         ? t("Día 3 de 3 · ¡Último día de prueba!", idioma)
                         : diaPruebaActual === 2
-                        ? `${t("Día 2 de 3 · Prueba activa", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)})`
-                        : `${t("Día 1 de 3 · Prueba activa", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)})`}
+                          ? `${t("Día 2 de 3 · Prueba activa", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)})`
+                          : `${t("Día 1 de 3 · Prueba activa", idioma)} (${diasRestantesPrueba} ${diasRestantesPrueba === 1 ? t("día restante", idioma) : t("días restantes", idioma)})`}
                     </p>
                     <p style={{ margin: 0, fontSize: 11, color: MUTED }}>
                       {t("Pasa a adquirir tu suscripción para mantener todo tu avance", idioma)}
@@ -4411,7 +4501,7 @@ function ScreenInicio({ seleccion, toggleSel, onNext, nombre, apodo, onBorrarPru
 
             {/* 3. Usuario con período de prueba concluido */}
             {pruebaExpirada && (
-              <div 
+              <div
                 style={{
                   background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(220, 38, 38, 0.06) 100%)",
                   border: "1px solid rgba(239, 68, 68, 0.28)",
@@ -4617,8 +4707,8 @@ function ScreenInicio({ seleccion, toggleSel, onNext, nombre, apodo, onBorrarPru
         )}
         <button
           className="ss-btn ss-btn-primary"
-          style={{ 
-            width: "100%", 
+          style={{
+            width: "100%",
             boxShadow: esTutorial ? "0 0 0 4px #dfa15f, 0 10px 25px rgba(223,161,95,0.4)" : "0 6px 18px rgba(63,107,91,0.2)",
             transform: esTutorial ? "scale(1.02)" : undefined,
             transition: "all 0.3s ease",
@@ -4740,7 +4830,7 @@ function useSonidoAmbiental() {
           audioRef.current.pause();
           audioRef.current.src = "";
         }
-      } catch (e) {}
+      } catch (e) { }
     };
   }, []);
 
@@ -4751,7 +4841,7 @@ function useSonidoAmbiental() {
 
 function limpiarDuplicadosConsecutivos(texto) {
   if (!texto || typeof texto !== "string") return "";
-  
+
   let limpio = texto.replace(/\s+/g, " ").trim();
   if (!limpio) return "";
 
@@ -4763,7 +4853,7 @@ function limpiarDuplicadosConsecutivos(texto) {
     const anterior = sinPalabrasRepetidas[sinPalabrasRepetidas.length - 1];
     const cleanActual = actual.toLowerCase().replace(/^[.,!?;:"'¿¡()]+|[.,!?;:"'¿¡()]+$/g, '');
     const cleanAnterior = anterior ? anterior.toLowerCase().replace(/^[.,!?;:"'¿¡()]+|[.,!?;:"'¿¡()]+$/g, '') : "";
-    
+
     if (cleanActual && cleanActual === cleanAnterior) {
       continue;
     }
@@ -4857,7 +4947,7 @@ function useDictado(onResult) {
     return () => {
       userWantsRecordingRef.current = false;
       if (recRef.current) {
-        try { recRef.current.abort(); } catch (e) {}
+        try { recRef.current.abort(); } catch (e) { }
         recRef.current = null;
       }
     };
@@ -4867,7 +4957,7 @@ function useDictado(onResult) {
     userWantsRecordingRef.current = false;
     setEscuchando(false);
     if (recRef.current) {
-      try { recRef.current.stop(); } catch (e) {}
+      try { recRef.current.stop(); } catch (e) { }
       recRef.current = null;
     }
   };
@@ -4882,7 +4972,7 @@ function useDictado(onResult) {
     }
 
     if (recRef.current) {
-      try { recRef.current.abort(); } catch (e) {}
+      try { recRef.current.abort(); } catch (e) { }
       recRef.current = null;
     }
 
@@ -5524,7 +5614,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
         if (window.screen && window.screen.orientation && typeof window.screen.orientation.unlock === "function") {
           window.screen.orientation.unlock();
         }
-      } catch (e) {}
+      } catch (e) { }
     };
   }, []);
 
@@ -5604,7 +5694,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
     const measure = () => {
       if (!containerRef.current) return;
       const containerRect = containerRef.current.getBoundingClientRect();
-      
+
       const hotspotEl = document.getElementById(`hotspot-${zonaActiva}`);
       if (!hotspotEl) return;
       const hRect = hotspotEl.getBoundingClientRect();
@@ -5618,7 +5708,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
         const itemEl = document.getElementById(`sub-item-${idx}`);
         if (!itemEl) return null;
         const itemRect = itemEl.getBoundingClientRect();
-        
+
         // Conexión al borde izquierdo de la tarjeta del síntoma
         const endX = itemRect.left - containerRect.left;
         const endY = itemRect.top - containerRect.top + 18; // Centro de la primera fila de la tarjeta
@@ -5748,12 +5838,12 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
 
       {/* Selector de Energía / Género Premium — Solo visible para el usuario de prueba */}
       {esUsuarioPrueba && (
-        <div 
-          style={{ 
-            display: "flex", 
-            background: "rgba(0,0,0,0.03)", 
-            padding: "3px", 
-            borderRadius: "99px", 
+        <div
+          style={{
+            display: "flex",
+            background: "rgba(0,0,0,0.03)",
+            padding: "3px",
+            borderRadius: "99px",
             marginBottom: "16px",
             border: `1.5px solid ${LINE}`,
             position: "relative"
@@ -5801,12 +5891,12 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
       )}
 
       {/* Main Container Card */}
-      <div 
+      <div
         ref={containerRef}
-        style={{ 
-          position: "relative", 
-          width: "100%", 
-          maxWidth: splitMode ? "720px" : "360px", 
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: splitMode ? "720px" : "360px",
           height: splitMode ? (esMovil ? "520px" : "440px") : "440px",
           background: "#faf9f7",
           borderRadius: 24,
@@ -5850,12 +5940,12 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
                 <path d="M20 9l1 3-3-1" stroke={colorGlow} strokeWidth="1.2" />
               </svg>
             </div>
-            
-            <h3 
-              style={{ 
-                fontSize: "15px", 
-                fontWeight: 700, 
-                color: INK, 
+
+            <h3
+              style={{
+                fontSize: "15px",
+                fontWeight: 700,
+                color: INK,
                 margin: "0 0 8px",
                 fontFamily: FONT_BODY,
                 letterSpacing: "-0.01em"
@@ -5863,20 +5953,20 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
             >
               {t("Experiencia Horizontal Recomendada", idioma)}
             </h3>
-            
-            <p 
-              style={{ 
-                fontSize: "12px", 
-                color: MUTED, 
-                lineHeight: "1.5", 
-                maxWidth: "280px", 
+
+            <p
+              style={{
+                fontSize: "12px",
+                color: MUTED,
+                lineHeight: "1.5",
+                maxWidth: "280px",
                 margin: "0 0 20px",
                 fontFamily: FONT_BODY
               }}
             >
               {t("Para navegar por el mapa de tu cuerpo y explorar la sabiduría somática con total claridad y movimiento, gira tu dispositivo horizontalmente.", idioma)}
             </p>
-            
+
             <button
               className="ss-btn"
               onClick={() => setDismissedRotationPrompt(true)}
@@ -5900,7 +5990,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
         )}
 
         {/* Sacred Geometry Background / Glowing Circles (Left Pane) */}
-        <div 
+        <div
           className="ss-grid-circle"
           style={{
             position: "absolute",
@@ -5915,7 +6005,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
             transition: "all 0.5s cubic-bezier(0.25, 1, 0.5, 1)"
           }}
         />
-        <div 
+        <div
           className="ss-grid-circle"
           style={{
             position: "absolute",
@@ -5986,15 +6076,15 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
             <img
               src={imagen}
               alt={esFemenino ? "Silueta femenina interactiva" : "Silueta masculina interactiva"}
-              style={{ 
-                width: "100%", 
-                height: "100%", 
+              style={{
+                width: "100%",
+                height: "100%",
                 objectFit: "contain",
                 position: "absolute",
                 top: 0,
                 left: 0,
-                display: "block", 
-                userSelect: "none", 
+                display: "block",
+                userSelect: "none",
                 opacity: 0.94,
                 filter: zonaActiva ? "brightness(1.02) contrast(1.05)" : "none",
                 transition: "all 0.3s ease",
@@ -6027,15 +6117,15 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
                     padding: esMovil ? "3px 7px" : "4px 8px",
                     borderRadius: 99,
                     border: activo ? `2px solid ${colorGlow}` : "1.1px solid rgba(0,0,0,0.08)",
-                    background: activo 
-                      ? colorGlow 
+                    background: activo
+                      ? colorGlow
                       : "rgba(255, 255, 255, 0.94)",
                     color: activo ? "white" : INK,
                     fontFamily: FONT_BODY,
                     fontSize: activo ? (esMovil ? 10 : 11) : (esMovil ? 9 : 10),
                     fontWeight: 700,
                     cursor: "pointer",
-                    boxShadow: activo 
+                    boxShadow: activo
                       ? `0 6px 18px ${esFemenino ? "rgba(138, 107, 184, 0.35)" : "rgba(63, 107, 91, 0.35)"}`
                       : "0 2px 8px rgba(0,0,0,0.04)",
                     zIndex: activo ? 25 : 10,
@@ -6046,7 +6136,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
                   }}
                 >
                   {/* Colored Indicator Dot */}
-                  <span 
+                  <span
                     className={!activo ? pulseClass : ""}
                     style={{
                       width: 6,
@@ -6092,7 +6182,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
             </defs>
             {lineCoords.map((line, idx) => {
               const { startX, startY, endX, endY, esSeleccionado } = line;
-              
+
               // Dynamic organic curves that gracefully adapt to desktop (horizontal flow) vs mobile (vertical/diagonal flow)
               const cpX1 = esMovil ? startX : startX + (endX - startX) * 0.5;
               const cpY1 = esMovil ? startY + (endY - startY) * 0.5 : startY;
@@ -6199,7 +6289,7 @@ function CuerpoSeleccionable({ sexo, zonaActiva, onSelectZone, nombre, idioma })
                       flexDirection: "column",
                       padding: "12px 14px",
                       borderRadius: 14,
-                      background: esSeleccionado 
+                      background: esSeleccionado
                         ? (esFemenino ? "rgba(138, 107, 184, 0.04)" : "rgba(63, 107, 91, 0.04)")
                         : "rgba(0, 0, 0, 0.02)",
                       border: `1.5px solid ${esSeleccionado ? colorGlow : "rgba(0,0,0,0.03)"}`,
@@ -6492,29 +6582,29 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
             </div>
 
             <div style={{
-               flex: 1,
-               position: "relative",
-               borderRadius: 20,
-               background: dictado.escuchando ? "rgba(254, 242, 242, 0.7)" : "rgba(255, 255, 255, 0.8)",
-               backdropFilter: "blur(12px)",
-               border: `1.5px solid ${dictado.escuchando ? "#ef4444" : LINE}`,
-               boxShadow: dictado.escuchando ? "0 8px 24px rgba(239, 68, 68, 0.15)" : "0 6px 16px rgba(0,0,0,0.04)",
-               transition: "all 0.3s ease",
-               padding: "18px 20px 60px 20px",
-               minHeight: "200px",
-               display: "flex", 
-               flexDirection: "column"
+              flex: 1,
+              position: "relative",
+              borderRadius: 20,
+              background: dictado.escuchando ? "rgba(254, 242, 242, 0.7)" : "rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(12px)",
+              border: `1.5px solid ${dictado.escuchando ? "#ef4444" : LINE}`,
+              boxShadow: dictado.escuchando ? "0 8px 24px rgba(239, 68, 68, 0.15)" : "0 6px 16px rgba(0,0,0,0.04)",
+              transition: "all 0.3s ease",
+              padding: "18px 20px 60px 20px",
+              minHeight: "200px",
+              display: "flex",
+              flexDirection: "column"
             }}
-            onFocus={(e) => {
-               e.currentTarget.style.borderColor = SAGE;
-               e.currentTarget.style.boxShadow = "0 8px 24px rgba(111,168,146,0.15)";
-               e.currentTarget.style.background = "#ffffff";
-            }}
-            onBlur={(e) => {
-               e.currentTarget.style.borderColor = dictado.escuchando ? "#ef4444" : LINE;
-               e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.04)";
-               e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
-            }}>
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = SAGE;
+                e.currentTarget.style.boxShadow = "0 8px 24px rgba(111,168,146,0.15)";
+                e.currentTarget.style.background = "#ffffff";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = dictado.escuchando ? "#ef4444" : LINE;
+                e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.04)";
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+              }}>
               <textarea
                 name="historia"
                 id="historia-input"
@@ -6524,18 +6614,18 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                 spellCheck={true}
                 autoCapitalize="sentences"
                 data-gramm="true"
-                style={{ 
-                   width: "100%",
-                   background: "transparent",
-                   border: "none",
-                   outline: "none",
-                   color: INK,
-                   fontSize: 15.5,
-                   lineHeight: 1.6,
-                   resize: "none",
-                   fontFamily: FONT_BODY,
-                   overflowY: "auto",
-                   flex: 1
+                style={{
+                  width: "100%",
+                  background: "transparent",
+                  border: "none",
+                  outline: "none",
+                  color: INK,
+                  fontSize: 15.5,
+                  lineHeight: 1.6,
+                  resize: "none",
+                  fontFamily: FONT_BODY,
+                  overflowY: "auto",
+                  flex: 1
                 }}
                 placeholder={t("Escribe tu historia aquí... no te preocupes por el formato, solo déjalo salir, o toca el micrófono para contarla en voz alta.", idioma)}
                 value={datos.historia}
@@ -6550,16 +6640,16 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
               </div>
             </div>
             {dictado.error === "permiso" && (
-              <div 
+              <div
                 onClick={() => dispararGuiaPermisos("microfono")}
-                style={{ 
-                  fontSize: 11.5, 
-                  color: "#b91c1c", 
+                style={{
+                  fontSize: 11.5,
+                  color: "#b91c1c",
                   background: "#fef2f2",
                   border: "1px solid #fecaca",
                   borderRadius: 8,
                   padding: "6px 10px",
-                  margin: "8px 0 0", 
+                  margin: "8px 0 0",
                   lineHeight: 1.4,
                   cursor: "pointer",
                   display: "flex",
@@ -6622,19 +6712,19 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                   transition: "all 0.3s ease",
                   padding: "18px 20px 60px 20px",
                   minHeight: "200px",
-                  display: "flex", 
+                  display: "flex",
                   flexDirection: "column"
                 }}
-                onFocus={(e) => {
-                   e.currentTarget.style.borderColor = SAGE;
-                   e.currentTarget.style.boxShadow = "0 8px 24px rgba(111,168,146,0.15)";
-                   e.currentTarget.style.background = "#ffffff";
-                }}
-                onBlur={(e) => {
-                   e.currentTarget.style.borderColor = LINE;
-                   e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.04)";
-                   e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
-                }}>
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = SAGE;
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(111,168,146,0.15)";
+                    e.currentTarget.style.background = "#ffffff";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = LINE;
+                    e.currentTarget.style.boxShadow = "0 6px 16px rgba(0,0,0,0.04)";
+                    e.currentTarget.style.background = "rgba(255, 255, 255, 0.8)";
+                  }}>
                   <textarea
                     name={`historia_etapa_${p.id}`}
                     inputMode="text"
@@ -6643,18 +6733,18 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                     spellCheck={true}
                     autoCapitalize="sentences"
                     data-gramm="true"
-                    style={{ 
-                       width: "100%",
-                       background: "transparent",
-                       border: "none",
-                       outline: "none",
-                       color: INK,
-                       fontSize: 15.5,
-                       lineHeight: 1.6,
-                       resize: "none",
-                       fontFamily: FONT_BODY,
-                       overflowY: "auto",
-                       flex: 1
+                    style={{
+                      width: "100%",
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      color: INK,
+                      fontSize: 15.5,
+                      lineHeight: 1.6,
+                      resize: "none",
+                      fontFamily: FONT_BODY,
+                      overflowY: "auto",
+                      flex: 1
                     }}
                     placeholder={t("Escribe o dicta lo que venga a tu memoria...", idioma)}
                     value={valorActual}
@@ -6669,16 +6759,16 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                   </div>
                 </div>
                 {dictadoVida.error === "permiso" && (
-                  <div 
+                  <div
                     onClick={() => dispararGuiaPermisos("microfono")}
-                    style={{ 
-                      fontSize: 11.5, 
-                      color: "#b91c1c", 
+                    style={{
+                      fontSize: 11.5,
+                      color: "#b91c1c",
                       background: "#fef2f2",
                       border: "1px solid #fecaca",
                       borderRadius: 8,
                       padding: "6px 10px",
-                      margin: "8px 0 0", 
+                      margin: "8px 0 0",
                       lineHeight: 1.4,
                       cursor: "pointer",
                       display: "flex",
@@ -6736,8 +6826,8 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
             <p style={{ fontSize: 11.5, color: MUTED, margin: "0 0 12px" }}>
               {t("Selecciona un punto de tensión o dolor directamente sobre la silueta corporal.", idioma)}
             </p>
-            <CuerpoSeleccionable 
-              sexo={sexo} 
+            <CuerpoSeleccionable
+              sexo={sexo}
               zonaActiva={zonaActiva}
               nombre={nombre}
               idioma={idioma}
@@ -6746,7 +6836,7 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                 setDatos({ ...datos, fisica: texto });
               }}
             />
-            
+
             {zonaActiva && (() => {
               const punto = PUNTOS_CUERPO.find(p => p.grupo === zonaActiva);
               if (!punto) return null;
@@ -6828,8 +6918,8 @@ function ScreenCaptura({ seleccion, datos, setDatos, onNext, onBack, sexo, onIrP
                     const seleccionadas = Array.isArray(datos.emocion)
                       ? datos.emocion
                       : datos.emocion
-                      ? [datos.emocion]
-                      : [];
+                        ? [datos.emocion]
+                        : [];
                     const activa = seleccionadas.includes(em);
                     return (
                       <button
@@ -6909,7 +6999,7 @@ function ScreenAnalizando({ onDone, idioma }) {
         textAlign: "center",
       }}
     >
-      
+
       <div className="ss-logo-loading-container">
         <div className="ss-logo-loading-aura" />
         <img src={LOGO_DATA_URI} className="ss-logo-loading" alt="Cargando..." />
@@ -6953,17 +7043,17 @@ function CajaFuente({ resultados, tema, idioma }) {
   const highlight = tema ? tema.highlight : "#2c4a3f";
   return (
     <div style={{ background: bg, borderRadius: 14, marginTop: 4, overflow: "hidden" }}>
-      <button 
+      <button
         onClick={() => setOpen(!open)}
-        style={{ 
-          width: "100%", 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
-          padding: 14, 
-          background: "none", 
-          border: "none", 
-          cursor: "pointer" 
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: 14,
+          background: "none",
+          border: "none",
+          cursor: "pointer"
         }}
       >
         <span style={{ fontSize: 10.5, fontWeight: 700, color: color, textTransform: "uppercase" }}>
@@ -6973,8 +7063,8 @@ function CajaFuente({ resultados, tema, idioma }) {
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
-      <div style={{ 
-        display: "grid", 
+      <div style={{
+        display: "grid",
         gridTemplateRows: open ? "1fr" : "0fr",
         transition: "grid-template-rows 0.3s ease-in-out"
       }}>
@@ -7000,42 +7090,42 @@ function CajaOtrasCausas({ resultados, tema, idioma }) {
   if (!resultados || resultados.length === 0) return null;
   const r = resultados[0];
   if (!r.otrasCausas || r.otrasCausas.length === 0) return null;
-  
+
   const bg = tema ? tema.tint : LAVENDER_TINT;
   const stroke = tema ? tema.stroke : "#d8d2e5";
   const iconColor = tema ? tema.iconColor : LAVENDER;
   const highlight = tema ? tema.highlight : "#4a3c63";
-  
+
   return (
     <div style={{ background: bg, border: `1px solid ${stroke}`, borderRadius: 16, marginBottom: 16, overflow: "hidden" }}>
-      <button 
+      <button
         onClick={() => setOpen(!open)}
-        style={{ 
-          width: "100%", 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between", 
-          padding: "16px 18px", 
-          background: "none", 
-          border: "none", 
-          cursor: "pointer" 
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "16px 18px",
+          background: "none",
+          border: "none",
+          cursor: "pointer"
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 12h4l3-9 5 18 3-9h5"/>
-           </svg>
-           <h4 style={{ fontSize: 11.5, fontWeight: 700, color: iconColor, textTransform: "uppercase", margin: 0, letterSpacing: 0.5 }}>
-             {t("Otras posibles causas", idioma)}
-           </h4>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 12h4l3-9 5 18 3-9h5" />
+          </svg>
+          <h4 style={{ fontSize: 11.5, fontWeight: 700, color: iconColor, textTransform: "uppercase", margin: 0, letterSpacing: 0.5 }}>
+            {t("Otras posibles causas", idioma)}
+          </h4>
         </div>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease" }}>
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
-      
-      <div style={{ 
-        display: "grid", 
+
+      <div style={{
+        display: "grid",
         gridTemplateRows: open ? "1fr" : "0fr",
         transition: "grid-template-rows 0.3s ease-in-out"
       }}>
@@ -7045,10 +7135,10 @@ function CajaOtrasCausas({ resultados, tema, idioma }) {
               {idioma === "en"
                 ? `Sometimes a conflict has more than one origin. Without stating this is your case, some situations that often accompany “${r.termino.toLowerCase()}” are:`
                 : idioma === "fr"
-                ? `Parfois, un conflit a plusieurs origines. Sans affirmer que ce soit votre cas, certaines situations qui accompagnent souvent « ${r.termino.toLowerCase()} » sont :`
-                : idioma === "it"
-                ? `A volte un conflitto ha più di un'origine. Senza affermare che sia il tuo caso, alcune situazioni che spesso accompagnano “${r.termino.toLowerCase()}” sono:`
-                : `A veces un conflicto tiene más de un origen. Sin afirmar que sea tu caso, algunas situaciones que suelen acompañar a “${r.termino.toLowerCase()}” son:`}
+                  ? `Parfois, un conflit a plusieurs origines. Sans affirmer que ce soit votre cas, certaines situations qui accompagnent souvent « ${r.termino.toLowerCase()} » sont :`
+                  : idioma === "it"
+                    ? `A volte un conflitto ha più di un'origine. Senza affermare che sia il tuo caso, alcune situazioni che spesso accompagnano “${r.termino.toLowerCase()}” sono:`
+                    : `A veces un conflicto tiene más de un origen. Sin afirmar que sea tu caso, algunas situaciones que suelen acompañar a “${r.termino.toLowerCase()}” son:`}
             </p>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 8 }}>
               {r.otrasCausas.map((c, i) => (
@@ -7082,7 +7172,7 @@ function AvisoBienestar({ tema, idioma }) {
       }}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkColor} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.85 }}>
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         <line x1="12" y1="8" x2="12" y2="12"></line>
         <line x1="12" y1="16" x2="12.01" y2="16"></line>
       </svg>
@@ -7098,44 +7188,44 @@ function IconoCapaBiologica({ capa, color, size = 15 }) {
   if (c.includes("emoc") || c.includes("feel")) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
       </svg>
     );
   }
   if (c.includes("ecto")) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
     );
   }
   if (c.includes("meso")) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 8v8"/>
-        <path d="M8 12h8"/>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 8v8" />
+        <path d="M8 12h8" />
       </svg>
     );
   }
   if (c.includes("endo")) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 3a9 9 0 0 0 0 18v-9Z"/>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 3a9 9 0 0 0 0 18v-9Z" />
       </svg>
     );
   }
   if (c.includes("nerv")) {
     return (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
       </svg>
     );
   }
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
     </svg>
   );
 }
@@ -7196,8 +7286,8 @@ function GuiaRespiracion1Min({ tema, idioma }) {
           }}
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
           </svg>
           {t("Pausar y respirar 1 minuto con este sentir", idioma) || "Pausar y respirar 1 minuto con este sentir"}
         </button>
@@ -7244,20 +7334,20 @@ function SintonometroResonancia({ tema, idioma }) {
   const [resonancia, setResonancia] = React.useState(null);
 
   const opciones = [
-    { 
-      id: "mucho", 
-      label: t("🌱 Resuena profundo", idioma) || "🌱 Resuena profundo", 
-      mensaje: t("Tu cuerpo ya reconoce la verdad de este patrón; honra este momento de claridad.", idioma) || "Tu cuerpo ya reconoce la verdad de este patrón; honra este momento de claridad." 
+    {
+      id: "mucho",
+      label: t("🌱 Resuena profundo", idioma) || "🌱 Resuena profundo",
+      mensaje: t("Tu cuerpo ya reconoce la verdad de este patrón; honra este momento de claridad.", idioma) || "Tu cuerpo ya reconoce la verdad de este patrón; honra este momento de claridad."
     },
-    { 
-      id: "parte", 
-      label: t("🌾 En parte", idioma) || "🌾 En parte", 
-      mensaje: t("Toma solo lo que te resuene hoy; lo demás se acomodará suavemente a su tiempo.", idioma) || "Toma solo lo que te resuene hoy; lo demás se acomodará suavemente a su tiempo." 
+    {
+      id: "parte",
+      label: t("🌾 En parte", idioma) || "🌾 En parte",
+      mensaje: t("Toma solo lo que te resuene hoy; lo demás se acomodará suavemente a su tiempo.", idioma) || "Toma solo lo que te resuene hoy; lo demás se acomodará suavemente a su tiempo."
     },
-    { 
-      id: "procesando", 
-      label: t("🔍 Lo estoy asimilando", idioma) || "🔍 Lo estoy asimilando", 
-      mensaje: t("Permítete observar sin prisa. Nombrar algo nuevo requiere una digestión amable.", idioma) || "Permítete observar sin prisa. Nombrar algo nuevo requiere una digestión amable." 
+    {
+      id: "procesando",
+      label: t("🔍 Lo estoy asimilando", idioma) || "🔍 Lo estoy asimilando",
+      mensaje: t("Permítete observar sin prisa. Nombrar algo nuevo requiere una digestión amable.", idioma) || "Permítete observar sin prisa. Nombrar algo nuevo requiere una digestión amable."
     },
   ];
 
@@ -7272,11 +7362,11 @@ function SintonometroResonancia({ tema, idioma }) {
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={tema.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <path d="m4.93 4.93 4.24 4.24"/>
-          <path d="m14.83 9.17 4.24-4.24"/>
-          <path d="m14.83 14.83 4.24 4.24"/>
-          <path d="m9.17 14.83-4.24 4.24"/>
+          <circle cx="12" cy="12" r="10" />
+          <path d="m4.93 4.93 4.24 4.24" />
+          <path d="m14.83 9.17 4.24-4.24" />
+          <path d="m14.83 14.83 4.24 4.24" />
+          <path d="m9.17 14.83-4.24 4.24" />
         </svg>
         <h4 style={{ fontSize: 12.5, fontWeight: 700, color: tema.dark, margin: 0 }}>
           {t("¿Qué tanto resuena esta lectura en tu cuerpo?", idioma) || "¿Qué tanto resuena esta lectura en tu cuerpo?"}
@@ -7355,20 +7445,20 @@ function ScreenLecturaBienestar({
         cuerpo: idioma === "en"
           ? `${n ? n + ", with" : "With"} the information you shared, we cannot provide a reliable reading yet. The text might be incomplete or difficult to recognize. Tell us in your own words what is happening or what physical symptom you feel, and we'll gladly try again.`
           : idioma === "fr"
-          ? `${n ? n + ", avec" : "Avec"} les informations partagées, nous ne pouvons pas encore vous proposer une lecture fiable. Le texte semble incomplet ou difficile à interpréter. Racontez-nous avec vos propres mots ce qui se passe ou le symptôme physique que vous ressentez, et nous réessaierons avec plaisir.`
-          : idioma === "it"
-          ? `${n ? n + ", con" : "Con"} le informazioni che hai condiviso non possiamo ancora offrirti una lettura affidabile. Il testo potrebbe essere incompleto o difficile da riconoscere. Raccontaci con parole tue cosa ti sta accadendo o quale sintomo fisico avverti, e riproveremo volentieri.`
-          : `${n ? n + ", c" : "C"}on la información que compartiste no podemos ofrecerte una lectura confiable todavía. Puede que el texto haya salido incompleto, repetido o difícil de reconocer. Cuéntanos con tus propias palabras qué te está pasando, o qué síntoma físico sientes, y lo intentamos de nuevo con gusto.`,
+            ? `${n ? n + ", avec" : "Avec"} les informations partagées, nous ne pouvons pas encore vous proposer une lecture fiable. Le texte semble incomplet ou difficile à interpréter. Racontez-nous avec vos propres mots ce qui se passe ou le symptôme physique que vous ressentez, et nous réessaierons avec plaisir.`
+            : idioma === "it"
+              ? `${n ? n + ", con" : "Con"} le informazioni che hai condiviso non possiamo ancora offrirti una lettura affidabile. Il testo potrebbe essere incompleto o difficile da riconoscere. Raccontaci con parole tue cosa ti sta accadendo o quale sintomo fisico avverti, e riproveremo volentieri.`
+              : `${n ? n + ", c" : "C"}on la información que compartiste no podemos ofrecerte una lectura confiable todavía. Puede que el texto haya salido incompleto, repetido o difícil de reconocer. Cuéntanos con tus propias palabras qué te está pasando, o qué síntoma físico sientes, y lo intentamos de nuevo con gusto.`,
       },
       insuficiente: {
         titulo: t("Necesitamos un poco más para acompañarte", idioma),
         cuerpo: idioma === "en"
           ? `${n ? n + ", what" : "What"} you shared is too brief to produce a reliable reading. Tell us in more detail what you are going through, where in your body you feel discomfort, or what emotion accompanies you. The more you tell us, the better we can guide you.`
           : idioma === "fr"
-          ? `${n ? n + ", ce" : "Ce"} que vous avez partagé est trop bref pour une lecture fiable. Racontez-nous plus en détail ce que vous traversez, où vous ressentez une gêne corporelle ou quelle émotion vous accompagne. Plus vous nous en direz, mieux nous pourrons vous orienter.`
-          : idioma === "it"
-          ? `${n ? n + ", quanto" : "Quanto"} hai condiviso è troppo breve per elaborare una lettura affidabile. Raccontaci con più dettagli cosa stai vivendo, dove avverti fastidio nel corpo o quale emozione ti accompagna. Più informazioni ci dai, meglio possiamo orientarti.`
-          : `${n ? n + ", l" : "L"}o que compartiste es muy breve para hacer una lectura confiable. Cuéntanos con más detalle qué estás viviendo, dónde sientes molestia en el cuerpo, o qué emoción te acompaña. Mientras más nos digas, mejor podemos orientarte.`,
+            ? `${n ? n + ", ce" : "Ce"} que vous avez partagé est trop bref pour une lecture fiable. Racontez-nous plus en détail ce que vous traversez, où vous ressentez une gêne corporelle ou quelle émotion vous accompagne. Plus vous nous en direz, mieux nous pourrons vous orienter.`
+            : idioma === "it"
+              ? `${n ? n + ", quanto" : "Quanto"} hai condiviso è troppo breve per elaborare una lettura affidabile. Raccontaci con più dettagli cosa stai vivendo, dove avverti fastidio nel corpo o quale emozione ti accompagna. Più informazioni ci dai, meglio possiamo orientarti.`
+              : `${n ? n + ", l" : "L"}o que compartiste es muy breve para hacer una lectura confiable. Cuéntanos con más detalle qué estás viviendo, dónde sientes molestia en el cuerpo, o qué emoción te acompaña. Mientras más nos digas, mejor podemos orientarte.`,
       },
       vacio: {
         titulo: t("No recibimos información", idioma),
@@ -7408,72 +7498,72 @@ function ScreenLecturaBienestar({
   const rPrincipal = resultados && resultados.length > 0 ? resultados[0] : null;
 
   const THEMES_POR_CAPA = {
-    "Emoción": { 
-      tint: "#f5f0fb", 
-      dark: "#6c4d9e", 
-      bg: "linear-gradient(180deg, #fbf8fd 0%, #f4eef9 100%)", 
-      iconColor: "#7c55b5", 
-      stroke: "#e5dcf2", 
+    "Emoción": {
+      tint: "#f5f0fb",
+      dark: "#6c4d9e",
+      bg: "linear-gradient(180deg, #fbf8fd 0%, #f4eef9 100%)",
+      iconColor: "#7c55b5",
+      stroke: "#e5dcf2",
       highlight: "#3c2561",
       accent: "#8a5fc7",
       glow: "rgba(138, 95, 199, 0.15)",
       pillBg: "#ede5f7",
       badgeText: t("Capa Emocional · Puerto Seguro", idioma) || "Capa Emocional · Puerto Seguro"
     },
-    "Ectodermo": { 
-      tint: "#eef6f2", 
-      dark: "#2d634f", 
-      bg: "linear-gradient(180deg, #f7faf8 0%, #edf5f0 100%)", 
-      iconColor: "#397d64", 
-      stroke: "#d0e4d9", 
+    "Ectodermo": {
+      tint: "#eef6f2",
+      dark: "#2d634f",
+      bg: "linear-gradient(180deg, #f7faf8 0%, #edf5f0 100%)",
+      iconColor: "#397d64",
+      stroke: "#d0e4d9",
       highlight: "#1e4436",
       accent: "#459678",
       glow: "rgba(69, 150, 120, 0.15)",
       pillBg: "#e0efe7",
       badgeText: t("Capa Ectodérmica · Contacto y Relación", idioma) || "Capa Ectodérmica · Contacto y Relación"
     },
-    "Mesodermo": { 
-      tint: "#fdf3f0", 
-      dark: "#964531", 
-      bg: "linear-gradient(180deg, #fdf9f7 0%, #faede8 100%)", 
-      iconColor: "#ba553c", 
-      stroke: "#f3d3c8", 
+    "Mesodermo": {
+      tint: "#fdf3f0",
+      dark: "#964531",
+      bg: "linear-gradient(180deg, #fdf9f7 0%, #faede8 100%)",
+      iconColor: "#ba553c",
+      stroke: "#f3d3c8",
       highlight: "#682e20",
       accent: "#d4664b",
       glow: "rgba(212, 102, 75, 0.15)",
       pillBg: "#fae2db",
       badgeText: t("Capa Mesodérmica · Estructura y Valor", idioma) || "Capa Mesodérmica · Estructura y Valor"
     },
-    "Endodermo": { 
-      tint: "#fff6eb", 
-      dark: "#995200", 
-      bg: "linear-gradient(180deg, #fffcf7 0%, #fcf0df 100%)", 
-      iconColor: "#c26d0e", 
-      stroke: "#f7dfbe", 
+    "Endodermo": {
+      tint: "#fff6eb",
+      dark: "#995200",
+      bg: "linear-gradient(180deg, #fffcf7 0%, #fcf0df 100%)",
+      iconColor: "#c26d0e",
+      stroke: "#f7dfbe",
       highlight: "#663600",
       accent: "#d97d18",
       glow: "rgba(217, 125, 24, 0.15)",
       pillBg: "#fcedd7",
       badgeText: t("Capa Endodérmica · Nutrición y Asimilación", idioma) || "Capa Endodérmica · Nutrición y Asimilación"
     },
-    "Sistema nervioso": { 
-      tint: "#edf6fc", 
-      dark: "#1c5d8a", 
-      bg: "linear-gradient(180deg, #f6fafd 0%, #e9f3fa 100%)", 
-      iconColor: "#2579b3", 
-      stroke: "#cbe3f5", 
+    "Sistema nervioso": {
+      tint: "#edf6fc",
+      dark: "#1c5d8a",
+      bg: "linear-gradient(180deg, #f6fafd 0%, #e9f3fa 100%)",
+      iconColor: "#2579b3",
+      stroke: "#cbe3f5",
       highlight: "#123e5c",
       accent: "#2f92d4",
       glow: "rgba(47, 146, 212, 0.15)",
       pillBg: "#dcecf7",
       badgeText: t("Sistema Nervioso · Regulación Somática", idioma) || "Sistema Nervioso · Regulación Somática"
     },
-    "default": { 
-      tint: SAGE_TINT, 
-      dark: SAGE_DARK, 
-      bg: "linear-gradient(180deg, #fafbf9 0%, #f2f5f1 100%)", 
-      iconColor: SAGE_DARK, 
-      stroke: LINE, 
+    "default": {
+      tint: SAGE_TINT,
+      dark: SAGE_DARK,
+      bg: "linear-gradient(180deg, #fafbf9 0%, #f2f5f1 100%)",
+      iconColor: SAGE_DARK,
+      stroke: LINE,
       highlight: INK,
       accent: SAGE_DARK,
       glow: "rgba(63, 107, 91, 0.12)",
@@ -7528,9 +7618,9 @@ function ScreenLecturaBienestar({
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column", background: tema.bg, margin: "-22px -22px 0", paddingTop: 22 }}>
       <TopBar title={t("Tu lectura de bienestar", idioma)} onBack={onBack} />
-      
+
       <div style={{ flex: 1, marginTop: 4, overflowY: "auto", padding: "0 22px" }}>
-        
+
         {/* Breathing awareness pulse bar */}
         <div style={{
           display: "flex",
@@ -7669,8 +7759,8 @@ function ScreenLecturaBienestar({
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={tema.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 7 4 8 7 8z"/>
-                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 7 4 8 7 8z"/>
+                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H4c-1.25 0-2 .75-2 2v6c0 7 4 8 7 8z" />
+                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-4c-1.25 0-2 .75-2 2v6c0 7 4 8 7 8z" />
               </svg>
               <span style={{ fontSize: 11, fontWeight: 700, color: tema.dark, textTransform: "uppercase", letterSpacing: 0.5 }}>
                 {t("Lo que nombró tu voz", idioma) || "Lo que nombró tu voz"}
@@ -7693,7 +7783,7 @@ function ScreenLecturaBienestar({
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tema.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
             </svg>
             <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: tema.highlight, margin: 0, fontWeight: 600 }}>
               {t("El espejo de tu sentir", idioma) || "El espejo de tu sentir"}
@@ -7723,9 +7813,9 @@ function ScreenLecturaBienestar({
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tema.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="16" x2="12" y2="12"/>
-                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
               </svg>
               <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: tema.highlight, margin: 0, fontWeight: 600 }}>
                 {t("El mensaje biológico profundo", idioma) || "El mensaje biológico profundo"}
@@ -7794,7 +7884,7 @@ function ScreenLecturaBienestar({
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tema.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
               <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: tema.highlight, margin: 0, fontWeight: 600 }}>
                 {t("Tu momento y recursos de regulación", idioma) || "Tu momento y recursos de regulación"}
@@ -7856,8 +7946,8 @@ function ScreenLecturaBienestar({
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={tema.accent || tema.dark} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                  <circle cx="12" cy="12" r="10" />
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
                 </svg>
                 <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: tema.highlight, margin: 0, fontWeight: 700 }}>
                   {t("Tu brújula práctica de hoy", idioma) || "Tu brújula práctica de hoy"}
@@ -7923,7 +8013,7 @@ function ScreenLecturaBienestar({
         {/* Soft, supportive disclaimer note at bottom */}
         <AvisoBienestar tema={tema} idioma={idioma} />
       </div>
-      
+
       {/* Bottom CTA to continue plan */}
       <div style={{ padding: "0 22px" }}>
         <button className="ss-btn ss-btn-premium" style={{ width: "100%", marginTop: 14 }} onClick={onPaywall}>
@@ -7993,7 +8083,7 @@ const PLANES_PAGO = [
 function ScreenPostRegistro({ onNext, idioma }) {
   const menuCtx = React.useContext(MenuContext);
   const [paso, setPaso] = React.useState(0);
-  
+
   const slides = [
     {
       title: t("Bienvenido a tu nuevo refugio", idioma),
@@ -8023,13 +8113,13 @@ function ScreenPostRegistro({ onNext, idioma }) {
         <div style={{ fontSize: 56, marginBottom: 24 }} className="ss-onda-3">{slides[paso].icon}</div>
         <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 600, color: SAGE_DARK, marginBottom: 16 }}>{slides[paso].title}</h2>
         <p style={{ fontSize: 15, color: INK, lineHeight: 1.6, marginBottom: 40, maxWidth: 300 }}><ResaltarMarca>{slides[paso].desc}</ResaltarMarca></p>
-        
+
         <div style={{ display: "flex", gap: 8, marginBottom: 40 }}>
           {slides.map((_, i) => (
             <div key={i} style={{ width: i === paso ? 24 : 8, height: 8, borderRadius: 4, background: i === paso ? SAGE : "rgba(111,168,146,0.2)", transition: "all 0.3s ease" }} />
           ))}
         </div>
-        
+
         <button
           className="ss-btn ss-btn-primary"
           style={{ width: "100%", padding: "16px", fontSize: "16px" }}
@@ -8088,15 +8178,15 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
   return (
     <div className="ss-fade" style={{ padding: "0 0 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <TopBar title={t("Elige tu plan", idioma)} onBack={onBack} />
-      
+
       <div style={{ flex: 1, overflowY: "auto", padding: "0 22px" }} className="ss-no-scrollbar">
         {/* Cabecera Inspiracional */}
         <div style={{ textAlign: "center", margin: "16px 0 16px" }}>
-          <p style={{ 
-            fontFamily: FONT_DISPLAY, 
-            fontStyle: "italic", 
-            fontSize: 16, 
-            color: INK, 
+          <p style={{
+            fontFamily: FONT_DISPLAY,
+            fontStyle: "italic",
+            fontSize: 16,
+            color: INK,
             lineHeight: 1.5,
             maxWidth: 290,
             margin: "0 auto 12px"
@@ -8166,15 +8256,15 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
           {PLANES_PAGO.map((p) => {
             const activo = planElegido === p.id;
-            
+
             // Colores personalizados por tarjeta
             const isAnual = p.id === "anual";
-            const borderCol = activo 
-              ? (isAnual ? KINOEMOTION_UI : SAGE_DARK) 
+            const borderCol = activo
+              ? (isAnual ? KINOEMOTION_UI : SAGE_DARK)
               : LINE;
-            
-            const bgCol = activo 
-              ? (isAnual ? KINOEMOTION_TINT : SAGE_TINT) 
+
+            const bgCol = activo
+              ? (isAnual ? KINOEMOTION_TINT : SAGE_TINT)
               : "white";
 
             return (
@@ -8195,8 +8285,8 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                   minHeight: 140,
                   gap: 4,
                   fontFamily: FONT_BODY,
-                  boxShadow: activo 
-                    ? `0 6px 18px ${isAnual ? "rgba(184,90,63,0.12)" : "rgba(63,107,91,0.08)"}` 
+                  boxShadow: activo
+                    ? `0 6px 18px ${isAnual ? "rgba(184,90,63,0.12)" : "rgba(63,107,91,0.08)"}`
                     : "none",
                   transform: activo ? "scale(1.02)" : "scale(1)",
                   transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -8226,26 +8316,26 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
 
                 {/* Encabezado de la Tarjeta */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-                  <span style={{ 
-                    fontSize: 10, 
-                    fontWeight: 800, 
-                    color: activo ? borderCol : MUTED, 
-                    textTransform: "uppercase", 
-                    letterSpacing: "0.05em" 
+                  <span style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: activo ? borderCol : MUTED,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em"
                   }}>
                     {t(p.nombre, idioma) || p.nombre}
                   </span>
-                  
+
                   {/* Selector visual */}
                   <span style={{
                     width: 15, height: 15,
                     borderRadius: "50%",
                     border: `1.5px solid ${activo ? borderCol : LINE}`,
                     background: activo ? borderCol : "transparent",
-                    display: "flex", 
-                    alignItems: "center", 
+                    display: "flex",
+                    alignItems: "center",
                     justifyContent: "center",
-                    color: "white", 
+                    color: "white",
                     fontSize: 8,
                     fontWeight: 900
                   }}>
@@ -8286,9 +8376,9 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                 </div>
 
                 {/* Mini etiqueta de cobro real */}
-                <span style={{ 
-                  fontSize: 8.5, 
-                  color: activo ? borderCol : MUTED, 
+                <span style={{
+                  fontSize: 8.5,
+                  color: activo ? borderCol : MUTED,
                   textAlign: "center",
                   fontWeight: activo ? 600 : 400,
                   opacity: 0.95
@@ -8304,8 +8394,8 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
         <div style={{
           background: "white",
           border: `1.5px solid ${planTheme.color}30`,
-          borderRadius: 20, 
-          padding: "18px 20px", 
+          borderRadius: 20,
+          padding: "18px 20px",
           marginBottom: 16,
           boxShadow: `0 8px 24px rgba(0,0,0,0.015)`,
           position: "relative",
@@ -8351,16 +8441,16 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
               </span>
             )}
 
-            <h4 style={{ 
-              fontFamily: FONT_DISPLAY, 
-              fontSize: 17, 
-              fontWeight: 600, 
-              color: planTheme.darkColor, 
-              margin: "0 0 6px" 
+            <h4 style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: 17,
+              fontWeight: 600,
+              color: planTheme.darkColor,
+              margin: "0 0 6px"
             }}>
               {t("Beneficios del plan", idioma)} {t(plan.nombre, idioma) || plan.nombre}
             </h4>
-            
+
             <p style={{ fontSize: 13, color: MUTED, margin: "0 0 16px", lineHeight: 1.4, maxWidth: "85%" }}>
               {planTheme.desc}
             </p>
@@ -8419,11 +8509,11 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
 
             {/* Resumen del Ahorro Anual */}
             {plan.ahorro && (
-              <div style={{ 
-                marginTop: 16, 
-                padding: "10px 14px", 
-                background: "#fef8f6", 
-                borderRadius: 12, 
+              <div style={{
+                marginTop: 16,
+                padding: "10px 14px",
+                background: "#fef8f6",
+                borderRadius: 12,
                 border: `1px solid ${KINOEMOTION_UI}20`,
                 display: "flex",
                 alignItems: "center",
@@ -8440,7 +8530,7 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
 
         {/* Tabla Comparativa Desplegable - Inteligente y Espaciosa */}
         <div style={{ marginBottom: 18 }}>
-          <button 
+          <button
             onClick={() => setVerDetalles(!verDetalles)}
             style={{
               width: "100%",
@@ -8458,9 +8548,9 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
             <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.04em" }}>
               {t("Comparar características completas", idioma)}
             </span>
-            <span style={{ 
-              fontSize: 11, 
-              fontWeight: 600, 
+            <span style={{
+              fontSize: 11,
+              fontWeight: 600,
               color: SAGE_DARK,
               display: "flex",
               alignItems: "center",
@@ -8479,12 +8569,12 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                   {t("Beneficio", idioma)}
                 </div>
                 {PLANES_PAGO.map((p) => (
-                  <div key={p.id} style={{ 
-                    padding: "10px 4px", 
-                    textAlign: "center", 
-                    fontSize: 10, 
-                    fontWeight: 800, 
-                    color: planElegido === p.id ? KINOEMOTION_UI : MUTED, 
+                  <div key={p.id} style={{
+                    padding: "10px 4px",
+                    textAlign: "center",
+                    fontSize: 10,
+                    fontWeight: 800,
+                    color: planElegido === p.id ? KINOEMOTION_UI : MUTED,
                     textTransform: "uppercase",
                     background: planElegido === p.id ? `${planTheme.color}08` : "transparent"
                   }}>
@@ -8492,27 +8582,27 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                   </div>
                 ))}
               </div>
-              
+
               {/* Filas */}
               {TABLA_PLANES.map((row, i) => (
-                <div key={row.feature} style={{ 
-                  display: "grid", 
-                  gridTemplateColumns: "1.2fr 0.6fr 0.6fr 0.6fr", 
-                  borderBottom: i < TABLA_PLANES.length - 1 ? `1px solid ${LINE}` : "none", 
-                  background: i % 2 === 0 ? "white" : CREAM 
+                <div key={row.feature} style={{
+                  display: "grid",
+                  gridTemplateColumns: "1.2fr 0.6fr 0.6fr 0.6fr",
+                  borderBottom: i < TABLA_PLANES.length - 1 ? `1px solid ${LINE}` : "none",
+                  background: i % 2 === 0 ? "white" : CREAM
                 }}>
                   <div style={{ padding: "11px 12px", fontSize: 12, color: INK, fontWeight: 500 }}>
                     {t(row.feature, idioma) || row.feature}
                   </div>
-                  {["prueba","mensual","anual"].map((id) => {
+                  {["prueba", "mensual", "anual"].map((id) => {
                     const val = row[id];
                     const isSelectedCol = planElegido === id;
                     return (
-                      <div key={id} style={{ 
-                        padding: "11px 4px", 
-                        textAlign: "center", 
-                        display: "flex", 
-                        alignItems: "center", 
+                      <div key={id} style={{
+                        padding: "11px 4px",
+                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
                         justifyContent: "center",
                         background: isSelectedCol ? `${planTheme.color}08` : "transparent"
                       }}>
@@ -8534,9 +8624,9 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                             <span style={{ fontSize: 13, color: "#d2d2d2" }}>—</span>
                           )
                         ) : (
-                          <span style={{ 
-                            fontSize: 11, 
-                            fontWeight: 700, 
+                          <span style={{
+                            fontSize: 11,
+                            fontWeight: 700,
                             color: id === "anual" ? KINOEMOTION_UI : SAGE_DARK,
                             background: id === "anual" ? KINOEMOTION_TINT : SAGE_TINT,
                             padding: "2px 6px",
@@ -8555,10 +8645,10 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
         </div>
 
         {/* Garantía, Privacidad y Confianza */}
-        <div style={{ 
-          background: CREAM, 
-          borderRadius: 16, 
-          padding: "14px 16px", 
+        <div style={{
+          background: CREAM,
+          borderRadius: 16,
+          padding: "14px 16px",
           marginBottom: 10,
           border: `1px dashed ${LINE}`,
           display: "flex",
@@ -8578,14 +8668,14 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
 
         {/* Nota explicativa de pago para la Prueba */}
         {esGratisPlan && (
-          <div style={{ 
-            background: "#fff5f2", 
-            border: "1px solid #f6d1c9", 
-            borderRadius: 16, 
-            padding: "12px 16px", 
-            marginBottom: 10, 
-            display: "flex", 
-            gap: 10 
+          <div style={{
+            background: "#fff5f2",
+            border: "1px solid #f6d1c9",
+            borderRadius: 16,
+            padding: "12px 16px",
+            marginBottom: 10,
+            display: "flex",
+            gap: 10
           }}>
             <Lock size={16} style={{ color: KINOEMOTION_UI, marginTop: 2, flexShrink: 0 }} />
             <p style={{ fontSize: 12, color: "#8a3a20", margin: 0, lineHeight: 1.4 }}>
@@ -8646,16 +8736,16 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
             </>
           )}
         </button>
-        
-        <button 
-          className="ss-btn ss-btn-ghost" 
-          style={{ 
-            width: "100%", 
-            fontSize: 13, 
+
+        <button
+          className="ss-btn ss-btn-ghost"
+          style={{
+            width: "100%",
+            fontSize: 13,
             color: MUTED,
             fontWeight: 600,
             padding: "8px 12px"
-          }} 
+          }}
           onClick={onSaltar}
         >
           {t("Seguir usando la versión básica gratuita", idioma)}
@@ -8688,7 +8778,11 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
             }}
           >
             <GooglePlayIcon size={13} />
-            <span>{t("¿Ya compraste en Google Play? Restaurar compras", idioma)}</span>
+            <span>
+              {typeof window !== "undefined" && (window.Capacitor?.getPlatform?.() === "ios" || (/iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent)))
+                ? (t("¿Ya te suscribiste en App Store? Restaurar compras", idioma) || "¿Ya te suscribiste en App Store? Restaurar compras")
+                : t("¿Ya compraste en Google Play? Restaurar compras", idioma)}
+            </span>
           </button>
         )}
       </div>
@@ -8700,6 +8794,11 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
   const activeAuth = auth?.currentUser;
   const targetUser = (currentUser?.uid && !currentUser.uid.startsWith("play_user_")) ? currentUser : activeAuth;
   const estaAutenticado = !!targetUser?.uid;
+  const esApple = typeof window !== "undefined" && (
+    window.Capacitor?.getPlatform?.() === "ios" ||
+    (/iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent))
+  );
+  const nombreTienda = esApple ? "App Store" : "Google Play Store";
   const [errorPago, setErrorPago] = useState("");
   const [avisoPlayStore, setAvisoPlayStore] = useState("");
   const [paso, setPaso] = useState("preparado"); // "preparado" | "procesando" | "completado"
@@ -8720,9 +8819,9 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
       return;
     }
 
-    // Conexión real con Google Play Billing oficial
+    // Conexión real con pasarela oficial (App Store o Google Play)
     setPaso("procesando");
-    setMensajePlayProgreso(t("Conectando con Google Play Store...", idioma));
+    setMensajePlayProgreso(esApple ? (t("Conectando con Apple App Store...", idioma) || "Conectando con Apple App Store...") : t("Conectando con Google Play Store...", idioma));
 
     try {
       const res = await procesarCompraGooglePlay({
@@ -8750,30 +8849,30 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
           osc.start();
           osc.stop(ctx.currentTime + 0.3);
-        } catch(e){}
+        } catch (e) { }
 
         setTimeout(() => {
           onConfirmar(res.datosPago);
         }, 500);
       } else {
         setPaso("preparado");
-        setErrorPago(res?.mensaje || t("No se pudo iniciar la pasarela de Google Play. Puedes reintentar o volver al inicio.", idioma));
+        setErrorPago(res?.mensaje || t(`No se pudo iniciar la pasarela de ${nombreTienda}. Puedes reintentar o volver al inicio.`, idioma));
       }
     } catch (err) {
       const msg = err?.message || "";
       if (msg.includes("ITEM_ALREADY_OWNED") || msg.includes("Ya te suscribiste") || msg.includes("already owned") || err?.code === 7) {
-        const orderId = `GPA.OWNED.${Date.now()}`;
+        const orderId = `${esApple ? "APL" : "GPA"}.OWNED.${Date.now()}`;
         const duracionDias = plan.id === "anual" ? 365 : 30;
         const now = Date.now();
         const datos = {
-          plataforma: "Google Play Store",
-          gateway: "google_play",
+          plataforma: esApple ? "Apple App Store" : "Google Play Store",
+          gateway: esApple ? "apple_app_store" : "google_play",
           orderId,
           transaccionId: orderId,
-          purchaseToken: "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
+          purchaseToken: esApple ? "APPLE_APPSTORE_ACTIVE_OWNED_TOKEN" : "GOOGLE_PLAY_ACTIVE_OWNED_TOKEN",
           productId: skuInfo.productId,
           planId: plan.id,
-          medioPago: "Google Play Billing",
+          medioPago: esApple ? "Apple In-App Purchase" : "Google Play Billing",
           fechaTransaccion: new Date(now).toLocaleDateString() + " " + new Date(now).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           fechaInicio: now,
           fechaExpiracion: now + (duracionDias * 24 * 60 * 60 * 1000),
@@ -8786,11 +8885,11 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
         return;
       }
       setPaso("preparado");
-      if (msg.includes("cancel") || msg.includes("Cancel") || msg.includes("cancelado") || msg.includes("USER_CANCELED") || err?.code === 1 || err?.code === 6777006) {
+      if (msg.includes("cancel") || msg.includes("Cancel") || msg.includes("cancelado") || msg.includes("USER_CANCELED") || err?.code === 1 || err?.code === 6777006 || err?.code === 2) {
         setAvisoPlayStore(t("Has cerrado o cancelado el proceso de pago. No se realizó ningún cargo a tu tarjeta. Puedes reanudar tu suscripción cuando lo desees.", idioma));
         return;
       }
-      setErrorPago(err.message || t("Error al conectar con Google Play Store", idioma));
+      setErrorPago(err.message || t(`Error al conectar con ${nombreTienda}`, idioma));
     }
   };
 
@@ -8837,17 +8936,21 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
 
   return (
     <div className="ss-fade" style={{ padding: "0 20px 24px", minHeight: "100%", display: "flex", flexDirection: "column", background: "#faf8f3" }}>
-      <TopBar title={t("Google Play Store", idioma)} onBack={onBack} />
-      
-      <div style={{ flex: 1, marginTop: 4, overflowY: "auto" }} className="ss-no-scrollbar">
-        {/* Banner Oficial Google Play Store */}
+      <TopBar title={esApple ? (t("Apple App Store", idioma) || "Apple App Store") : t("Google Play Store", idioma)} onBack={onBack} />
+
+      <div style={{ flex: 1, marginTop: 4, overflowY: "auto", paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 32px)" }} className="ss-no-scrollbar">
+        {/* Banner Oficial de la Tienda (Apple App Store o Google Play Store) */}
         <div style={{
-          background: "linear-gradient(135deg, #01875f 0%, #0b694b 100%)",
+          background: esApple
+            ? "linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%)"
+            : "linear-gradient(135deg, #01875f 0%, #0b694b 100%)",
           borderRadius: 18,
           padding: "16px 18px",
           marginBottom: 16,
           color: "white",
-          boxShadow: "0 4px 16px rgba(1,135,95,0.22)"
+          boxShadow: esApple
+            ? "0 4px 16px rgba(0,0,0,0.25)"
+            : "0 4px 16px rgba(1,135,95,0.22)"
         }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 8 }}>
             <div style={{
@@ -8865,19 +8968,23 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <h4 style={{ fontSize: 14, fontWeight: 700, margin: 0, color: "white" }}>
-                  Google Play Billing
+                  {esApple ? "Apple In-App Purchase" : "Google Play Billing"}
                 </h4>
                 <span style={{ fontSize: 9.5, background: "rgba(255,255,255,0.25)", padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>
-                  OFICIAL
+                  {t("OFICIAL", idioma) || "OFICIAL"}
                 </span>
               </div>
               <p style={{ fontSize: 11, color: "rgba(255,255,255,0.85)", margin: "2px 0 0", fontWeight: 500 }}>
-                {t("Facturación segura y directa de Google Play para Android", idioma)}
+                {esApple
+                  ? (t("Facturación segura y protegida de Apple App Store", idioma) || "Facturación segura y protegida de Apple App Store")
+                  : t("Facturación segura y directa de Google Play para Android", idioma)}
               </p>
             </div>
           </div>
           <p style={{ fontSize: 11.5, color: "rgba(255,255,255,0.92)", margin: 0, lineHeight: 1.45 }}>
-            {t("Tus datos bancarios están blindados por Google Play. Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta de Google Play Store.", idioma)}
+            {esApple
+              ? (t("Tus datos bancarios están protegidos por Apple. Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta de Apple ID.", idioma) || "Tus datos bancarios están protegidos por Apple. Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta de Apple ID.")
+              : t("Tus datos bancarios están blindados por Google Play. Puedes gestionar o cancelar tu suscripción en cualquier momento desde los ajustes de tu cuenta de Google Play Store.", idioma)}
           </p>
         </div>
 
@@ -8930,14 +9037,16 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {beneficios.map((b, i) => (
               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                <span style={{ color: "#01875f", fontWeight: 900, fontSize: 13, lineHeight: 1.2 }}>✓</span>
+                <span style={{ color: esApple ? "#0071e3" : "#01875f", fontWeight: 900, fontSize: 13, lineHeight: 1.2 }}>✓</span>
                 <span style={{ fontSize: 12, color: "#334155", lineHeight: 1.35 }}>{b}</span>
               </div>
             ))}
           </div>
 
           <div style={{ borderTop: `1px solid ${LINE}`, marginTop: 14, paddingTop: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 11, color: MUTED }}>{t("Cuenta de Google", idioma)}</span>
+            <span style={{ fontSize: 11, color: MUTED }}>
+              {esApple ? (t("Cuenta de Apple", idioma) || "Cuenta de Apple") : t("Cuenta de Google", idioma)}
+            </span>
             <span style={{ fontSize: 11, fontWeight: 600, color: INK }}>{usuarioEmail}</span>
           </div>
         </div>
@@ -8945,9 +9054,9 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
         {/* Notificaciones / Avisos inline */}
         {avisoPlayStore && (
           <div style={{
-            background: "rgba(1, 135, 95, 0.1)",
-            border: "1px solid #01875f",
-            color: "#065f46",
+            background: esApple ? "rgba(0, 113, 227, 0.08)" : "rgba(1, 135, 95, 0.1)",
+            border: `1px solid ${esApple ? "#0071e3" : "#01875f"}`,
+            color: esApple ? "#0071e3" : "#065f46",
             padding: "12px 14px",
             borderRadius: 12,
             fontSize: 12,
@@ -8975,7 +9084,9 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
                 {t("Primero debes iniciar sesión o registrarte", idioma)}
               </p>
               <p style={{ fontSize: 10.5, color: "#64748b", margin: "2px 0 0", lineHeight: 1.3 }}>
-                {t("Para asociar tu suscripción de Google Play y tus 3 días de prueba de forma segura a tu cuenta.", idioma)}
+                {esApple
+                  ? (t("Para asociar tu suscripción de Apple y tus 3 días de prueba de forma segura a tu cuenta.", idioma) || "Para asociar tu suscripción de Apple y tus 3 días de prueba de forma segura a tu cuenta.")
+                  : t("Para asociar tu suscripción de Google Play y tus 3 días de prueba de forma segura a tu cuenta.", idioma)}
               </p>
             </div>
           </div>
@@ -8987,7 +9098,9 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
             onClick={handleSuscribirse}
             style={{
               width: "100%",
-              background: estaAutenticado ? "#01875f" : "#E07A5F",
+              background: estaAutenticado
+                ? (esApple ? "#000000" : "#01875f")
+                : "#E07A5F",
               border: "none",
               borderRadius: 24,
               padding: "15px 20px",
@@ -8999,14 +9112,20 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
-              boxShadow: estaAutenticado ? "0 4px 14px rgba(1,135,95,0.35)" : "0 4px 14px rgba(224, 122, 95, 0.3)",
+              boxShadow: estaAutenticado
+                ? (esApple ? "0 4px 14px rgba(0,0,0,0.3)" : "0 4px 14px rgba(1,135,95,0.35)")
+                : "0 4px 14px rgba(224, 122, 95, 0.3)",
               transition: "all 0.2s"
             }}
           >
             {estaAutenticado ? (
               <>
                 <GooglePlayIcon size={18} />
-                <span>{t("Suscribirse con Google Play", idioma)}</span>
+                <span>
+                  {esApple
+                    ? (t("Suscribirse con Apple In-App Purchase", idioma) || "Suscribirse con Apple In-App Purchase")
+                    : t("Suscribirse con Google Play", idioma)}
+                </span>
               </>
             ) : (
               <>
@@ -9017,7 +9136,9 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
           </button>
 
           <p style={{ fontSize: 10.5, color: "#64748b", textAlign: "center", margin: "4px 0 0", lineHeight: 1.4 }}>
-            {t("Al continuar, Google Play abrirá su pasarela oficial para que elijas tu medio de pago y confirmes la suscripción.", idioma)}
+            {esApple
+              ? (t("Al continuar, Apple App Store abrirá su pasarela oficial para confirmar tu suscripción de forma segura.", idioma) || "Al continuar, Apple App Store abrirá su pasarela oficial para confirmar tu suscripción de forma segura.")
+              : t("Al continuar, Google Play abrirá su pasarela oficial para que elijas tu medio de pago y confirmes la suscripción.", idioma)}
           </p>
 
           {onRestaurarCompras && (
@@ -9033,7 +9154,7 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
                 style={{
                   background: "transparent",
                   border: "none",
-                  color: "#0f766e",
+                  color: esApple ? "#0071e3" : "#0f766e",
                   fontSize: 12,
                   fontWeight: 700,
                   cursor: "pointer",
@@ -9044,7 +9165,11 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
                 }}
               >
                 <GooglePlayIcon size={14} />
-                <span>{t("Restaurar compras previas de Google Play", idioma)}</span>
+                <span>
+                  {esApple
+                    ? (t("Restaurar compras de App Store", idioma) || "Restaurar compras de App Store")
+                    : t("Restaurar compras previas de Google Play", idioma)}
+                </span>
               </button>
             </div>
           )}
@@ -9702,13 +9827,13 @@ function CustomSelect({ options, value, onChange, placeholder, flex = 1 }) {
 
   return (
     <div ref={ref} style={{ position: "relative", flex, minWidth: 0 }}>
-      <div 
+      <div
         className="ss-input"
-        style={{ 
-          padding: "13px 10px", 
-          cursor: "pointer", 
-          display: "flex", 
-          justifyContent: "space-between", 
+        style={{
+          padding: "13px 10px",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
           whiteSpace: "nowrap",
           overflow: "hidden",
@@ -9821,14 +9946,14 @@ function ScreenNacimiento({ onNext, onBack, nacimiento, setNacimiento, esEdicion
   const d = partesFecha[2] || "";
 
   const onChangeFecha = (part, value) => {
-     let newA = a, newM = m, newD = d;
-     if (part === 'A') newA = value;
-     if (part === 'M') newM = value;
-     if (part === 'D') newD = value;
-     
-     // Guardamos el string aunque este incompleto (ej. "2024-05-") para no perder el estado
-     // Pero si las 3 estan, aseguramos el formato YYYY-MM-DD
-     set("fecha", [newA, newM, newD].join("-"));
+    let newA = a, newM = m, newD = d;
+    if (part === 'A') newA = value;
+    if (part === 'M') newM = value;
+    if (part === 'D') newD = value;
+
+    // Guardamos el string aunque este incompleto (ej. "2024-05-") para no perder el estado
+    // Pero si las 3 estan, aseguramos el formato YYYY-MM-DD
+    set("fecha", [newA, newM, newD].join("-"));
   }
 
   const partesHora = (nacimiento.hora || "").split(":");
@@ -9836,10 +9961,10 @@ function ScreenNacimiento({ onNext, onBack, nacimiento, setNacimiento, esEdicion
   const min = partesHora[1] || "";
 
   const onChangeHora = (part, value) => {
-     let newH = h, newMin = min;
-     if (part === 'H') newH = value;
-     if (part === 'MIN') newMin = value;
-     set("hora", [newH, newMin].join(":"));
+    let newH = h, newMin = min;
+    if (part === 'H') newH = value;
+    if (part === 'MIN') newMin = value;
+    set("hora", [newH, newMin].join(":"));
   }
 
   const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
@@ -9865,19 +9990,19 @@ function ScreenNacimiento({ onNext, onBack, nacimiento, setNacimiento, esEdicion
                 placeholder={t("Día", idioma)}
                 value={d}
                 onChange={v => onChangeFecha('D', v)}
-                options={Array.from({length: 31}, (_, i) => ({ value: String(i+1).padStart(2, '0'), label: String(i+1) }))}
+                options={Array.from({ length: 31 }, (_, i) => ({ value: String(i + 1).padStart(2, '0'), label: String(i + 1) }))}
               />
               <CustomSelect
                 placeholder={t("Mes", idioma)}
                 value={m}
                 onChange={v => onChangeFecha('M', v)}
-                options={meses.map((mes, i) => ({ value: String(i+1).padStart(2, '0'), label: t(mes, idioma) }))}
+                options={meses.map((mes, i) => ({ value: String(i + 1).padStart(2, '0'), label: t(mes, idioma) }))}
               />
               <CustomSelect
                 placeholder={t("Año", idioma)}
                 value={a}
                 onChange={v => onChangeFecha('A', v)}
-                options={Array.from({length: 100}, (_, i) => ({ value: String(currentYear - i), label: String(currentYear - i) }))}
+                options={Array.from({ length: 100 }, (_, i) => ({ value: String(currentYear - i), label: String(currentYear - i) }))}
               />
             </div>
           </div>
@@ -9891,14 +10016,14 @@ function ScreenNacimiento({ onNext, onBack, nacimiento, setNacimiento, esEdicion
                 placeholder={t("Hora", idioma)}
                 value={h}
                 onChange={v => onChangeHora('H', v)}
-                options={Array.from({length: 24}, (_, i) => ({ value: String(i).padStart(2, '0'), label: String(i).padStart(2, '0') }))}
+                options={Array.from({ length: 24 }, (_, i) => ({ value: String(i).padStart(2, '0'), label: String(i).padStart(2, '0') }))}
               />
               <span style={{ display: "flex", alignItems: "center", fontWeight: "bold", color: MUTED }}>:</span>
               <CustomSelect
                 placeholder={t("Min", idioma)}
                 value={min}
                 onChange={v => onChangeHora('MIN', v)}
-                options={Array.from({length: 60}, (_, i) => ({ value: String(i).padStart(2, '0'), label: String(i).padStart(2, '0') }))}
+                options={Array.from({ length: 60 }, (_, i) => ({ value: String(i).padStart(2, '0'), label: String(i).padStart(2, '0') }))}
               />
             </div>
             <label style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 7, fontSize: 12, color: MUTED, cursor: "pointer" }}>
@@ -9948,10 +10073,10 @@ function ScreenNacimiento({ onNext, onBack, nacimiento, setNacimiento, esEdicion
                   {tieneUbicacionPrecisa
                     ? t("✓ Ubicación reconocida — podemos calcular tu ascendente y las casas.", idioma)
                     : buscandoRemoto
-                    ? t("Buscando tu ciudad…", idioma)
-                    : sinCoincidencias
-                    ? `${t("No encontramos", idioma)} "${nacimiento.lugar}" — ${t("elige una sugerencia de la lista o ingresa las coordenadas manualmente abajo.", idioma)}`
-                    : t("Elige una sugerencia de la lista para que podamos calcular tu ascendente y las casas.", idioma)}
+                      ? t("Buscando tu ciudad…", idioma)
+                      : sinCoincidencias
+                        ? `${t("No encontramos", idioma)} "${nacimiento.lugar}" — ${t("elige una sugerencia de la lista o ingresa las coordenadas manualmente abajo.", idioma)}`
+                        : t("Elige una sugerencia de la lista para que podamos calcular tu ascendente y las casas.", idioma)}
                 </p>
                 <button
                   type="button"
@@ -10105,7 +10230,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
     };
 
     const wordCounts = { serenidad: 0, ansiedad: 0, tristeza: 0, gratitud: 0, frustracion: 0 };
-    
+
     palabras.forEach(word => {
       // Limpiar puntuaciones
       const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()¿?]/g, "");
@@ -10119,7 +10244,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
     // Determinar emoción dominante
     let dominantEmotion = "Neutro / Explorador 🌱";
     let maxCount = 0;
-    
+
     if (wordCounts.serenidad > maxCount) { maxCount = wordCounts.serenidad; dominantEmotion = "Serenidad y Calma 🌱"; }
     if (wordCounts.ansiedad > maxCount) { maxCount = wordCounts.ansiedad; dominantEmotion = "Ansiedad o Estrés Activo 🌀"; }
     if (wordCounts.tristeza > maxCount) { maxCount = wordCounts.tristeza; dominantEmotion = "Tristeza o Procesamiento Emocional 💧"; }
@@ -10239,7 +10364,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
     }
     setEstaAnalizando(false);
   };
-  
+
   // Real-time ticking timer for countdown
   useEffect(() => {
     const timer = setInterval(() => {
@@ -10291,11 +10416,11 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
     const unlockDate = new Date(getNextMidnight(timestamp));
     try {
       const locale = idioma === "en" ? "en-US" : idioma === "fr" ? "fr-FR" : idioma === "it" ? "it-IT" : "es-CO";
-      const options = { 
-        weekday: 'long', 
-        day: 'numeric', 
-        month: 'long', 
-        hour: '2-digit', 
+      const options = {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        hour: '2-digit',
         minute: '2-digit',
         hour12: true,
         timeZoneName: 'short'
@@ -10305,7 +10430,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
       return unlockDate.toLocaleString();
     }
   };
-  
+
   const unlockTimeFormatted = lastCompletedTimestamp ? formatUnlockTime(lastCompletedTimestamp) : "";
 
   // Local state for interactive features
@@ -10395,7 +10520,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <TopBar title={t("Reto 21 días", idioma)} onBack={onBack} />
-      
+
       <div className="ss-stagger" style={{ flex: 1, marginTop: 6, overflowY: "auto", paddingBottom: 20 }}>
         <AvisoBienestar />
 
@@ -10450,14 +10575,14 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             <div style={{ position: "relative", width: 80, height: 80 }}>
               <svg width="80" height="80" viewBox="0 0 80 80">
                 <circle cx="40" cy="40" r="32" fill="none" stroke={LAVENDER_TINT} strokeWidth="6.5" />
-                <circle 
-                  cx="40" 
-                  cy="40" 
-                  r="32" 
-                  fill="none" 
-                  stroke={LAVENDER} 
-                  strokeWidth="6.5" 
-                  strokeDasharray="201" 
+                <circle
+                  cx="40"
+                  cy="40"
+                  r="32"
+                  fill="none"
+                  stroke={LAVENDER}
+                  strokeWidth="6.5"
+                  strokeDasharray="201"
                   strokeDashoffset={201 - (201 * progreso) / 100}
                   strokeLinecap="round"
                   transform="rotate(-90 40 40)"
@@ -10563,10 +10688,10 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             </div>
 
             {/* Countdown widget */}
-            <div style={{ 
-              background: "white", 
-              borderRadius: 16, 
-              padding: "14px 10px", 
+            <div style={{
+              background: "white",
+              borderRadius: 16,
+              padding: "14px 10px",
               border: `1.5px solid ${LINE}`,
               maxWidth: "280px",
               margin: "0 auto 14px",
@@ -10646,7 +10771,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
                     </svg>
                     {t("Completado y guardado", idioma)}
                   </span>
-                  <button 
+                  <button
                     onClick={() => setEditandoHoy(true)}
                     style={{
                       background: "none",
@@ -10744,8 +10869,8 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
                     </div>
                   )}
                   {editandoHoy && (
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="ss-btn ss-btn-ghost"
                       style={{ flex: 1, padding: "8px 12px", fontSize: 12.5 }}
                       onClick={() => setEditandoHoy(false)}
@@ -10756,11 +10881,11 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
                   <button
                     type="submit"
                     className="ss-btn ss-btn-primary"
-                    style={{ 
-                      flex: 2, 
-                      padding: "10px 16px", 
-                      fontSize: 13, 
-                      background: tutorialStep === 6 ? "#dfa15f" : SAGE_DARK, 
+                    style={{
+                      flex: 2,
+                      padding: "10px 16px",
+                      fontSize: 13,
+                      background: tutorialStep === 6 ? "#dfa15f" : SAGE_DARK,
                       border: `1.5px solid ${tutorialStep === 6 ? "#dfa15f" : SAGE_DARK}`,
                       transform: tutorialStep === 6 ? "scale(1.02)" : undefined,
                       boxShadow: tutorialStep === 6 ? "0 6px 15px rgba(223,161,95,0.3)" : undefined,
@@ -10821,7 +10946,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             const futuro = d > retoDiaActual;
             const seleccionado = diaSeleccionado === d;
             const esHoyBloqueadoPorTimer = esHoy && isLockedByTimer;
-            
+
             let bg = "white";
             let color = MUTED;
             let border = LINE;
@@ -10929,7 +11054,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             position: "relative"
           }}>
             {/* Close button */}
-            <button 
+            <button
               onClick={() => setDiaSeleccionado(null)}
               style={{
                 position: "absolute",
@@ -10948,11 +11073,11 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
               </svg>
             </button>
 
-            <span style={{ 
-              fontSize: 10.5, 
-              fontWeight: 700, 
-              color: esSeleccionadoBloqueado ? "#b0af9f" : completadosSet.has(diaSeleccionado) ? SAGE_DARK : LAVENDER, 
-              textTransform: "uppercase", 
+            <span style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              color: esSeleccionadoBloqueado ? "#b0af9f" : completadosSet.has(diaSeleccionado) ? SAGE_DARK : LAVENDER,
+              textTransform: "uppercase",
               letterSpacing: 1,
               display: "block",
               marginBottom: 4
@@ -10982,7 +11107,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
                 <p style={{ fontSize: 13, color: INK, margin: "0 0 12px", lineHeight: 1.45 }}>
                   {idioma === "en" ? `Hello ${n}! To respect your pace of healing and emotional integration, each challenge unlocks at the start of the next day (12:00 AM).` : idioma === "fr" ? `Bonjour ${n} ! Pour respecter votre rythme de guérison et d'intégration émotionnelle, chaque défi se débloque au début du jour suivant (00h00).` : idioma === "it" ? `Ciao ${n}! Per rispettare il tuo ritmo di guarigione e integrazione emotiva, ogni sfida si sblocca all'inizio del giorno successivo (00:00).` : `¡Hola ${n}! Para respetar tu ritmo de sanación e integración emocional, cada reto se desbloquea al comenzar el siguiente día (12:00 AM).`}
                 </p>
-                
+
                 {isLockedByTimer ? (
                   <>
                     {/* Live Countdown widget inside selection panel */}
@@ -11042,8 +11167,8 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             ) : (
               <div>
                 <p style={{ fontSize: 12, color: MUTED, margin: 0, lineHeight: 1.45 }}>
-                  {diaSeleccionado < retoDiaActual 
-                    ? t("Omitiste la reflexión de este día. Puedes presionar el botón de abajo para marcarlo como completado e integrar tu nota.", idioma) 
+                  {diaSeleccionado < retoDiaActual
+                    ? t("Omitiste la reflexión de este día. Puedes presionar el botón de abajo para marcarlo como completado e integrar tu nota.", idioma)
                     : t("Este día está reservado para el futuro de tu proceso de sanación. Concéntrate en la práctica del día de hoy.", idioma)}
                 </p>
                 {diaSeleccionado < retoDiaActual && (
@@ -11075,13 +11200,13 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
               {diasConHistorial.map((d) => (
-                <div 
-                  key={d} 
+                <div
+                  key={d}
                   onClick={() => handleSelectDia(d)}
-                  style={{ 
-                    background: "white", 
-                    border: `1px solid ${LINE}`, 
-                    borderRadius: 16, 
+                  style={{
+                    background: "white",
+                    border: `1px solid ${LINE}`,
+                    borderRadius: 16,
                     padding: "12px 14px",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
@@ -11227,7 +11352,7 @@ function ScreenReto({ onBack, onVerHub, retoDiaActual = 1, retoCompletados = [],
           {/* Report Display */}
           {analisisReporte ? (
             <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 20 }}>
-              
+
               {/* Resultados Principales */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
                 <div style={{ background: "#f5f9f7", border: `1px solid ${LINE}`, borderRadius: 10, padding: 12 }}>
@@ -11858,10 +11983,10 @@ function ScreenConstelacion({ familia, nombre, sexo, onBack, onEditar, onIrReto,
                 background: m.excluido
                   ? "transparent"
                   : m.estado === "no_nacido"
-                  ? "rgba(255,255,255,0.35)"
-                  : m.estado === "fallecido"
-                  ? "#8a6bb8"
-                  : "#e3d9a3",
+                    ? "rgba(255,255,255,0.35)"
+                    : m.estado === "fallecido"
+                      ? "#8a6bb8"
+                      : "#e3d9a3",
                 border: m.excluido ? "1.5px dashed rgba(255,255,255,0.5)" : m.estado === "no_nacido" ? "1px solid rgba(255,255,255,0.55)" : "none",
                 display: "flex",
                 alignItems: "center",
@@ -12031,8 +12156,8 @@ function generarNarrativaNatal(nombre, sexo, carta, resultados, familia) {
       z.modalidad.toLowerCase() === "cardinal"
         ? "la urgencia de actuar antes de terminar de sentir del todo lo que está pasando"
         : z.modalidad.toLowerCase() === "fijo"
-        ? "la dificultad para soltar algo una vez que ya se instaló"
-        : `la tendencia a adaptarte tanto que terminas perdiéndote de vista ${a === "o" ? "a ti mismo" : "a ti misma"}`;
+          ? "la dificultad para soltar algo una vez que ya se instaló"
+          : `la tendencia a adaptarte tanto que terminas perdiéndote de vista ${a === "o" ? "a ti mismo" : "a ti misma"}`;
     parrafos.push(
       `Esto resuena con lo que compartiste antes: identificamos posibles causas emocionales relacionadas con “${r.termino.toLowerCase()}”. Alguien con Sol en ${z.signo} suele vivir ese tipo de tensión desde ${lente}. No es una causa única ni definitiva, pero sí una lente más para observar el mismo patrón desde otro ángulo.`
     );
@@ -12068,8 +12193,7 @@ function generarNarrativaNatal(nombre, sexo, carta, resultados, familia) {
   const infoPlaneta = PLANETAS_REGENTES[principal];
   if (infoPlaneta) {
     parrafos.push(
-      `Hay una capa más que suele pasar desapercibida: tu Sol en ${z.signo} está regido por ${principal}${
-        regentes.length > 1 ? ` (en su acepción moderna; la tradición antigua usaba también a ${regentes[1]})` : ""
+      `Hay una capa más que suele pasar desapercibida: tu Sol en ${z.signo} está regido por ${principal}${regentes.length > 1 ? ` (en su acepción moderna; la tradición antigua usaba también a ${regentes[1]})` : ""
       }, el planeta que gobierna ${infoPlaneta.rige}. Esto le da a tu energía de “${z.clave.toLowerCase()}” un tono particular: ${infoPlaneta.tono}. No es un dato decorativo — es la firma personal de ${principal} coloreando cómo vives tu signo, distinta de cómo la viviría alguien del mismo signo bajo otro énfasis planetario.`
     );
   }
@@ -12386,7 +12510,7 @@ function ScreenComunicacionNoViolenta({ onBack, onIrReto, idioma }) {
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <TopBar title={t("Comunicación no violenta", idioma)} onBack={onBack} />
-      
+
       {/* Selector de Pestañas Principal */}
       <div style={{ display: "flex", background: "#f5f3eb", borderRadius: 12, padding: 4, marginBottom: 16, marginTop: 8 }}>
         {[
@@ -12420,7 +12544,7 @@ function ScreenComunicacionNoViolenta({ onBack, onIrReto, idioma }) {
       </div>
 
       <div style={{ flex: 1, overflowY: "auto" }}>
-        
+
         {/* PESTAÑA 1: APRENDER CNV (EDUCATIVO) */}
         {tabActual === "aprender" && (
           <div className="ss-fade">
@@ -12681,7 +12805,7 @@ function ScreenComunicacionNoViolenta({ onBack, onIrReto, idioma }) {
                     <p style={{ fontSize: 11, fontWeight: "bold", color: SAGE_DARK, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 8 }}>
                       ✨ {t("Resultado del Análisis Sistémico CNV", idioma)}
                     </p>
-                    
+
                     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                       <div>
                         <strong style={{ fontSize: 11, color: SAGE_DARK, display: "block" }}>{t("Traducción Final a Comunicación Compasiva:", idioma)}</strong>
@@ -13010,16 +13134,16 @@ function ScreenTarot({ nombre, onBack, onIrReto, idioma }) {
             <MicButton escuchando={dictado.escuchando} soportado={dictado.soportado} onClick={() => dictado.toggle(pregunta)} />
           </div>
           {dictado.error === "permiso" && (
-            <div 
+            <div
               onClick={() => dispararGuiaPermisos("microfono")}
-              style={{ 
-                fontSize: 11.5, 
-                color: "#b91c1c", 
+              style={{
+                fontSize: 11.5,
+                color: "#b91c1c",
                 background: "#fef2f2",
                 border: "1px solid #fecaca",
                 borderRadius: 8,
                 padding: "6px 10px",
-                margin: "4px 0 0", 
+                margin: "4px 0 0",
                 lineHeight: 1.4,
                 cursor: "pointer",
                 display: "flex",
@@ -13594,79 +13718,79 @@ function ScreenHubDetalle({ item, nacimiento, nombre, nombreCompleto, sexo, resu
 }
 
 const HERRAMIENTAS_ITEMS = [
-  { 
-    id: "practicasolfeo", 
-    label: "Práctica con solfeo", 
+  {
+    id: "practicasolfeo",
+    label: "Práctica con solfeo",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
       </svg>
-    ), 
+    ),
     desc: "Ejercicios interactivos de resonancia y transmutación",
     bg: "linear-gradient(135deg, #fdf5ea, #fbe8d0)",
     color: "#b27329",
     border: "#fbe8d0"
   },
-  { 
-    id: "respiracion", 
-    label: "Respiración guiada", 
+  {
+    id: "respiracion",
+    label: "Respiración guiada",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+        <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
       </svg>
-    ), 
+    ),
     desc: "3 minutos para calmar el sistema nervioso",
     bg: "linear-gradient(135deg, #eaf3ef, #d4e8dd)",
     color: "#3f6b5b",
     border: "#d4e8dd"
   },
-  { 
-    id: "presente", 
-    label: "Ejercicio de presente", 
+  {
+    id: "presente",
+    label: "Ejercicio de presente",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/>
+        <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="M2 12h2" /><path d="M20 12h2" />
       </svg>
-    ), 
+    ),
     desc: "Vuelve al ahora a través de tus sentidos",
     bg: "linear-gradient(135deg, #f1ecf9, #e4d8f3)",
     color: "#7d5ba6",
     border: "#e4d8f3"
   },
-  { 
-    id: "gratitud", 
-    label: "Gratitud", 
+  {
+    id: "gratitud",
+    label: "Gratitud",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
       </svg>
-    ), 
+    ),
     desc: "Tres cosas buenas de hoy, aunque el día haya sido difícil",
     bg: "linear-gradient(135deg, #fff9e6, #fcebc5)",
     color: "#a37c27",
     border: "#fcebc5"
   },
-  { 
-    id: "relajacion", 
-    label: "Relajación corporal", 
+  {
+    id: "relajacion",
+    label: "Relajación corporal",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" />
       </svg>
-    ), 
+    ),
     desc: "Un recorrido breve por tu cuerpo, zona por zona",
     bg: "linear-gradient(135deg, #f0f7fb, #dceef7)",
     color: "#4682a8",
     border: "#dceef7"
   },
-  { 
-    id: "lugarseguro", 
-    label: "Lugar seguro", 
+  {
+    id: "lugarseguro",
+    label: "Lugar seguro",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" />
       </svg>
-    ), 
+    ),
     desc: "Una visualización guiada para volver a la calma",
     bg: "linear-gradient(135deg, #fdf4f6, #fad8e1)",
     color: "#b05f76",
@@ -13761,40 +13885,41 @@ function ScreenHerramientas({ onSelect, onBack, onIrDiario, silenciado, onAltern
                     <span style={{ fontSize: 24 }}>👈</span>
                   </div>
                 )}
-                <div 
+                <div
                   style={{
                     position: "absolute",
                     top: 0, left: 0, bottom: 0, width: 4,
                     background: esRespiracionTuto ? "#dfa15f" : h.bg,
-                  }} 
+                  }}
                 />
-              <span
-                style={{
-                  width: 52,
-                  height: 52,
-                  minWidth: 52,
-                  borderRadius: 16,
-                  background: h.bg,
-                  border: `1px solid ${h.border}`,
-                  color: h.color,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                {h.icon}
-              </span>
-              <span style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, fontSize: 15, color: INK, marginBottom: 4, letterSpacing: "-0.2px" }}>{t(h.label, idioma)}</div>
-                <div style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.4 }}>{t(h.desc, idioma)}</div>
-              </span>
-              <span style={{ color: "#c8ccd0", marginLeft: 4 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-              </span>
-            </button>
-          )})}
+                <span
+                  style={{
+                    width: 52,
+                    height: 52,
+                    minWidth: 52,
+                    borderRadius: 16,
+                    background: h.bg,
+                    border: `1px solid ${h.border}`,
+                    color: h.color,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {h.icon}
+                </span>
+                <span style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: INK, marginBottom: 4, letterSpacing: "-0.2px" }}>{t(h.label, idioma)}</div>
+                  <div style={{ fontSize: 12.5, color: MUTED, lineHeight: 1.4 }}>{t(h.desc, idioma)}</div>
+                </span>
+                <span style={{ color: "#c8ccd0", marginLeft: 4 }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </span>
+              </button>
+            )
+          })}
         </div>
 
         {onIrDiario && (
@@ -13984,86 +14109,86 @@ const createBrownNoiseBuffer = (ctx, duration = 4) => {
 
 // Frecuencias de bienestar solfeggio extraídas del JSON proporcionado
 export const FRECUENCIAS_SOLFEGGIO = [
-  { 
-    hz: 396, 
-    label: "396 Hz", 
-    intencion: "Liberación del miedo y la culpa", 
-    emoji: "🪶", 
-    color: "#FAF0D7", 
-    text: "#9B7508", 
-    binauralOffset: 6.0, 
+  {
+    hz: 396,
+    label: "396 Hz",
+    intencion: "Liberación del miedo y la culpa",
+    emoji: "🪶",
+    color: "#FAF0D7",
+    text: "#9B7508",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_396hz.wav",
     emocion: "Miedo, culpa, inseguridad y tristeza profunda.",
     descripcion: "Esta frecuencia actúa directamente sobre los bloqueos emocionales inconscientes. Facilita la transmutación del dolor en alegría, promoviendo una base sólida de seguridad y arraigo."
   },
-  { 
-    hz: 417, 
-    label: "417 Hz", 
-    intencion: "Deshacer situaciones y facilitar el cambio", 
-    emoji: "🌱", 
-    color: "#D2E0DC", 
-    text: "#3B6E5F", 
-    binauralOffset: 6.0, 
+  {
+    hz: 417,
+    label: "417 Hz",
+    intencion: "Deshacer situaciones y facilitar el cambio",
+    emoji: "🌱",
+    color: "#D2E0DC",
+    text: "#3B6E5F",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_417hz.wav",
     emocion: "Estancamiento, frustración, resistencia al cambio y traumas del pasado.",
     descripcion: "Limpia las experiencias traumáticas del pasado y remueve el estancamiento energético. Facilita la asimilación de los cambios y disuelve nudos emocionales arraigados."
   },
-  { 
-    hz: 528, 
-    label: "528 Hz", 
-    intencion: "Transformación, amor y reparación profunda", 
-    emoji: "🤍", 
-    color: "#F4E0E0", 
-    text: "#A44C4C", 
-    binauralOffset: 6.0, 
+  {
+    hz: 528,
+    label: "528 Hz",
+    intencion: "Transformación, amor y reparación profunda",
+    emoji: "🤍",
+    color: "#F4E0E0",
+    text: "#A44C4C",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_528hz.wav",
     emocion: "Baja autoestima, desamor, fatiga vital y desconexión con el corazón.",
     descripcion: "Conocida como la frecuencia de la transformación and los milagros. Resuena en el centro del pecho promoviendo la autocompasión, la fuerza vital y la claridad mental."
   },
-  { 
-    hz: 639, 
-    label: "639 Hz", 
-    intencion: "Reconexión y relaciones armoniosas", 
-    emoji: "🕊️", 
-    color: "#D2DAFF", 
-    text: "#485E9E", 
-    binauralOffset: 6.0, 
+  {
+    hz: 639,
+    label: "639 Hz",
+    intencion: "Reconexión y relaciones armoniosas",
+    emoji: "🕊️",
+    color: "#D2DAFF",
+    text: "#485E9E",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_639hz.wav",
     emocion: "Soledad, resentimiento, desconfianza y aislamiento social o familiar.",
     descripcion: "Fomenta la comunicación fluida, la empatía y la tolerancia en las relaciones humanas. Es excelente para superar tensiones interpersonales y sanar heridas por distancia."
   },
-  { 
-    hz: 741, 
-    label: "741 Hz", 
-    intencion: "Expresión, limpieza y soluciones", 
-    emoji: "💧", 
-    color: "#FFECD6", 
-    text: "#A05A18", 
-    binauralOffset: 6.0, 
+  {
+    hz: 741,
+    label: "741 Hz",
+    intencion: "Expresión, limpieza y soluciones",
+    emoji: "💧",
+    color: "#FFECD6",
+    text: "#A05A18",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_741hz.wav",
     emocion: "Bloqueo creativo, timidez, confusión y dificultad para expresarse de manera auténtica.",
     descripcion: "Actúa como un purificador mental para disolver pensamientos repetitivos o tóxicos. Impulsa la libre expresión y el desarrollo de soluciones intuitivas."
   },
-  { 
-    hz: 852, 
-    label: "852 Hz", 
-    intencion: "Retorno al orden espiritual y paz interior", 
-    emoji: "🕯️", 
-    color: "#E7E6F2", 
-    text: "#5B5482", 
-    binauralOffset: 6.0, 
+  {
+    hz: 852,
+    label: "852 Hz",
+    intencion: "Retorno al orden espiritual y paz interior",
+    emoji: "🕯️",
+    color: "#E7E6F2",
+    text: "#5B5482",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_852hz.wav",
     emocion: "Desorientación existencial, ilusión mental y desconexión con el ser espiritual.",
     descripcion: "Ayuda a elevar la conciencia individual abriendo la intuición profunda. Te asiste en ver la verdad del ser y recuperar la calma y balance a nivel espiritual."
   },
-  { 
-    hz: 963, 
-    label: "963 Hz", 
-    intencion: "Conexión con la consciencia superior", 
-    emoji: "🪷", 
-    color: "#E2E8F0", 
-    text: "#475569", 
-    binauralOffset: 6.0, 
+  {
+    hz: 963,
+    label: "963 Hz",
+    intencion: "Conexión con la consciencia superior",
+    emoji: "🪷",
+    color: "#E2E8F0",
+    text: "#475569",
+    binauralOffset: 6.0,
     archivo: "/audio/solfeggio_963hz.wav",
     emocion: "Vacío emocional, separación existencial y olvido de la presencia interior.",
     descripcion: "La 'frecuencia de la corona' despierta la conexión intrínseca con el universo y el estado puro del ser, uniendo cuerpo y mente en paz absoluta."
@@ -14074,22 +14199,22 @@ export const FRECUENCIAS_SOLFEGGIO = [
 export function iniciarTonoBinaural(ctx, hz, offset, masterGainNode) {
   const oscL = ctx.createOscillator();
   const oscR = ctx.createOscillator();
-  
+
   const gainL = ctx.createGain();
   const gainR = ctx.createGain();
-  
+
   oscL.type = 'sine';
   oscL.frequency.setValueAtTime(hz, ctx.currentTime);
-  
+
   oscR.type = 'sine';
   oscR.frequency.setValueAtTime(hz + offset, ctx.currentTime);
-  
+
   gainL.gain.setValueAtTime(0.4, ctx.currentTime);
   gainR.gain.setValueAtTime(0.4, ctx.currentTime);
-  
+
   oscL.connect(gainL);
   oscR.connect(gainR);
-  
+
   // Usar StereoPannerNode para espacialización estéreo robusta (izq/der)
   // con fallback directo para máxima compatibilidad (monitores/bocinas mono)
   if (ctx.createStereoPanner) {
@@ -14098,10 +14223,10 @@ export function iniciarTonoBinaural(ctx, hz, offset, masterGainNode) {
       pannerL.pan.setValueAtTime(-1, ctx.currentTime); // Totalmente a la izquierda
       const pannerR = ctx.createStereoPanner();
       pannerR.pan.setValueAtTime(1, ctx.currentTime);  // Totalmente a la derecha
-      
+
       gainL.connect(pannerL);
       gainR.connect(pannerR);
-      
+
       pannerL.connect(masterGainNode);
       pannerR.connect(masterGainNode);
     } catch (e) {
@@ -14114,10 +14239,10 @@ export function iniciarTonoBinaural(ctx, hz, offset, masterGainNode) {
     gainL.connect(masterGainNode);
     gainR.connect(masterGainNode);
   }
-  
+
   oscL.start();
   oscR.start();
-  
+
   return { oscL, oscR, gainL, gainR };
 }
 
@@ -14152,18 +14277,18 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
     currentFreqRef.current = null;
     if (sourcesRef.current) {
       sourcesRef.current.forEach(item => {
-        try { if (item.oscL) item.oscL.stop(); } catch(e){}
-        try { if (item.oscR) item.oscR.stop(); } catch(e){}
-        try { if (item.oscL) item.oscL.disconnect(); } catch(e){}
-        try { if (item.oscR) item.oscR.disconnect(); } catch(e){}
-        try { if (item.gainL) item.gainL.disconnect(); } catch(e){}
-        try { if (item.gainR) item.gainR.disconnect(); } catch(e){}
-        try { if (item.merger) item.merger.disconnect(); } catch(e){}
+        try { if (item.oscL) item.oscL.stop(); } catch (e) { }
+        try { if (item.oscR) item.oscR.stop(); } catch (e) { }
+        try { if (item.oscL) item.oscL.disconnect(); } catch (e) { }
+        try { if (item.oscR) item.oscR.disconnect(); } catch (e) { }
+        try { if (item.gainL) item.gainL.disconnect(); } catch (e) { }
+        try { if (item.gainR) item.gainR.disconnect(); } catch (e) { }
+        try { if (item.merger) item.merger.disconnect(); } catch (e) { }
       });
       sourcesRef.current = [];
     }
     if (gainRef.current) {
-      try { gainRef.current.disconnect(); } catch(e){}
+      try { gainRef.current.disconnect(); } catch (e) { }
       gainRef.current = null;
     }
   };
@@ -14178,7 +14303,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       detenerAudioDirecto();
       return;
     }
-    
+
     // Si ya se está reproduciendo este mismo tono de forma activa, evitar reiniciarlo
     if (
       audioCtxRef.current &&
@@ -14205,17 +14330,17 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
 
     gainRef.current = ctx.createGain();
     gainRef.current.connect(ctx.destination);
-    
+
     // Ajustar volumen más alto (0.35 en vez de 0.12) para máxima audibilidad
     gainRef.current.gain.value = 0.35;
     try {
       gainRef.current.gain.setValueAtTime(0.35, ctx.currentTime);
-    } catch (e) {}
+    } catch (e) { }
 
     sourcesRef.current = [];
 
     const freqObj = FRECUENCIAS_SOLFEGGIO.find(f => f.hz === Number(fHz)) || FRECUENCIAS_SOLFEGGIO[2];
-    
+
     // Iniciar tono binaural nativo
     const nodes = iniciarTonoBinaural(ctx, freqObj.hz, freqObj.binauralOffset, gainRef.current);
     sourcesRef.current.push(nodes);
@@ -14227,7 +14352,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
       try {
         gainRef.current.gain.linearRampToValueAtTime(0, audioCtxRef.current.currentTime + 1);
-      } catch (e) {}
+      } catch (e) { }
       fadeTimeoutRef.current = setTimeout(detenerAudioDirecto, 1000);
     }
   };
@@ -14237,9 +14362,9 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       detenerAudio();
       return;
     }
-    
+
     iniciarAudio();
-    
+
     const secuencia = [
       { fase: "Inhala", ms: 4000 },
       { fase: "Sostén", ms: 4000 },
@@ -14247,13 +14372,13 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
     ];
     let i = 0;
     setFase(secuencia[0].fase);
-    
+
     const avanzar = () => {
       i = (i + 1) % secuencia.length;
       if (i === 0) setCiclos((c) => c + 1);
       setFase(secuencia[i].fase);
       timerRef.current = setTimeout(avanzar, secuencia[i].ms);
-      
+
       // Modular volumen ligeramente con la respiración
       if (gainRef.current && audioCtxRef.current) {
         const ctx = audioCtxRef.current;
@@ -14261,7 +14386,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
         gainRef.current.gain.linearRampToValueAtTime(targetVol, ctx.currentTime + (secuencia[i].ms / 1000));
       }
     };
-    
+
     timerRef.current = setTimeout(avanzar, secuencia[0].ms);
     return () => {
       clearTimeout(timerRef.current);
@@ -14275,11 +14400,11 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
   const freqObj = FRECUENCIAS_SOLFEGGIO.find(f => f.hz === Number(ambiente)) || FRECUENCIAS_SOLFEGGIO[2];
 
   return (
-    <div className="ss-fade" style={{ 
-      padding: "0", 
-      minHeight: "100%", 
+    <div className="ss-fade" style={{
+      padding: "0",
+      minHeight: "100%",
       flex: 1,
-      display: "flex", 
+      display: "flex",
       flexDirection: "column",
       background: activo ? "#0f172a" : "#f8fafc",
       transition: "background 1.5s ease-in-out",
@@ -14306,12 +14431,12 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       </div>
 
       {activo && (
-        <div style={{ 
-          zIndex: 10, 
-          display: "flex", 
-          justifyContent: "center", 
-          marginTop: -6, 
-          marginBottom: 10 
+        <div style={{
+          zIndex: 10,
+          display: "flex",
+          justifyContent: "center",
+          marginTop: -6,
+          marginBottom: 10
         }}>
           <button
             onClick={() => {
@@ -14364,10 +14489,10 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       )}
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 32, zIndex: 1, position: "relative" }}>
-        
+
         {/* Selector de Frecuencia Solfeggio (se oculta al estar activo para evitar distracciones) */}
-        <div style={{ 
-          opacity: activo ? 0 : 1, 
+        <div style={{
+          opacity: activo ? 0 : 1,
           transform: activo ? "translateY(-20px)" : "translateY(0)",
           transition: "all 0.8s ease",
           pointerEvents: activo ? "none" : "auto",
@@ -14377,7 +14502,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
             {t("Frecuencia de Bienestar (Solfeggio)", idioma)}
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, width: "100%", maxHeight: "240px", overflowY: "auto", paddingRight: 4 }}>
-            
+
             {/* Botón Silencio (Predeterminado) */}
             <button
               onClick={() => {
@@ -14390,7 +14515,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
                 border: `1.5px solid ${ambiente === "silencio" ? SAGE_DARK : LINE}`,
                 background: ambiente === "silencio" ? "white" : "rgba(255,255,255,0.4)",
                 color: INK,
-                display: "flex", 
+                display: "flex",
                 flexDirection: "column",
                 textAlign: "left",
                 transition: "all 0.25s ease",
@@ -14419,7 +14544,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
                   border: `1.5px solid ${ambiente === f.hz ? f.color : LINE}`,
                   background: ambiente === f.hz ? "white" : "rgba(255,255,255,0.4)",
                   color: INK,
-                  display: "flex", 
+                  display: "flex",
                   flexDirection: "column",
                   gap: ambiente === f.hz ? 10 : 0,
                   textAlign: "left",
@@ -14444,11 +14569,11 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
                 </div>
 
                 {ambiente === f.hz && (
-                  <div style={{ 
-                    width: "100%", 
-                    borderTop: `1px solid ${LINE}`, 
-                    paddingTop: 8, 
-                    fontSize: 11.5, 
+                  <div style={{
+                    width: "100%",
+                    borderTop: `1px solid ${LINE}`,
+                    paddingTop: 8,
+                    fontSize: 11.5,
                     lineHeight: 1.45,
                     display: "flex",
                     flexDirection: "column",
@@ -14482,7 +14607,7 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
               transition: "transform 4s linear, border-color 1s ease",
             }}
           />
-          
+
           {/* Círculo interior */}
           <div
             style={{
@@ -14499,9 +14624,9 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
               boxShadow: activo ? "0 0 40px rgba(255,255,255,0.1)" : "0 10px 30px rgba(0,0,0,0.05)",
             }}
           >
-            <span style={{ 
-              fontFamily: FONT_DISPLAY, 
-              fontSize: 26, 
+            <span style={{
+              fontFamily: FONT_DISPLAY,
+              fontSize: 26,
               color: activo ? "#fff" : SAGE_DARK,
               transition: "color 1s ease",
               textShadow: activo ? "0 2px 10px rgba(0,0,0,0.3)" : "none"
@@ -14512,11 +14637,11 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
         </div>
 
         <div style={{ height: 60, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <p style={{ 
-            fontSize: 14, 
-            color: activo ? "rgba(255,255,255,0.7)" : MUTED, 
-            textAlign: "center", 
-            maxWidth: 280, 
+          <p style={{
+            fontSize: 14,
+            color: activo ? "rgba(255,255,255,0.7)" : MUTED,
+            textAlign: "center",
+            maxWidth: 280,
             lineHeight: 1.5,
             transition: "color 1s ease"
           }}>
@@ -14535,8 +14660,8 @@ function ScreenRespiracion({ onBack, onGuardar, tutorialStep, onComenzarTutorial
       <div style={{ padding: "0 22px 30px", zIndex: 1 }}>
         <button
           className={activo ? "ss-btn" : "ss-btn ss-btn-primary"}
-          style={{ 
-            width: "100%", 
+          style={{
+            width: "100%",
             background: tutorialStep === 9 && !activo ? "#dfa15f" : (activo ? "rgba(255,255,255,0.1)" : SAGE_DARK),
             color: "#fff",
             border: tutorialStep === 9 && !activo ? "2px solid #dfa15f" : (activo ? "1px solid rgba(255,255,255,0.2)" : "none"),
@@ -14640,31 +14765,31 @@ function ScreenPresente({ onBack, onGuardar, idioma }) {
 
   const EyeIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
     </svg>
   );
 
   const HandIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/><path d="M7 15V8a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v0"/>
+      <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0" /><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2" /><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" /><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" /><path d="M7 15V8a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v0" />
     </svg>
   );
 
   const EarIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1"/><path d="M8 12c-1.33-1-3-1-3-1"/><path d="M14 10s-1 1-1 3"/><circle cx="12" cy="18.5" r=".5" fill="currentColor" stroke="none"/>
+      <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1" /><path d="M8 12c-1.33-1-3-1-3-1" /><path d="M14 10s-1 1-1 3" /><circle cx="12" cy="18.5" r=".5" fill="currentColor" stroke="none" />
     </svg>
   );
 
   const WindIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2" />
     </svg>
   );
 
   const TasteIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 8c0 4.418-4.03 8-9 8C7.03 16 3 12.418 3 8s4.03-8 9-8c4.97 0 9 3.582 9 8z"/><path d="M7 8c0 2.76 2.24 5 5 5s5-2.24 5-5"/><path d="M12 13v7"/>
+      <path d="M21 8c0 4.418-4.03 8-9 8C7.03 16 3 12.418 3 8s4.03-8 9-8c4.97 0 9 3.582 9 8z" /><path d="M7 8c0 2.76 2.24 5 5 5s5-2.24 5-5" /><path d="M12 13v7" />
     </svg>
   );
 
@@ -14714,7 +14839,7 @@ function ScreenPresente({ onBack, onGuardar, idioma }) {
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column", background: "#fff" }}>
       <TopBar title={t("Conexión con el presente", idioma)} onBack={onBack} step={paso + 1} totalSteps={PASOS_PRESENTE.length} />
-      
+
       <div style={{ flex: 1, marginTop: 10, display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <span style={{ color: theme.text }}>{theme.icon}</span>
@@ -14722,17 +14847,17 @@ function ScreenPresente({ onBack, onGuardar, idioma }) {
             {t("Sentido", idioma)}: {t(actual.sentido, idioma)}
           </p>
         </div>
-        
+
         <h2 style={{ fontFamily: FONT_DISPLAY, fontWeight: 500, fontSize: 22, color: INK, margin: "0 0 24px", lineHeight: 1.3 }}>
           {t(actual.prompt, idioma)}
         </h2>
-        
+
         <div className="ss-stagger" style={{ display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", paddingBottom: 20, flex: 1 }}>
           {textos.map((txt, i) => (
             <div key={`${paso}-${i}`} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-              <div style={{ 
-                width: 28, height: 28, minWidth: 28, 
-                borderRadius: "50%", 
+              <div style={{
+                width: 28, height: 28, minWidth: 28,
+                borderRadius: "50%",
                 background: theme.bg,
                 border: `1px solid ${theme.border}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -14755,9 +14880,9 @@ function ScreenPresente({ onBack, onGuardar, idioma }) {
                   e.target.style.height = (e.target.scrollHeight > 48 ? e.target.scrollHeight : 48) + 'px';
                   handleTextChange(i, e.target.value);
                 }}
-                style={{ 
-                  flex: 1, 
-                  background: "#f9f9fa", 
+                style={{
+                  flex: 1,
+                  background: "#f9f9fa",
                   border: `1px solid ${LINE}`,
                   borderRadius: 16,
                   padding: "14px 16px",
@@ -14785,9 +14910,9 @@ function ScreenPresente({ onBack, onGuardar, idioma }) {
       </div>
 
       <div style={{ paddingTop: 16 }}>
-        <button 
-          className="ss-btn" 
-          style={{ width: "100%", background: theme.text, color: "#fff", boxShadow: `0 6px 16px ${theme.text}40` }} 
+        <button
+          className="ss-btn"
+          style={{ width: "100%", background: theme.text, color: "#fff", boxShadow: `0 6px 16px ${theme.text}40` }}
           onClick={siguiente}
         >
           {paso < PASOS_PRESENTE.length - 1 ? t("Siguiente", idioma) : t("Terminar", idioma)}
@@ -14890,18 +15015,18 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
     currentFreqRef.current = null;
     if (sourcesRef.current) {
       sourcesRef.current.forEach(item => {
-        try { if (item.oscL) item.oscL.stop(); } catch(e){}
-        try { if (item.oscR) item.oscR.stop(); } catch(e){}
-        try { if (item.oscL) item.oscL.disconnect(); } catch(e){}
-        try { if (item.oscR) item.oscR.disconnect(); } catch(e){}
-        try { if (item.gainL) item.gainL.disconnect(); } catch(e){}
-        try { if (item.gainR) item.gainR.disconnect(); } catch(e){}
-        try { if (item.merger) item.merger.disconnect(); } catch(e){}
+        try { if (item.oscL) item.oscL.stop(); } catch (e) { }
+        try { if (item.oscR) item.oscR.stop(); } catch (e) { }
+        try { if (item.oscL) item.oscL.disconnect(); } catch (e) { }
+        try { if (item.oscR) item.oscR.disconnect(); } catch (e) { }
+        try { if (item.gainL) item.gainL.disconnect(); } catch (e) { }
+        try { if (item.gainR) item.gainR.disconnect(); } catch (e) { }
+        try { if (item.merger) item.merger.disconnect(); } catch (e) { }
       });
       sourcesRef.current = [];
     }
     if (gainRef.current) {
-      try { gainRef.current.disconnect(); } catch(e){}
+      try { gainRef.current.disconnect(); } catch (e) { }
       gainRef.current = null;
     }
   };
@@ -14916,7 +15041,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
       detenerAudioDirecto();
       return;
     }
-    
+
     // Si ya se está reproduciendo este mismo tono de forma activa, evitar reiniciarlo
     if (
       audioCtxRef.current &&
@@ -14941,17 +15066,17 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
 
     gainRef.current = ctx.createGain();
     gainRef.current.connect(ctx.destination);
-    
+
     // Ajustar volumen más alto (0.35 en vez de 0.12) para máxima audibilidad
     gainRef.current.gain.value = 0.35;
     try {
       gainRef.current.gain.setValueAtTime(0.35, ctx.currentTime);
-    } catch (e) {}
+    } catch (e) { }
 
     sourcesRef.current = [];
 
     const freqObj = FRECUENCIAS_SOLFEGGIO.find(f => f.hz === Number(fHz)) || FRECUENCIAS_SOLFEGGIO[2];
-    
+
     // Iniciar tono binaural
     const nodes = iniciarTonoBinaural(ctx, freqObj.hz, freqObj.binauralOffset, gainRef.current);
     sourcesRef.current.push(nodes);
@@ -14963,7 +15088,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
       if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
       try {
         gainRef.current.gain.linearRampToValueAtTime(0, audioCtxRef.current.currentTime + 1);
-      } catch (e) {}
+      } catch (e) { }
       fadeTimeoutRef.current = setTimeout(detenerAudioDirecto, 1000);
     }
   };
@@ -15002,7 +15127,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
     return (
       <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", flex: 1, display: "flex", flexDirection: "column", background: "#fff" }}>
         <TopBar title={t("Relajación corporal", idioma)} onBack={onBack} />
-        
+
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 24, overflowY: "auto", paddingBottom: 20 }}>
           <div style={{ textAlign: "center" }}>
             <div style={{
@@ -15025,7 +15150,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
               {t("Frecuencia de Acompañamiento", idioma)}
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: "240px", overflowY: "auto", paddingRight: 4 }}>
-              
+
               {/* Opción de Silencio (Predeterminado) */}
               <button
                 onClick={() => {
@@ -15038,7 +15163,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
                   border: `1.5px solid ${ambiente === "silencio" ? SAGE_DARK : LINE}`,
                   background: ambiente === "silencio" ? "white" : "transparent",
                   color: INK,
-                  display: "flex", 
+                  display: "flex",
                   flexDirection: "column",
                   textAlign: "left",
                   transition: "all 0.2s ease",
@@ -15067,7 +15192,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
                     border: `1.5px solid ${ambiente === f.hz ? f.color : LINE}`,
                     background: ambiente === f.hz ? "white" : "transparent",
                     color: INK,
-                    display: "flex", 
+                    display: "flex",
                     flexDirection: "column",
                     gap: ambiente === f.hz ? 10 : 0,
                     textAlign: "left",
@@ -15092,11 +15217,11 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
                   </div>
 
                   {ambiente === f.hz && (
-                    <div style={{ 
-                      width: "100%", 
-                      borderTop: `1px solid ${LINE}`, 
-                      paddingTop: 8, 
-                      fontSize: 11.5, 
+                    <div style={{
+                      width: "100%",
+                      borderTop: `1px solid ${LINE}`,
+                      paddingTop: 8,
+                      fontSize: 11.5,
                       lineHeight: 1.45,
                       display: "flex",
                       flexDirection: "column",
@@ -15119,8 +15244,8 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
         </div>
 
         <div style={{ paddingTop: 16 }}>
-          <button 
-            className="ss-btn ss-btn-primary" 
+          <button
+            className="ss-btn ss-btn-primary"
             style={{ width: "100%", height: 50, fontSize: 16 }}
             onClick={() => {
               // Pre-initialize and resume the AudioContext synchronously inside user activation
@@ -15131,7 +15256,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
                 }
               }
               if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
-                 audioCtxRef.current.resume();
+                audioCtxRef.current.resume();
               }
               setIniciado(true);
               iniciarAudio(ambiente);
@@ -15181,14 +15306,14 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
       <div style={{ zIndex: 10 }}>
         <TopBar title={t("Relajación corporal", idioma)} onBack={() => { detenerAudio(); onBack(); }} step={paso + 1} totalSteps={PASOS_RELAJACION.length} />
       </div>
-      
+
       {iniciado && !terminado && (
-        <div style={{ 
-          zIndex: 10, 
-          display: "flex", 
-          justifyContent: "center", 
-          marginTop: -6, 
-          marginBottom: 10 
+        <div style={{
+          zIndex: 10,
+          display: "flex",
+          justifyContent: "center",
+          marginTop: -6,
+          marginBottom: 10
         }}>
           <button
             onClick={() => {
@@ -15238,7 +15363,7 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
           </button>
         </div>
       )}
-      
+
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
         {/* Soft background aura using the selected frequency color */}
         <div style={{
@@ -15250,15 +15375,15 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
           animation: "pulseAura 6s infinite alternate ease-in-out"
         }} />
 
-        <p 
+        <p
           key={animKey}
           className="ss-fade-up"
-          style={{ 
-            fontFamily: FONT_DISPLAY, 
-            fontSize: 24, 
-            color: INK, 
-            lineHeight: 1.5, 
-            margin: 0, 
+          style={{
+            fontFamily: FONT_DISPLAY,
+            fontSize: 24,
+            color: INK,
+            lineHeight: 1.5,
+            margin: 0,
             textAlign: "center",
             maxWidth: 300,
             zIndex: 1,
@@ -15270,9 +15395,9 @@ function ScreenRelajacion({ onBack, onGuardar, idioma }) {
       </div>
 
       <div style={{ zIndex: 10, paddingTop: 16 }}>
-        <button 
-          className="ss-btn ss-btn-primary" 
-          style={{ width: "100%", height: 50, fontSize: 16, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }} 
+        <button
+          className="ss-btn ss-btn-primary"
+          style={{ width: "100%", height: 50, fontSize: 16, boxShadow: "0 6px 16px rgba(0,0,0,0.06)" }}
           onClick={() => setPaso((p) => p + 1)}
         >
           {paso < PASOS_RELAJACION.length - 1 ? t("Siguiente", idioma) : t("Terminar", idioma)}
@@ -15366,13 +15491,13 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
     if (!ctx) return;
 
     activeNodesRef.current.forEach((item) => {
-      try { if (item.oscL) item.oscL.stop(); } catch (e) {}
-      try { if (item.oscR) item.oscR.stop(); } catch (e) {}
-      try { if (item.oscL) item.oscL.disconnect(); } catch (e) {}
-      try { if (item.oscR) item.oscR.disconnect(); } catch (e) {}
-      try { if (item.gainL) item.gainL.disconnect(); } catch (e) {}
-      try { if (item.gainR) item.gainR.disconnect(); } catch (e) {}
-      try { if (item.merger) item.merger.disconnect(); } catch (e) {}
+      try { if (item.oscL) item.oscL.stop(); } catch (e) { }
+      try { if (item.oscR) item.oscR.stop(); } catch (e) { }
+      try { if (item.oscL) item.oscL.disconnect(); } catch (e) { }
+      try { if (item.oscR) item.oscR.disconnect(); } catch (e) { }
+      try { if (item.gainL) item.gainL.disconnect(); } catch (e) { }
+      try { if (item.gainR) item.gainR.disconnect(); } catch (e) { }
+      try { if (item.merger) item.merger.disconnect(); } catch (e) { }
     });
 
     activeNodesRef.current = [];
@@ -15418,7 +15543,7 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
       if (audioCtxRef.current) {
         try {
           audioCtxRef.current.close();
-        } catch (e) {}
+        } catch (e) { }
       }
     };
   }, []);
@@ -15434,7 +15559,7 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
       <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
         <TopBar title={ui.title} onBack={onBack} />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16, textAlign: "center" }}>
-          
+
           <div style={{
             width: 80,
             height: 80,
@@ -15453,7 +15578,7 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
           <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 20, color: INK, margin: "10px 0 0" }}>
             {ui.completedTitle(nombre)}
           </h3>
-          
+
           <p style={{ fontSize: 13.5, color: MUTED, maxWidth: 260, lineHeight: 1.6, margin: 0 }}>
             {ui.completedDesc}
           </p>
@@ -15503,10 +15628,10 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
 
       {/* Main Interactive Sensory Display */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "12px 0 20px" }}>
-        
+
         {/* Pulsing Sensory Mandala */}
         <div style={{ display: "flex", justifyContent: "center", margin: "16px 0 10px" }}>
-          <div 
+          <div
             style={{
               "--glow-color": pAct.colorGlow,
               width: 110,
@@ -15528,50 +15653,50 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
 
         {/* Dynamic Centered Text Block */}
         <div style={{ textAlign: "center", padding: "0 8px", flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <span style={{ 
-            fontSize: 12, 
-            fontWeight: 700, 
-            color: SAGE_DARK, 
-            textTransform: "uppercase", 
+          <span style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: SAGE_DARK,
+            textTransform: "uppercase",
             letterSpacing: 1.5,
             marginBottom: 6,
             display: "block"
           }}>
             {ui.phaseLabel} {paso + 1}
           </span>
-          
+
           <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 21, color: INK, margin: "0 0 14px", fontWeight: 700 }}>
             {pAct.titulo}
           </h2>
 
-          <p style={{ 
-            fontFamily: FONT_BODY, 
-            fontSize: 14.5, 
-            color: INK, 
-            lineHeight: 1.6, 
-            margin: "0 auto 12px", 
-            maxWidth: 290 
+          <p style={{
+            fontFamily: FONT_BODY,
+            fontSize: 14.5,
+            color: INK,
+            lineHeight: 1.6,
+            margin: "0 auto 12px",
+            maxWidth: 290
           }}>
             {pAct.texto}
           </p>
 
-          <p style={{ 
-            fontFamily: FONT_BODY, 
-            fontSize: 12.5, 
-            color: MUTED, 
-            fontStyle: "italic", 
-            margin: 0 
+          <p style={{
+            fontFamily: FONT_BODY,
+            fontSize: 12.5,
+            color: MUTED,
+            fontStyle: "italic",
+            margin: 0
           }}>
             {pAct.sabor}
           </p>
         </div>
 
         {/* Ambient Sensory Tray */}
-        <div style={{ 
-          background: "rgba(247, 246, 249, 0.9)", 
-          border: `1.5px solid ${LINE}`, 
-          borderRadius: 20, 
-          padding: "12px 14px 12px", 
+        <div style={{
+          background: "rgba(247, 246, 249, 0.9)",
+          border: `1.5px solid ${LINE}`,
+          borderRadius: 20,
+          padding: "12px 14px 12px",
           marginTop: 18,
           boxShadow: "0 4px 12px rgba(0,0,0,0.02)"
         }}>
@@ -15591,17 +15716,17 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
           </div>
 
           {/* Scroll horizontal de frecuencias */}
-          <div style={{ 
-            display: "flex", 
-            gap: 8, 
-            overflowX: "auto", 
+          <div style={{
+            display: "flex",
+            gap: 8,
+            overflowX: "auto",
             paddingBottom: 6,
             WebkitOverflowScrolling: "touch",
             scrollbarWidth: "none"
           }} className="ss-hide-scrollbar">
-            
+
             {/* Botón Silencio */}
-            <button 
+            <button
               onClick={() => playSound("silencio")}
               style={{
                 flex: "0 0 auto",
@@ -15623,7 +15748,7 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
 
             {/* Botones de Frecuencias */}
             {FRECUENCIAS_SOLFEGGIO.map(f => (
-              <button 
+              <button
                 key={f.hz}
                 onClick={() => playSound(String(f.hz))}
                 style={{
@@ -15653,14 +15778,14 @@ function ScreenLugarSeguro({ onBack, nombre, sexo, onGuardar, idioma }) {
             const selectedFreq = FRECUENCIAS_SOLFEGGIO.find(f => f.hz === Number(sonidoActivo));
             if (!selectedFreq) return null;
             return (
-              <div style={{ 
-                marginTop: 12, 
-                padding: "10px 12px", 
-                background: "rgba(255, 255, 255, 0.7)", 
-                borderRadius: 12, 
-                border: `1px solid ${selectedFreq.color}`, 
-                fontSize: 12, 
-                color: INK, 
+              <div style={{
+                marginTop: 12,
+                padding: "10px 12px",
+                background: "rgba(255, 255, 255, 0.7)",
+                borderRadius: 12,
+                border: `1px solid ${selectedFreq.color}`,
+                fontSize: 12,
+                color: INK,
                 lineHeight: 1.45,
                 animation: "ss-fade-up 0.2s ease-out"
               }}>
@@ -15704,7 +15829,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeEspecialista, setActiveEspecialista] = useState(null);
   useBloquearScrollFondo(Boolean(activeEspecialista));
-  
+
   // Helpers localizados
   const especialistasList = getLocalizedEspecialistas(idioma);
   const cats = getLocalizedCategorias(idioma);
@@ -15761,9 +15886,9 @@ function ScreenEspecialistas({ onBack, idioma }) {
     let matchSearch = true;
     if (searchQuery.trim() !== "") {
       const q = searchQuery.toLowerCase();
-      matchSearch = 
-        e.nombre.toLowerCase().includes(q) || 
-        e.rol.toLowerCase().includes(q) || 
+      matchSearch =
+        e.nombre.toLowerCase().includes(q) ||
+        e.rol.toLowerCase().includes(q) ||
         e.enfoque.toLowerCase().includes(q) ||
         e.bio.toLowerCase().includes(q) ||
         e.tags.some(t => t.toLowerCase().includes(q));
@@ -15803,9 +15928,9 @@ function ScreenEspecialistas({ onBack, idioma }) {
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column" }}>
       <TopBar title={ui.topBarTitle} onBack={onBack} />
-      
+
       <div style={{ flex: 1, marginTop: 12, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
-        
+
         {/* Banner de Bienvenida Reaseguradora */}
         <div style={{
           background: SAGE_TINT,
@@ -15871,7 +15996,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
             }}
           />
           {searchQuery && (
-            <button 
+            <button
               onClick={() => setSearchQuery("")}
               style={{
                 background: "none",
@@ -15890,17 +16015,17 @@ function ScreenEspecialistas({ onBack, idioma }) {
 
         {/* Selector de Especialidades Adaptativo, Sensorial y Fluido */}
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <div style={{ 
-            display: "flex", 
-            justifyContent: "space-between", 
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
-            padding: "0 4px" 
+            padding: "0 4px"
           }}>
             <span style={{ fontSize: 11.5, fontWeight: 700, color: MUTED, textTransform: "uppercase", letterSpacing: "0.03em" }}>
               {ui.exploreDisciplines}
             </span>
             {filtro !== "todos" && (
-              <button 
+              <button
                 onClick={() => setFiltro("todos")}
                 style={{
                   background: "none",
@@ -15917,11 +16042,11 @@ function ScreenEspecialistas({ onBack, idioma }) {
             )}
           </div>
 
-          <div style={{ 
-            display: "flex", 
-            gap: 10, 
-            overflowX: "auto", 
-            paddingBottom: "8px", 
+          <div style={{
+            display: "flex",
+            gap: 10,
+            overflowX: "auto",
+            paddingBottom: "8px",
             margin: "0 -22px",
             paddingLeft: "22px",
             paddingRight: "22px",
@@ -15929,7 +16054,8 @@ function ScreenEspecialistas({ onBack, idioma }) {
             msOverflowStyle: "none",
             WebkitOverflowScrolling: "touch"
           }} className="ss-no-scrollbar">
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+              __html: `
               .ss-no-scrollbar::-webkit-scrollbar {
                 display: none;
               }
@@ -15939,7 +16065,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
               const isSelected = filtro === c.id;
               const count = countForCat(c.id);
               const IconComp = CAT_ICONS_ESPECIALISTAS[c.id] || Sparkles;
-              
+
               return (
                 <button
                   key={c.id}
@@ -15955,8 +16081,8 @@ function ScreenEspecialistas({ onBack, idioma }) {
                     color: isSelected ? "white" : INK,
                     cursor: "pointer",
                     whiteSpace: "nowrap",
-                    boxShadow: isSelected 
-                      ? `0 6px 14px rgba(63, 107, 91, 0.15)` 
+                    boxShadow: isSelected
+                      ? `0 6px 14px rgba(63, 107, 91, 0.15)`
                       : "0 2px 6px rgba(0,0,0,0.015)",
                     transform: isSelected ? "scale(1.02)" : "scale(1)",
                     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -15979,8 +16105,8 @@ function ScreenEspecialistas({ onBack, idioma }) {
                   </div>
 
                   {/* Nombre de la Categoría */}
-                  <span style={{ 
-                    fontSize: 12.5, 
+                  <span style={{
+                    fontSize: 12.5,
                     fontWeight: isSelected ? 700 : 500,
                     transition: "all 0.25s ease"
                   }}>
@@ -16010,7 +16136,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
         {(filtro !== "todos" || searchQuery.trim() !== "") && (
           <div className="ss-fade" style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", marginTop: -4, paddingLeft: 4 }}>
             <span style={{ fontSize: 11, color: MUTED, marginRight: 2 }}>{ui.filterBy}</span>
-            
+
             {filtro !== "todos" && (
               <span style={{
                 fontSize: 11,
@@ -16025,7 +16151,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                 border: `1px solid ${SAGE}30`
               }}>
                 {cats.find(c => c.id === filtro)?.label || ""}
-                <button 
+                <button
                   onClick={() => setFiltro("todos")}
                   style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", color: SAGE }}
                 >
@@ -16048,7 +16174,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                 border: `1px solid ${SAGE}30`
               }}>
                 "{searchQuery}"
-                <button 
+                <button
                   onClick={() => setSearchQuery("")}
                   style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex", color: SAGE }}
                 >
@@ -16057,7 +16183,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
               </span>
             )}
 
-            <button 
+            <button
               onClick={() => {
                 setFiltro("todos");
                 setSearchQuery("");
@@ -16099,13 +16225,13 @@ function ScreenEspecialistas({ onBack, idioma }) {
             {listaFiltrada.map((e) => {
               const yaContactado = contactadoIds.includes(e.id);
               return (
-                <div 
-                  key={e.id} 
-                  className="ss-card ss-fade" 
-                  style={{ 
-                    background: "white", 
-                    border: yaContactado ? `1.5px solid ${SAGE}` : `1.5px solid ${LINE}`, 
-                    borderRadius: 20, 
+                <div
+                  key={e.id}
+                  className="ss-card ss-fade"
+                  style={{
+                    background: "white",
+                    border: yaContactado ? `1.5px solid ${SAGE}` : `1.5px solid ${LINE}`,
+                    borderRadius: 20,
                     padding: 18,
                     boxShadow: yaContactado ? "0 4px 15px rgba(111,168,146,0.1)" : "0 3px 10px rgba(0,0,0,0.015)",
                     display: "flex",
@@ -16146,7 +16272,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                         <Check size={10} strokeWidth={3} />
                       </div>
                     </div>
-                    
+
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: "space-between" }}>
                         <span style={{ fontSize: 16, fontWeight: 700, color: INK, fontFamily: FONT_DISPLAY }}>
@@ -16320,7 +16446,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            
+
             {/* Barra superior del Modal */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -16337,7 +16463,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                   {ui.modalProfileTitle}
                 </span>
               </div>
-              <button 
+              <button
                 onClick={() => setActiveEspecialista(null)}
                 style={{
                   background: "white",
@@ -16403,7 +16529,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                   <span style={{ fontSize: 14, fontWeight: 700, color: INK, fontFamily: FONT_DISPLAY }}>
                     {ui.motiveQuestion}
                   </span>
-                  
+
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {ui.motives.map((motivo) => {
                       const selected = selectedMotivos.includes(motivo.id);
@@ -16435,7 +16561,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                   <span style={{ fontSize: 14, fontWeight: 700, color: INK, fontFamily: FONT_DISPLAY }}>
                     {ui.preferredModality}
                   </span>
-                  
+
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                     <button
                       onClick={() => setPreferredModalidad("online")}
@@ -16615,7 +16741,7 @@ function ScreenEspecialistas({ onBack, idioma }) {
                   <div style={{ fontSize: 11, fontWeight: 700, color: SAGE_DARK, textTransform: "uppercase" }}>
                     {ui.summaryTitle}
                   </div>
-                  
+
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, borderBottom: `1px solid ${LINE}`, paddingBottom: 8 }}>
                     <span style={{ color: MUTED }}>{ui.summarySpecialist}</span>
                     <strong style={{ color: INK }}>{activeEspecialista.nombre}</strong>
@@ -17090,11 +17216,11 @@ const MOODS_INFO = {
   ansioso: { label: "Ansioso", emoji: "🌪️", bg: "#F4E0E0", text: "#A44C4C" },
   cansado: { label: "Cansado", emoji: "🔋", bg: "#E7E6F2", text: "#5B5482" },
   inspirado: { label: "Inspirado", emoji: "✨", bg: "#FFECD6", text: "#A05A18" }
-};function EntradaCalendario({ entrada, idioma }) {
+}; function EntradaCalendario({ entrada, idioma }) {
   const [expandido, setExpandido] = useState(false);
   const { dia, mes } = formatearBadgeFecha(entrada.fecha);
-  const preview = entrada.texto && entrada.texto.length > 100 
-    ? entrada.texto.slice(0, 100).trim() + "\u2026" 
+  const preview = entrada.texto && entrada.texto.length > 100
+    ? entrada.texto.slice(0, 100).trim() + "\u2026"
     : (entrada.texto || "");
 
   const animoData = entrada.animo ? MOODS_INFO[entrada.animo] : null;
@@ -17214,10 +17340,10 @@ const MOODS_INFO = {
 
         {/* Rapid logging (Bullets de BuJo) */}
         {entrada.bullets && entrada.bullets.length > 0 && (
-          <div style={{ 
-            display: "flex", 
-            flexDirection: "column", 
-            gap: 5, 
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 5,
             margin: "10px 0 8px",
             borderLeft: `2px dashed ${LINE}`,
             paddingLeft: 12,
@@ -17226,18 +17352,18 @@ const MOODS_INFO = {
               const sym = b.tipo === "tarea" ? "☐" : b.tipo === "gratitud" ? "♥" : b.tipo === "idea" ? "💡" : "—";
               const isComp = b.tipo === "tarea" && b.completado;
               return (
-                <div key={b.id || idx} style={{ 
-                  display: "flex", 
-                  gap: 8, 
-                  alignItems: "center", 
+                <div key={b.id || idx} style={{
+                  display: "flex",
+                  gap: 8,
+                  alignItems: "center",
                   fontSize: 12,
                   color: isComp ? "#999386" : INK,
                   textDecoration: isComp ? "line-through" : "none",
                   opacity: isComp ? 0.7 : 1,
                   lineHeight: 1.35
                 }}>
-                  <span style={{ 
-                    fontWeight: 900, 
+                  <span style={{
+                    fontWeight: 900,
                     color: b.tipo === "gratitud" ? KINOEMOTION : b.tipo === "idea" ? "#df9f1a" : SAGE_DARK,
                     fontSize: b.tipo === "tarea" && isComp ? 15 : 12,
                     display: "inline-block",
@@ -17254,11 +17380,11 @@ const MOODS_INFO = {
         )}
 
         {entrada.texto && (
-          <p style={{ 
-            fontSize: 13, 
-            color: INK, 
-            margin: "8px 0 0", 
-            lineHeight: "22px", 
+          <p style={{
+            fontSize: 13,
+            color: INK,
+            margin: "8px 0 0",
+            lineHeight: "22px",
             whiteSpace: "pre-wrap",
             fontStyle: "italic",
             fontFamily: FONT_BODY,
@@ -17297,13 +17423,13 @@ function CalendarioEntradas({ entradas, idioma }) {
             marginBottom: 12,
             paddingLeft: 4
           }}>
-            <p style={{ 
+            <p style={{
               fontFamily: FONT_DISPLAY,
-              fontSize: 12.5, 
-              fontWeight: 700, 
-              color: SAGE_DARK, 
-              textTransform: "capitalize", 
-              margin: 0 
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: SAGE_DARK,
+              textTransform: "capitalize",
+              margin: 0
             }}>
               {g.etiqueta}
             </p>
@@ -17373,10 +17499,10 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
       })
       .filter(Boolean)
       .join(" · ");
-    
+
     // Unificar bullets al texto de manera elegante si no hay escritura libre, o guardarlos estructuradamente
     const entradaCompleta = extra ? `${texto.trim()}\n\n(${extra})` : texto.trim();
-    
+
     onAdd(crearEntradaDiario(titulo, entradaCompleta, null, {
       animo,
       bullets,
@@ -17385,7 +17511,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
     }));
 
     if (onRefinar && Object.keys(respuestas).length) onRefinar(texto.trim(), respuestas);
-    
+
     // Limpiar estados
     setTexto("");
     setTitulo("");
@@ -17405,7 +17531,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
   // Filtrar entradas para el historial
   const entradasFiltradas = entradas.filter((e) => {
     const coincideAnimo = !filtroAnimo || e.animo === filtroAnimo;
-    const coincideTexto = !busqueda || 
+    const coincideTexto = !busqueda ||
       (e.titulo && e.titulo.toLowerCase().includes(busqueda.toLowerCase())) ||
       (e.texto && e.texto.toLowerCase().includes(busqueda.toLowerCase())) ||
       (e.bullets && e.bullets.some(b => b.texto.toLowerCase().includes(busqueda.toLowerCase())));
@@ -17415,13 +17541,13 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
   return (
     <div className="ss-fade" style={{ padding: "0 22px 26px", minHeight: "100%", display: "flex", flexDirection: "column", background: "#fcfaf7" }}>
       <TopBar title={t("Diario de bienestar", idioma)} />
-      
+
       {/* TABS DE ENCUADERNACIÓN DE LIBRO (BOOK BINDER STYLE) */}
       {fase === "escribir" && (
-        <div style={{ 
-          display: "flex", 
-          justifyContent: "center", 
-          gap: 0, 
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 0,
           margin: "6px 0 16px",
           background: "#ece7dd",
           padding: 3,
@@ -17512,7 +17638,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                     borderRight: "1px dashed rgba(63,107,91,0.15)",
                     pointerEvents: "none"
                   }} />
-                  
+
                   {/* Pequeños ojales de costura dorados en el lomo */}
                   {[30, 80, 130, 180, 230, 280, 330, 380, 430, 480].map((topOffset) => (
                     <div key={topOffset} style={{
@@ -17589,11 +17715,11 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                             }}>
                               {info.emoji}
                             </div>
-                            <span style={{ 
-                              fontFamily: FONT_DISPLAY, 
-                              fontSize: 11, 
-                              fontWeight: isSelected ? 700 : 500, 
-                              color: isSelected ? SAGE_DARK : "#7b7365" 
+                            <span style={{
+                              fontFamily: FONT_DISPLAY,
+                              fontSize: 11,
+                              fontWeight: isSelected ? 700 : 500,
+                              color: isSelected ? SAGE_DARK : "#7b7365"
                             }}>
                               {t(info.label, idioma)}
                             </span>
@@ -17712,7 +17838,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                     <p style={{ fontFamily: FONT_DISPLAY, fontSize: 12, fontWeight: 800, color: SAGE_DARK, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 10px 4px", display: "flex", alignItems: "center", gap: 6 }}>
                       <span>📌</span> {t("📌 2. Viñetas de Bienestar (Bullets)", idioma)}
                     </p>
-                    
+
                     {/* Lista de Bullets Agregados */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       {bullets.length > 0 ? (
@@ -17742,8 +17868,8 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                                     fontFamily: FONT_BODY
                                   }}
                                 >
-                                  <span style={{ 
-                                    fontWeight: 900, 
+                                  <span style={{
+                                    fontWeight: 900,
                                     color: b.tipo === "gratitud" ? "#d6472b" : b.tipo === "idea" ? "#df9f1a" : SAGE_DARK,
                                     fontSize: 14,
                                     display: "inline-block",
@@ -17754,7 +17880,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                                   </span>
                                   <span style={{ lineHeight: 1.35 }}>{b.texto}</span>
                                 </button>
-                                
+
                                 <button
                                   type="button"
                                   onClick={() => eliminarBullet(b.id)}
@@ -17784,14 +17910,14 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                     </div>
 
                     {/* Formulario para agregar Bullet */}
-                    <div style={{ 
-                      display: "flex", 
+                    <div style={{
+                      display: "flex",
                       flexDirection: "column",
-                      gap: 8, 
-                      background: "#faf8f2", 
-                      padding: 8, 
-                      borderRadius: 14, 
-                      border: `1.5px solid ${LINE}` 
+                      gap: 8,
+                      background: "#faf8f2",
+                      padding: 8,
+                      borderRadius: 14,
+                      border: `1.5px solid ${LINE}`
                     }}>
                       <div style={{ display: "flex", gap: 3, width: "100%" }}>
                         {[
@@ -17821,9 +17947,9 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                               boxShadow: nuevoBulletTipo === opt.val ? "0 2px 4px rgba(0,0,0,0.03)" : "none"
                             }}
                           >
-                            <span style={{ 
-                              color: opt.val === "gratitud" && nuevoBulletTipo === opt.val ? "#d6472b" : 
-                                     opt.val === "idea" && nuevoBulletTipo === opt.val ? "#df9f1a" : SAGE_DARK 
+                            <span style={{
+                              color: opt.val === "gratitud" && nuevoBulletTipo === opt.val ? "#d6472b" :
+                                opt.val === "idea" && nuevoBulletTipo === opt.val ? "#df9f1a" : SAGE_DARK
                             }}>
                               {opt.icon}
                             </span>
@@ -17837,9 +17963,9 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                           type="text"
                           placeholder={
                             nuevoBulletTipo === "tarea" ? t("ej. Meditación matinal de 10 min...", idioma) :
-                            nuevoBulletTipo === "gratitud" ? t("ej. Por la llamada sanadora de mi hermana...", idioma) :
-                            nuevoBulletTipo === "idea" ? t("ej. Escribir una carta a mi pasado...", idioma) :
-                            t("ej. Hoy sentí una punzada de alivio en el pecho...", idioma)
+                              nuevoBulletTipo === "gratitud" ? t("ej. Por la llamada sanadora de mi hermana...", idioma) :
+                                nuevoBulletTipo === "idea" ? t("ej. Escribir una carta a mi pasado...", idioma) :
+                                  t("ej. Hoy sentí una punzada de alivio en el pecho...", idioma)
                           }
                           value={nuevoBulletTexto}
                           onChange={(e) => setNuevoBulletTexto(e.target.value)}
@@ -17856,7 +17982,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                             outline: "none"
                           }}
                         />
-                        
+
                         <button
                           type="button"
                           onClick={agregarBullet}
@@ -17916,10 +18042,10 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
 
                     <input
                       className="ss-input"
-                      style={{ 
-                        background: "white", 
-                        fontSize: 13, 
-                        fontFamily: FONT_DISPLAY, 
+                      style={{
+                        background: "white",
+                        fontSize: 13,
+                        fontFamily: FONT_DISPLAY,
                         fontWeight: 600,
                         border: `1px solid ${LINE}`,
                         borderRadius: 10,
@@ -17973,16 +18099,16 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
                       />
                     </div>
                     {dictado.error === "permiso" && (
-                      <div 
+                      <div
                         onClick={() => dispararGuiaPermisos("microfono")}
-                        style={{ 
-                          fontSize: 11.5, 
-                          color: "#b91c1c", 
+                        style={{
+                          fontSize: 11.5,
+                          color: "#b91c1c",
                           background: "#fef2f2",
                           border: "1px solid #fecaca",
                           borderRadius: 8,
                           padding: "6px 10px",
-                          margin: "8px 0 0", 
+                          margin: "8px 0 0",
                           lineHeight: 1.4,
                           cursor: "pointer",
                           display: "flex",
@@ -18201,7 +18327,7 @@ function ScreenDiario({ entradas, onAdd, onHome, onRefinar, idioma }) {
           </div>
         )}
       </div>
-      
+
       {fase === "escribir" && (
         <button className="ss-btn ss-btn-ghost ss-bounce" style={{ width: "100%", marginTop: 12 }} onClick={onHome}>
           {t("Volver al inicio", idioma)}
@@ -18407,7 +18533,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
 
   if (minimizado) {
     return (
-      <div 
+      <div
         style={{
           position: "absolute",
           top: 0, left: 0, right: 0, bottom: 0,
@@ -18420,7 +18546,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
           fontFamily: FONT_BODY,
         }}
       >
-        <div 
+        <div
           style={{
             background: "rgba(255, 255, 255, 0.98)",
             backdropFilter: "blur(8px)",
@@ -18447,9 +18573,9 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
               </span>
             </div>
           </div>
-          
+
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <button 
+            <button
               onClick={() => setMinimizado(false)}
               style={{
                 background: SAGE_TINT,
@@ -18467,7 +18593,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
             >
               {t("Ver guía", idioma)} ▲
             </button>
-            <button 
+            <button
               onClick={onSkip}
               style={{
                 background: "rgba(223, 161, 95, 0.12)",
@@ -18495,7 +18621,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
   }
 
   return (
-    <div 
+    <div
       style={{
         position: "absolute",
         top: 0, left: 0, right: 0, bottom: 0,
@@ -18508,7 +18634,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
         fontFamily: FONT_BODY,
       }}
     >
-      <div 
+      <div
         style={{
           background: "white",
           borderRadius: 24,
@@ -18529,8 +18655,8 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
             </span>
             <div style={{ display: "flex", gap: 4 }}>
               {TUTORIAL_STEPS.map((s) => (
-                <div 
-                  key={s.step} 
+                <div
+                  key={s.step}
                   style={{
                     width: s.step === step ? 12 : 4,
                     height: 4,
@@ -18542,9 +18668,9 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
               ))}
             </div>
           </div>
-          
+
           <div style={{ display: "flex", gap: 8 }}>
-            <button 
+            <button
               onClick={() => setMinimizado(true)}
               style={{
                 background: SAGE_TINT,
@@ -18561,7 +18687,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
             >
               {t("Minimizar", idioma)} ▼
             </button>
-            <button 
+            <button
               onClick={onSkip}
               style={{
                 background: "rgba(223, 161, 95, 0.12)",
@@ -18582,7 +18708,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
         </div>
 
         <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginTop: 4 }}>
-          <div 
+          <div
             className="ss-onda-3"
             style={{
               fontSize: 34,
@@ -18609,7 +18735,7 @@ function OnboardingOverlay({ step, onNext, onPrev, onSkip, minimizado, setMinimi
         </div>
 
         {tieneTarea && (
-          <div 
+          <div
             style={{
               background: "#fffbf5",
               border: "1px dashed #dfa15f",
@@ -18898,12 +19024,30 @@ function ModalSeleccionIdiomaInicial({
 // ===== MODAL DE SELECCIÓN DE IDIOMA PREDETERMINADO — FIN =====
 
 export default function SueltaPrototipo() {
+  // Habilitar autocorrector y corrector ortográfico nativo del teclado en iOS y navegadores
+  useEffect(() => {
+    const habilitarCorrectorTeclado = () => {
+      if (typeof document === "undefined") return;
+      const campos = document.querySelectorAll('input:not([type="password"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), textarea');
+      campos.forEach(campo => {
+        if (!campo.hasAttribute('autocorrect')) campo.setAttribute('autocorrect', 'on');
+        if (!campo.hasAttribute('spellcheck')) campo.setAttribute('spellcheck', 'true');
+        if (!campo.hasAttribute('autocapitalize')) campo.setAttribute('autocapitalize', 'sentences');
+      });
+    };
+
+    habilitarCorrectorTeclado();
+    const obs = new MutationObserver(habilitarCorrectorTeclado);
+    obs.observe(document.body, { childList: true, subtree: true });
+    return () => obs.disconnect();
+  }, []);
+
   const [deviceMode, setDeviceMode] = useState(() => {
     try { return window.localStorage.getItem("suelta-y-sana:device-mode") || "desktop"; } catch { return "desktop"; }
   });
   const cambiarDeviceMode = (m) => {
     setDeviceMode(m);
-    try { window.localStorage.setItem("suelta-y-sana:device-mode", m); } catch {}
+    try { window.localStorage.setItem("suelta-y-sana:device-mode", m); } catch { }
   };
   const [protoTheme, setProtoTheme] = useState("proto-2");
   const cambiarProtoTheme = (t) => {
@@ -18926,7 +19070,7 @@ export default function SueltaPrototipo() {
       if (hash === "#calma") return "herramientas";
       if (hash === "#diario") return "diario";
       if (hash === "#suscripcion") return "suscripcion";
-    } catch (e) {}
+    } catch (e) { }
     if (estadoGuardado.stage && ETAPAS_RESTAURABLES.includes(estadoGuardado.stage)) return estadoGuardado.stage;
     return isNativeApp ? "bienvenida" : "landing";
   });
@@ -18953,14 +19097,14 @@ export default function SueltaPrototipo() {
     try {
       const localSecure = window.localStorage.getItem("suelta_fecha_registro_segura");
       if (localSecure && !isNaN(Number(localSecure))) return Number(localSecure);
-    } catch (_) {}
+    } catch (_) { }
     if (estadoGuardado.fechaRegistro && !isNaN(Number(estadoGuardado.fechaRegistro))) {
       return Number(estadoGuardado.fechaRegistro);
     }
     const ahora = Date.now();
     try {
       window.localStorage.setItem("suelta_fecha_registro_segura", String(ahora));
-    } catch (_) {}
+    } catch (_) { }
     return ahora;
   });
   const [esVipUser, setEsVipUser] = useState(() => {
@@ -18978,7 +19122,7 @@ export default function SueltaPrototipo() {
       const lp = window.localStorage.getItem("suelta_plan_pago");
       if (lp === "anual" || lp === "mensual") return true;
       if (window.localStorage.getItem("suelta_google_play_purchase")) return true;
-    } catch (_) {}
+    } catch (_) { }
     // Durante los 3 días de prueba el acceso a los módulos está habilitado
     return true;
   });
@@ -18998,7 +19142,7 @@ export default function SueltaPrototipo() {
         const parsed = JSON.parse(localD);
         if (parsed.planId) return parsed.planId;
       }
-    } catch (_) {}
+    } catch (_) { }
     return "prueba"; // "prueba" | "mensual" | "anual"
   });
 
@@ -19020,8 +19164,8 @@ export default function SueltaPrototipo() {
   // Si >= 72h -> pruebaExpirada = true (3 días cumplidos)
   const diasCumplidosPrueba = Math.floor(tiempoTranscurridoPrueba / MS_POR_DIA);
   const diaPruebaActual = pruebaExpirada ? 3 : Math.min(3, diasCumplidosPrueba + 1);
-  const diasRestantesPrueba = pruebaExpirada 
-    ? 0 
+  const diasRestantesPrueba = pruebaExpirada
+    ? 0
     : Math.max(1, Math.ceil((DURACION_PRUEBA_MS - tiempoTranscurridoPrueba) / MS_POR_DIA));
 
   // Control del modal constante de período de prueba de 3 días
@@ -19063,7 +19207,7 @@ export default function SueltaPrototipo() {
     try {
       const g = window.localStorage.getItem("suelta_recordatorios_config");
       if (g) return JSON.parse(g);
-    } catch (e) {}
+    } catch (e) { }
     return estadoGuardado.configRecordatorios || CONFIG_RECORDATORIOS_INICIAL;
   });
 
@@ -19083,7 +19227,7 @@ export default function SueltaPrototipo() {
       } else {
         window.localStorage.removeItem("suelta_foto_perfil");
       }
-    } catch (e) {}
+    } catch (e) { }
     if (currentUser) {
       try {
         const docRef = doc(db, "users", currentUser.uid);
@@ -19176,7 +19320,7 @@ export default function SueltaPrototipo() {
       const nombreApp = t("¡Suelta!", idiomaDetectado) || "¡Suelta!";
       document.title = nombreApp;
       document.documentElement.lang = idiomaDetectado;
-    } catch (e) {}
+    } catch (e) { }
   }, [idiomaDetectado]);
 
   // Modal para selección de idioma predeterminado cuando el usuario es nuevo
@@ -19199,7 +19343,7 @@ export default function SueltaPrototipo() {
     try {
       window.localStorage.setItem("suelta_idioma", lang);
       window.localStorage.setItem("suelta_idioma_configurado", "true");
-    } catch (e) {}
+    } catch (e) { }
     setMostrarModalIdioma(false);
 
     if (currentUser) {
@@ -19220,7 +19364,7 @@ export default function SueltaPrototipo() {
     try {
       window.localStorage.setItem("suelta_idioma", nuevoIdioma);
       window.localStorage.setItem("suelta_idioma_configurado", "true");
-    } catch (e) {}
+    } catch (e) { }
     if (currentUser) {
       try {
         const docRef = doc(db, "users", currentUser.uid);
@@ -19287,7 +19431,7 @@ export default function SueltaPrototipo() {
           mensaje: "Tus datos locales y de perfil se han limpiado correctamente."
         };
       }
-    } catch (e) {}
+    } catch (e) { }
     return null;
   });
 
@@ -19478,13 +19622,13 @@ export default function SueltaPrototipo() {
       let yaVistoExp = false;
       try {
         yaVistoExp = !!window.sessionStorage.getItem(sesionExpiradaKey);
-      } catch (_) {}
+      } catch (_) { }
 
       if (!yaVistoExp) {
         setMostrarModalPrueba(true);
         try {
           window.sessionStorage.setItem(sesionExpiradaKey, "true");
-        } catch (_) {}
+        } catch (_) { }
       }
       return;
     }
@@ -19496,13 +19640,13 @@ export default function SueltaPrototipo() {
       let yaVisto = false;
       try {
         yaVisto = !!window.sessionStorage.getItem(sesionKey);
-      } catch (_) {}
+      } catch (_) { }
 
       if (!yaVisto) {
         setMostrarModalPrueba(true);
         try {
           window.sessionStorage.setItem(sesionKey, "true");
-        } catch (_) {}
+        } catch (_) { }
       }
     }
   }, [tieneSuscripcionActiva, pruebaExpirada, enPruebaActiva, diaPruebaActual, stage]);
@@ -19582,7 +19726,7 @@ export default function SueltaPrototipo() {
     if (typeof window !== "undefined" && window.history) {
       try {
         window.history.pushState({ stage, guia: guiaChecklistAbierta, submodal: submodalChecklistAbierto, drawer: drawerOpen, timestamp: Date.now() }, "", window.location.href);
-      } catch (_) {}
+      } catch (_) { }
     }
   }, [stage, guiaChecklistAbierta, submodalChecklistAbierto, drawerOpen]);
 
@@ -19620,12 +19764,12 @@ export default function SueltaPrototipo() {
         window.history.pushState({ guard: 1, timestamp: Date.now() }, "", window.location.href);
         window.history.pushState({ guard: 2, timestamp: Date.now() }, "", window.location.href);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     const handlePopState = () => {
       try {
         window.history.pushState({ stage: "intermedio", guard: true, timestamp: Date.now() }, "", window.location.href);
-      } catch (_) {}
+      } catch (_) { }
       if (handleAndroidBackRef.current) {
         handleAndroidBackRef.current();
       }
@@ -19701,7 +19845,7 @@ export default function SueltaPrototipo() {
     };
   }, []);
   const [authCargado, setAuthCargado] = useState(false);
-  
+
   // Temporizador de seguridad: Desbloquea la pantalla de carga tras 1.5s si Firebase o la red tardan en responder en iOS
   useEffect(() => {
     const safetyTimer = setTimeout(() => {
@@ -19715,7 +19859,7 @@ export default function SueltaPrototipo() {
     }, 1500);
     return () => clearTimeout(safetyTimer);
   }, []);
-  
+
   // La guía instructiva antigua ha sido reemplazada por el checklist interactivo paso a paso (GuiaChecklistPasoAPaso).
   // No se fuerza ningún tutorial invasivo al inicio.
   useEffect(() => {
@@ -19732,7 +19876,7 @@ export default function SueltaPrototipo() {
     const yaSolicitados = typeof window !== "undefined" && window.sessionStorage?.getItem("suelta_permisos_auto_solicitados");
 
     if (enPantallaPrincipal && !yaSolicitados) {
-      try { window.sessionStorage?.setItem("suelta_permisos_auto_solicitados", "true"); } catch(e) {}
+      try { window.sessionStorage?.setItem("suelta_permisos_auto_solicitados", "true"); } catch (e) { }
 
       const timer = setTimeout(() => {
         solicitarTodosLosPermisosAutomaticos({
@@ -19772,7 +19916,7 @@ export default function SueltaPrototipo() {
             const activeSexo = "Otro";
             const activeEmail = user.email || "no-email";
             const activeApodo = activeNombre.split(' ')[0];
-            
+
             const isVipUserRedir = await verificarSiEsVip(activeEmail);
             const fechaRegRedir = Date.now();
             const planRedir = isVipUserRedir ? "anual" : "prueba";
@@ -19858,356 +20002,315 @@ export default function SueltaPrototipo() {
           console.log("onAuthStateChanged: Omitiendo procesamiento porque se está registrando con Google.");
           return;
         }
-      if (user) {
-        if (user.email) {
-          guardarCuentaRecordadaLocal({
-            uid: user.uid,
-            email: user.email,
-            nombre: user.displayName || user.email.split('@')[0],
-            foto: user.photoURL || null
-          });
-        }
-        let userExists = false;
-        let isOfflineOrError = false;
-        try {
-          const docRef = doc(db, "users", user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            if (isRegisteringWithGoogleRef.current) {
-              console.log("onAuthStateChanged: El usuario ya existe pero está en flujo de registro con Google. Evitando auto-login.");
-              userExists = false;
-            } else {
-              userExists = true;
-              const data = docSnap.data();
-            const loadedNombre = data.nombre || data.apodo || (user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0]);
-            setNombre(loadedNombre);
-            if (data.nombreCompleto) setNombreCompleto(data.nombreCompleto);
-            setEmail(data.email || user.email);
-            if (data.sexo) setSexo(data.sexo);
-            const loadedIdioma = data.idioma || (data.appState && data.appState.idioma);
-            if (loadedIdioma) {
-              setIdiomaDetectado(loadedIdioma);
-              try { window.localStorage.setItem("suelta_idioma_configurado", "true"); } catch {}
-              setMostrarModalIdioma(false);
-            }
-            
-            if (data.appState) {
-              const s = data.appState;
-              if (s.seleccion) setSeleccion(s.seleccion);
-              if (s.datos) setDatos(s.datos);
-              if (s.resultados) setResultados(s.resultados);
-              
-              // Cargar de manera robusta la subcolección 'diario' para evitar el límite de 1MB de Firestore en el documento principal
-              try {
-                const diarioSnap = await getDocs(collection(db, "users", user.uid, "diario"));
-                const cargadas = [];
-                diarioSnap.forEach((d) => {
-                  cargadas.push(d.data());
-                });
-                cargadas.sort((a, b) => {
-                  const dateA = new Date(a.fecha || a.id || 0).getTime();
-                  const dateB = new Date(b.fecha || b.id || 0).getTime();
-                  return dateB - dateA;
-                });
-                if (cargadas.length > 0) {
-                  setEntradas(cargadas);
-                } else if (s.entradas) {
-                  setEntradas(s.entradas);
-                }
-              } catch (diarioErr) {
-                console.error("Error al cargar entradas de subcolección diario:", diarioErr);
-                if (s.entradas) setEntradas(s.entradas);
-              }
-
-              if (s.nacimiento) setNacimiento(s.nacimiento);
-              if (s.familia) setFamilia(s.familia);
-              if (s.retoDiaActual) setRetoDiaActual(s.retoDiaActual);
-              if (s.retoCompletados) setRetoCompletados(s.retoCompletados);
-              if (s.retoHistorial) setRetoHistorial(s.retoHistorial);
-              if (s.retoCompletadosFechas) setRetoCompletadosFechas(s.retoCompletadosFechas);
-              // Estado de suscripción y acceso (VIP y período de prueba de 3 días)
-              const docData = docSnap.data() || {};
-              const subDoc = docData.subscription || s.subscription;
-              const subActiva = subDoc?.isActive === true || subDoc?.status === "ACTIVE";
-              
-              // 1. Verificación de Acceso Total / VIP
-              const cleanUserEmail = (user.email || "").toLowerCase().trim();
-              let isVip = docData.esVip === true || docData.accesoTotal === true || subDoc?.vip === true;
-              if (!isVip && cleanUserEmail) {
-                isVip = await verificarSiEsVip(cleanUserEmail);
-              }
-              setEsVipUser(isVip);
-
-              // 2. Fecha de registro y cálculo de días de prueba
-              let fechaReg = docData.fechaRegistro;
-              if (!fechaReg) {
-                try {
-                  const localSecure = window.localStorage.getItem("suelta_fecha_registro_segura");
-                  if (localSecure && !isNaN(Number(localSecure))) {
-                    fechaReg = Number(localSecure);
-                  }
-                } catch (_) {}
-                if (!fechaReg) {
-                  fechaReg = Date.now();
-                }
-                setDoc(docRef, { fechaRegistro: fechaReg }, { merge: true }).catch(() => {});
-              }
-              setFechaRegistroUser(fechaReg);
-              try {
-                window.localStorage.setItem("suelta_fecha_registro_segura", String(fechaReg));
-              } catch (_) {}
-
-              // 3. Determinar estado de acceso y compras
-              const datosPagoRecuperados = docData.datosPagoBasico || s.datosPagoBasico || null;
-              if (datosPagoRecuperados) setDatosPagoBasico(datosPagoRecuperados);
-
-              const tieneDatosPagoValidos = !!(datosPagoRecuperados?.orderId || datosPagoRecuperados?.purchaseToken || datosPagoRecuperados?.transaccionId);
-              const planGuardado = docData.planPago || subDoc?.plan || s.planPago || (tieneDatosPagoValidos ? datosPagoRecuperados?.planId : null);
-              const tieneCompraActiva = subActiva || docData.esPremium === true || planGuardado === "anual" || planGuardado === "mensual" || tieneDatosPagoValidos;
-
-              const transcurrido = Date.now() - Number(fechaReg);
-              const enPrueba = transcurrido < DURACION_PRUEBA_MS;
-
-              if (isVip) {
-                setEsPremium(true);
-                setPlanPago("anual");
-              } else if (tieneCompraActiva) {
-                const planEfectivo = planGuardado || (subDoc?.plan === "anual" ? "anual" : "mensual");
-                setEsPremium(true);
-                setPlanPago(planEfectivo);
-                try {
-                  window.localStorage.setItem("suelta_es_premium", "true");
-                  window.localStorage.setItem("suelta_plan_pago", planEfectivo);
-                  if (datosPagoRecuperados) {
-                    window.localStorage.setItem("suelta_datos_pago", JSON.stringify(datosPagoRecuperados));
-                    window.localStorage.setItem("suelta_google_play_purchase", JSON.stringify(datosPagoRecuperados));
-                  }
-                } catch (_) {}
-              } else if (enPrueba) {
-                setEsPremium(true);
-                setPlanPago("prueba");
-              } else {
-                setEsPremium(false);
-                setPlanPago("prueba");
-              }
-              if (s.direccionEnvio) setDireccionEnvio(s.direccionEnvio);
-              if (s.recordatoriosReto) setRecordatoriosReto(s.recordatoriosReto);
-              if (s.tutorialCompletado !== undefined) setTutorialCompletado(s.tutorialCompletado);
-
-              if (s.stage && ETAPAS_RESTAURABLES.includes(s.stage)) {
-                setStage(s.stage);
-              } else {
-                setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
-              }
-            } else {
-              setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
-            }
+        if (user) {
+          if (user.email) {
+            guardarCuentaRecordadaLocal({
+              uid: user.uid,
+              email: user.email,
+              nombre: user.displayName || user.email.split('@')[0],
+              foto: user.photoURL || null
+            });
           }
-          } else {
-            // El usuario está logueado pero no tiene documento en Firestore.
-            // Si el usuario ya tiene progreso local (nombre guardado), lo guardamos de inmediato en la DB en lugar de borrarlo.
-            const activeNombre = nombre || estadoGuardado.nombre;
-            if (activeNombre) {
-              console.log("Usuario autenticado sin documento en DB, pero con progreso local. Guardando en la nube...");
-              userExists = true;
-              const activeSexo = sexo || estadoGuardado.sexo || "Otro";
-              const activeEmail = email || user.email || "no-email";
-              
-              const rawEstado = {
-                stage: stage === "bienvenida" || stage === "registro" ? "inicio" : stage,
-                nombre: activeNombre,
-                sexo: activeSexo,
-                seleccion,
-                datos,
-                resultados,
-                hubItem,
-                herramientaItem,
-                entradas,
-                nacimiento,
-                familia,
-                retoDiaActual,
-                retoCompletados,
-                retoHistorial,
-                retoCompletadosFechas,
-                esPremium,
-                  planPago,
-                datosPagoBasico,
-                direccionEnvio,
-                email: activeEmail,
-                nombreCompleto: nombreCompleto || activeNombre,
-                recordatoriosReto,
-                analisisReporte,
-              };
+          let userExists = false;
+          let isOfflineOrError = false;
+          try {
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              if (isRegisteringWithGoogleRef.current) {
+                console.log("onAuthStateChanged: El usuario ya existe pero está en flujo de registro con Google. Evitando auto-login.");
+                userExists = false;
+              } else {
+                userExists = true;
+                const data = docSnap.data();
+                const loadedNombre = data.nombre || data.apodo || (user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0]);
+                setNombre(loadedNombre);
+                if (data.nombreCompleto) setNombreCompleto(data.nombreCompleto);
+                setEmail(data.email || user.email);
+                if (data.sexo) setSexo(data.sexo);
+                const loadedIdioma = data.idioma || (data.appState && data.appState.idioma);
+                if (loadedIdioma) {
+                  setIdiomaDetectado(loadedIdioma);
+                  try { window.localStorage.setItem("suelta_idioma_configurado", "true"); } catch { }
+                  setMostrarModalIdioma(false);
+                }
 
-              try {
-                // Migrar entradas locales a subcolección diario de manera asíncrona para no perder datos locales
-                if (entradas && entradas.length > 0) {
-                  for (const ent of entradas) {
+                if (data.appState) {
+                  const s = data.appState;
+                  if (s.seleccion) setSeleccion(s.seleccion);
+                  if (s.datos) setDatos(s.datos);
+                  if (s.resultados) setResultados(s.resultados);
+
+                  // Cargar de manera robusta la subcolección 'diario' para evitar el límite de 1MB de Firestore en el documento principal
+                  try {
+                    const diarioSnap = await getDocs(collection(db, "users", user.uid, "diario"));
+                    const cargadas = [];
+                    diarioSnap.forEach((d) => {
+                      cargadas.push(d.data());
+                    });
+                    cargadas.sort((a, b) => {
+                      const dateA = new Date(a.fecha || a.id || 0).getTime();
+                      const dateB = new Date(b.fecha || b.id || 0).getTime();
+                      return dateB - dateA;
+                    });
+                    if (cargadas.length > 0) {
+                      setEntradas(cargadas);
+                    } else if (s.entradas) {
+                      setEntradas(s.entradas);
+                    }
+                  } catch (diarioErr) {
+                    console.error("Error al cargar entradas de subcolección diario:", diarioErr);
+                    if (s.entradas) setEntradas(s.entradas);
+                  }
+
+                  if (s.nacimiento) setNacimiento(s.nacimiento);
+                  if (s.familia) setFamilia(s.familia);
+                  if (s.retoDiaActual) setRetoDiaActual(s.retoDiaActual);
+                  if (s.retoCompletados) setRetoCompletados(s.retoCompletados);
+                  if (s.retoHistorial) setRetoHistorial(s.retoHistorial);
+                  if (s.retoCompletadosFechas) setRetoCompletadosFechas(s.retoCompletadosFechas);
+                  // Estado de suscripción y acceso (VIP y período de prueba de 3 días)
+                  const docData = docSnap.data() || {};
+                  const subDoc = docData.subscription || s.subscription;
+                  const subActiva = subDoc?.isActive === true || subDoc?.status === "ACTIVE";
+
+                  // 1. Verificación de Acceso Total / VIP
+                  const cleanUserEmail = (user.email || "").toLowerCase().trim();
+                  let isVip = docData.esVip === true || docData.accesoTotal === true || subDoc?.vip === true;
+                  if (!isVip && cleanUserEmail) {
+                    isVip = await verificarSiEsVip(cleanUserEmail);
+                  }
+                  setEsVipUser(isVip);
+
+                  // 2. Fecha de registro y cálculo de días de prueba
+                  let fechaReg = docData.fechaRegistro;
+                  if (!fechaReg) {
                     try {
-                      await setDoc(doc(db, "users", user.uid, "diario", ent.id), JSON.parse(JSON.stringify(ent)));
-                    } catch (migrE) {
-                      console.error("Error migrando entrada local:", ent.id, migrE);
+                      const localSecure = window.localStorage.getItem("suelta_fecha_registro_segura");
+                      if (localSecure && !isNaN(Number(localSecure))) {
+                        fechaReg = Number(localSecure);
+                      }
+                    } catch (_) { }
+                    if (!fechaReg) {
+                      fechaReg = Date.now();
+                    }
+                    setDoc(docRef, { fechaRegistro: fechaReg }, { merge: true }).catch(() => { });
+                  }
+                  setFechaRegistroUser(fechaReg);
+                  try {
+                    window.localStorage.setItem("suelta_fecha_registro_segura", String(fechaReg));
+                  } catch (_) { }
+
+                  // 3. Determinar estado de acceso y compras
+                  const datosPagoRecuperados = docData.datosPagoBasico || s.datosPagoBasico || null;
+                  if (datosPagoRecuperados) setDatosPagoBasico(datosPagoRecuperados);
+
+                  const tieneDatosPagoValidos = !!(datosPagoRecuperados?.orderId || datosPagoRecuperados?.purchaseToken || datosPagoRecuperados?.transaccionId);
+                  const planGuardado = docData.planPago || subDoc?.plan || s.planPago || (tieneDatosPagoValidos ? datosPagoRecuperados?.planId : null);
+                  const tieneCompraActiva = subActiva || docData.esPremium === true || planGuardado === "anual" || planGuardado === "mensual" || tieneDatosPagoValidos;
+
+                  const transcurrido = Date.now() - Number(fechaReg);
+                  const enPrueba = transcurrido < DURACION_PRUEBA_MS;
+
+                  if (isVip) {
+                    setEsPremium(true);
+                    setPlanPago("anual");
+                  } else if (tieneCompraActiva) {
+                    const planEfectivo = planGuardado || (subDoc?.plan === "anual" ? "anual" : "mensual");
+                    setEsPremium(true);
+                    setPlanPago(planEfectivo);
+                    try {
+                      window.localStorage.setItem("suelta_es_premium", "true");
+                      window.localStorage.setItem("suelta_plan_pago", planEfectivo);
+                      if (datosPagoRecuperados) {
+                        window.localStorage.setItem("suelta_datos_pago", JSON.stringify(datosPagoRecuperados));
+                        window.localStorage.setItem("suelta_google_play_purchase", JSON.stringify(datosPagoRecuperados));
+                      }
+                    } catch (_) { }
+                  } else if (enPrueba) {
+                    setEsPremium(true);
+                    setPlanPago("prueba");
+                  } else {
+                    setEsPremium(false);
+                    setPlanPago("prueba");
+                  }
+                  if (s.direccionEnvio) setDireccionEnvio(s.direccionEnvio);
+                  if (s.recordatoriosReto) setRecordatoriosReto(s.recordatoriosReto);
+                  if (s.tutorialCompletado !== undefined) setTutorialCompletado(s.tutorialCompletado);
+
+                  if (s.stage && ETAPAS_RESTAURABLES.includes(s.stage)) {
+                    setStage(s.stage);
+                  } else {
+                    setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
+                  }
+                } else {
+                  setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
+                }
+              }
+            } else {
+              // El usuario está logueado pero no tiene documento en Firestore.
+              // Si el usuario ya tiene progreso local (nombre guardado), lo guardamos de inmediato en la DB en lugar de borrarlo.
+              const activeNombre = nombre || estadoGuardado.nombre;
+              if (activeNombre) {
+                console.log("Usuario autenticado sin documento en DB, pero con progreso local. Guardando en la nube...");
+                userExists = true;
+                const activeSexo = sexo || estadoGuardado.sexo || "Otro";
+                const activeEmail = email || user.email || "no-email";
+
+                const rawEstado = {
+                  stage: stage === "bienvenida" || stage === "registro" ? "inicio" : stage,
+                  nombre: activeNombre,
+                  sexo: activeSexo,
+                  seleccion,
+                  datos,
+                  resultados,
+                  hubItem,
+                  herramientaItem,
+                  entradas,
+                  nacimiento,
+                  familia,
+                  retoDiaActual,
+                  retoCompletados,
+                  retoHistorial,
+                  retoCompletadosFechas,
+                  esPremium,
+                  planPago,
+                  datosPagoBasico,
+                  direccionEnvio,
+                  email: activeEmail,
+                  nombreCompleto: nombreCompleto || activeNombre,
+                  recordatoriosReto,
+                  analisisReporte,
+                };
+
+                try {
+                  // Migrar entradas locales a subcolección diario de manera asíncrona para no perder datos locales
+                  if (entradas && entradas.length > 0) {
+                    for (const ent of entradas) {
+                      try {
+                        await setDoc(doc(db, "users", user.uid, "diario", ent.id), JSON.parse(JSON.stringify(ent)));
+                      } catch (migrE) {
+                        console.error("Error migrando entrada local:", ent.id, migrE);
+                      }
                     }
                   }
+
+                  const cleanedRaw = { ...rawEstado };
+                  delete cleanedRaw.entradas;
+
+                  await setDoc(docRef, {
+                    email: activeEmail,
+                    nombre: activeNombre,
+                    apodo: activeNombre.split(' ')[0],
+                    sexo: activeSexo,
+                    edad: "26-35",
+                    celular: "",
+                    appState: JSON.parse(JSON.stringify(cleanedRaw))
+                  }, { merge: true });
+                  setNombre(activeNombre);
+                  setEmail(activeEmail);
+                  setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
+                } catch (e) {
+                  console.error("Error al sincronizar estado local a Firestore en onAuthStateChanged:", e);
                 }
+              } else {
+                // Es un usuario de Google nuevo y sin progreso local previo.
+                // Auto-creamos su documento básico para evitar que quede atrapado en el flujo de registro.
+                console.log("Auto-creando documento básico en Firestore para nuevo usuario...");
+                userExists = true;
+                const activeNombre = user.displayName || user.email.split('@')[0];
+                const activeEmail = user.email;
+                const activeApodo = activeNombre.split(' ')[0];
+
+                const rawEstado = {
+                  stage: "inicio",
+                  nombre: activeNombre,
+                  sexo: "Otro",
+                  seleccion,
+                  datos,
+                  resultados,
+                  hubItem,
+                  herramientaItem,
+                  entradas,
+                  nacimiento,
+                  familia,
+                  retoDiaActual,
+                  retoCompletados,
+                  retoHistorial,
+                  retoCompletadosFechas,
+                  esPremium,
+                  planPago,
+                  datosPagoBasico,
+                  direccionEnvio,
+                  email: activeEmail,
+                  nombreCompleto: activeNombre,
+                  recordatoriosReto,
+                  analisisReporte,
+                };
 
                 const cleanedRaw = { ...rawEstado };
                 delete cleanedRaw.entradas;
 
-                await setDoc(docRef, {
-                  email: activeEmail,
-                  nombre: activeNombre,
-                  apodo: activeNombre.split(' ')[0],
-                  sexo: activeSexo,
-                  edad: "26-35",
-                  celular: "",
-                  appState: JSON.parse(JSON.stringify(cleanedRaw))
-                }, { merge: true });
-                setNombre(activeNombre);
-                setEmail(activeEmail);
-                setStage(prev => (prev === "bienvenida" || prev === "registro" ? "inicio" : prev));
-              } catch (e) {
-                console.error("Error al sincronizar estado local a Firestore en onAuthStateChanged:", e);
-              }
-            } else {
-              // Es un usuario de Google nuevo y sin progreso local previo.
-              // Auto-creamos su documento básico para evitar que quede atrapado en el flujo de registro.
-              console.log("Auto-creando documento básico en Firestore para nuevo usuario...");
-              userExists = true;
-              const activeNombre = user.displayName || user.email.split('@')[0];
-              const activeEmail = user.email;
-              const activeApodo = activeNombre.split(' ')[0];
-              
-              const rawEstado = {
-                stage: "inicio",
-                nombre: activeNombre,
-                sexo: "Otro",
-                seleccion,
-                datos,
-                resultados,
-                hubItem,
-                herramientaItem,
-                entradas,
-                nacimiento,
-                familia,
-                retoDiaActual,
-                retoCompletados,
-                retoHistorial,
-                retoCompletadosFechas,
-                esPremium,
-                  planPago,
-                datosPagoBasico,
-                direccionEnvio,
-                email: activeEmail,
-                nombreCompleto: activeNombre,
-                recordatoriosReto,
-                analisisReporte,
-              };
-
-              const cleanedRaw = { ...rawEstado };
-              delete cleanedRaw.entradas;
-
-              try {
-                await setDoc(docRef, {
-                  email: activeEmail,
-                  nombre: activeNombre,
-                  apodo: activeApodo,
-                  sexo: "Otro",
-                  edad: "26-35",
-                  celular: "",
-                  appState: JSON.parse(JSON.stringify(cleanedRaw))
-                }, { merge: true });
-                setNombre(activeNombre);
-                setNombreCompleto(activeNombre);
-                setEmail(activeEmail);
-                setStage("inicio");
-              } catch (e) {
-                console.error("Error al auto-crear perfil en Firestore:", e);
+                try {
+                  await setDoc(docRef, {
+                    email: activeEmail,
+                    nombre: activeNombre,
+                    apodo: activeApodo,
+                    sexo: "Otro",
+                    edad: "26-35",
+                    celular: "",
+                    appState: JSON.parse(JSON.stringify(cleanedRaw))
+                  }, { merge: true });
+                  setNombre(activeNombre);
+                  setNombreCompleto(activeNombre);
+                  setEmail(activeEmail);
+                  setStage("inicio");
+                } catch (e) {
+                  console.error("Error al auto-crear perfil en Firestore:", e);
+                }
               }
             }
+          } catch (e) {
+            isOfflineOrError = true;
+            const msg = e?.message || String(e);
+            if (!msg.includes("permissions") && !msg.includes("Missing or insufficient")) {
+              console.warn("Firestore error in onAuthStateChanged (falling back to offline mode/local state):", e);
+            }
           }
-        } catch (e) {
-          isOfflineOrError = true;
-          const msg = e?.message || String(e);
-          if (!msg.includes("permissions") && !msg.includes("Missing or insufficient")) {
-            console.warn("Firestore error in onAuthStateChanged (falling back to offline mode/local state):", e);
+
+          if (userExists || isOfflineOrError) {
+            setStage(s => (s === "bienvenida" || s === "registro" ? "inicio" : s));
+          } else {
+            // Si no tiene documento ni pudimos auto-crearlo, nos aseguramos de no desloguear forzosamente
+            setStage(s => {
+              if (s !== "bienvenida" && s !== "registro" && s !== "captura" && s !== "postRegistro") {
+                return "inicio";
+              }
+              return s;
+            });
           }
-        }
-        
-        if (userExists || isOfflineOrError) {
-          setStage(s => (s === "bienvenida" || s === "registro" ? "inicio" : s));
         } else {
-          // Si no tiene documento ni pudimos auto-crearlo, nos aseguramos de no desloguear forzosamente
+          // User not logged in. If they have saved state (name/valid stage), they are a guest user who already passed onboarding.
+          // Don't force them back to bienvenida.
           setStage(s => {
-            if (s !== "bienvenida" && s !== "registro" && s !== "captura" && s !== "postRegistro") {
-              return "inicio";
+            if (s === "registro" || s === "legal") return s;
+            if (estadoGuardado.nombre || (estadoGuardado.stage && ETAPAS_RESTAURABLES.includes(estadoGuardado.stage))) {
+              return (s === "bienvenida" || s === "landing") ? "inicio" : s;
             }
-            return s;
+            return "bienvenida";
           });
         }
-      } else {
-        // User not logged in. If they have saved state (name/valid stage), they are a guest user who already passed onboarding.
-        // Don't force them back to bienvenida.
-        setStage(s => {
-          if (s === "registro" || s === "legal") return s;
-          if (estadoGuardado.nombre || (estadoGuardado.stage && ETAPAS_RESTAURABLES.includes(estadoGuardado.stage))) {
-            return (s === "bienvenida" || s === "landing") ? "inicio" : s;
-          }
-          return "bienvenida";
-        });
+      } catch (err) {
+        console.warn("Aviso procesando sesión inicial:", err);
+      } finally {
+        setAuthCargado(true);
       }
-    } catch (err) {
-      console.warn("Aviso procesando sesión inicial:", err);
-    } finally {
-      setAuthCargado(true);
-    }
-  });
-  return unsubscribe;
+    });
+    return unsubscribe;
   }, [auth]);
 
-  // Flujo 100% dentro de la app: Invoca el selector nativo de Google en Android o el modal integrado
+  // Flujo 100% dentro de la app: Abre el selector de cuentas de Google in-app con opción nativa y recordadas
   const handleGoogleLogin = async (isLoginOnly = false) => {
-    const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
-    if (isAndroid) {
-      try {
-        const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
-        try {
-          await GoogleAuth.initialize({
-            clientId: "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com",
-            scopes: ["profile", "email"],
-            grantOfflineAccess: false,
-          });
-        } catch (_) {}
-        // IMPORTANTE: Asegurar signOut previo en GoogleAuth para obligar al sistema Android
-        // a mostrar SIEMPRE el selector de cuentas ("Elegir una cuenta") permitiendo al usuario
-        // cambiar de cuenta o agregar una nueva en lugar de reutilizar la anterior en silencio
-        try {
-          await GoogleAuth.signOut();
-        } catch (_) {}
-        const googleUser = await GoogleAuth.signIn();
-        if (googleUser && googleUser.email) {
-          try {
-            window.sessionStorage.setItem("suelta_used_google_native_auth", "true");
-          } catch (_) {}
-          await handleSeleccionarCuentaGoogleInApp({
-            id: googleUser.id,
-            email: googleUser.email,
-            nombre: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim() || googleUser.email.split('@')[0],
-            foto: googleUser.imageUrl || null,
-            idToken: googleUser.authentication?.idToken
-          });
-          return;
-        }
-      } catch (nativeErr) {
-        console.warn("Aviso en GoogleAuth nativo:", nativeErr);
-        const errMsg = String(nativeErr?.message || nativeErr || "");
-        if (errMsg.includes("12501") || errMsg.includes("cancel") || errMsg.includes("Canceled") || errMsg.includes("USER_CANCELLED")) {
-          return;
-        }
-      }
-    }
-
-    // Modal de selección de cuentas
     setMostrarModalGoogleInApp(true);
   };
 
@@ -20269,7 +20372,7 @@ export default function SueltaPrototipo() {
               try {
                 const fallbackRes = await signInWithEmailAndPassword(auth, emailNormalizado, "Suelta_GoogleAuth_" + emailNormalizado.replace(/[^a-zA-Z0-9]/g, "_") + "_2026");
                 firebaseUser = fallbackRes.user;
-              } catch (_) {}
+              } catch (_) { }
             }
             console.warn("Aviso vinculando Firebase Auth in-app:", createErr?.code || createErr?.message);
           }
@@ -20323,7 +20426,7 @@ export default function SueltaPrototipo() {
         userDocSnap = await getDoc(userDocRef);
       } catch (e) {
         await new Promise(r => setTimeout(r, 600));
-        try { userDocSnap = await getDoc(userDocRef); } catch (_) {}
+        try { userDocSnap = await getDoc(userDocRef); } catch (_) { }
       }
 
       const isVipGoogle = await verificarSiEsVip(emailNormalizado);
@@ -20425,7 +20528,7 @@ export default function SueltaPrototipo() {
           const cargadas = [];
           diarioSnap.forEach((d) => cargadas.push(d.data()));
           if (cargadas.length > 0) setEntradas(cargadas);
-        } catch (_) {}
+        } catch (_) { }
       }
 
       // Persistir de inmediato en localStorage para que sobreviva a recargas
@@ -20440,7 +20543,7 @@ export default function SueltaPrototipo() {
         window.localStorage.setItem(SS_STORAGE_KEY, JSON.stringify(estadoActualizado));
         window.localStorage.setItem("suelta_es_premium", "true");
         window.localStorage.setItem("suelta_plan_pago", isVipGoogle ? "anual" : "prueba");
-      } catch (_) {}
+      } catch (_) { }
 
       setStage("inicio");
       setMostrarModalGoogleInApp(false);
@@ -20462,7 +20565,7 @@ export default function SueltaPrototipo() {
           planPago: "anual"
         };
         window.localStorage.setItem(SS_STORAGE_KEY, JSON.stringify(estadoFallback));
-      } catch (_) {}
+      } catch (_) { }
       setStage("inicio");
       setMostrarModalGoogleInApp(false);
     }
@@ -20494,9 +20597,53 @@ export default function SueltaPrototipo() {
     }
   };
 
-  // Autenticación oficial con ventana emergente de Google (para web/navegadores)
+  // Autenticación oficial con Google (soporta nativo Capacitor Android/iOS y web)
   const handleGooglePopupLogin = async () => {
     try {
+      const isCapacitor = typeof window !== "undefined" && window.Capacitor;
+      const platform = isCapacitor && typeof window.Capacitor.getPlatform === "function" ? window.Capacitor.getPlatform() : "";
+      const isNative = isCapacitor && (platform === "android" || platform === "ios" || (typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform()));
+
+      if (isNative) {
+        try {
+          const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
+          try {
+            const googleClientId = platform === "ios"
+              ? "706031612034-7rcv45h5jms5l32g32utivgarpaqhsup.apps.googleusercontent.com"
+              : "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com";
+            await GoogleAuth.initialize({
+              clientId: googleClientId,
+              scopes: ["profile", "email"],
+              grantOfflineAccess: false,
+            });
+          } catch (_) { }
+          try {
+            await GoogleAuth.signOut();
+          } catch (_) { }
+          const googleUser = await GoogleAuth.signIn();
+          if (googleUser && googleUser.email) {
+            try {
+              window.sessionStorage.setItem("suelta_used_google_native_auth", "true");
+            } catch (_) { }
+            await handleSeleccionarCuentaGoogleInApp({
+              id: googleUser.id,
+              email: googleUser.email,
+              nombre: googleUser.name || `${googleUser.givenName || ''} ${googleUser.familyName || ''}`.trim() || googleUser.email.split('@')[0],
+              foto: googleUser.imageUrl || null,
+              idToken: googleUser.authentication?.idToken
+            });
+            setMostrarModalGoogleInApp(false);
+            return;
+          }
+        } catch (nativeErr) {
+          console.warn("Aviso en GoogleAuth nativo en modal:", nativeErr);
+          const errMsg = String(nativeErr?.message || nativeErr || "");
+          if (errMsg.includes("12501") || errMsg.includes("cancel") || errMsg.includes("Canceled") || errMsg.includes("USER_CANCELLED")) {
+            return;
+          }
+        }
+      }
+
       googleProvider.setCustomParameters({ prompt: "select_account" });
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
@@ -20529,7 +20676,7 @@ export default function SueltaPrototipo() {
         console.log("Email Login: Auto-creando documento de respaldo...");
         const activeNombre = user.displayName || user.email.split('@')[0];
         const activeApodo = activeNombre.split(' ')[0];
-        
+
         const isVipEmailUser = await verificarSiEsVip(user.email);
         const fechaRegEmail = Date.now();
         const planEmail = isVipEmailUser ? "anual" : "prueba";
@@ -20562,7 +20709,7 @@ export default function SueltaPrototipo() {
           esVip: isVipEmailUser,
           accesoTotal: isVipEmailUser,
         };
-        
+
         try {
           // Migrar entradas locales a subcolección diario de manera asíncrona para no perder datos locales
           if (entradas && entradas.length > 0) {
@@ -20748,11 +20895,11 @@ export default function SueltaPrototipo() {
       accesoTotal: tieneAccesoTotal,
     };
     ssGuardarEstadoGuardado(estado);
-    
+
     if (currentUser && stage !== "bienvenida" && stage !== "registro" && stage !== "legal") {
       const emailToSave = email || currentUser.email || "no-email";
       const nombreToSave = nombre || currentUser.displayName || emailToSave.split('@')[0] || "Usuario";
-      
+
       // Limpiar el estado de cualquier objeto no serializable (como clases, funciones, symbols, etc.) para evitar fallos internos en Firestore
       let cleanedState = estado;
       try {
@@ -20764,7 +20911,7 @@ export default function SueltaPrototipo() {
         console.error("Error serializing appState for Firestore:", err);
       }
 
-      setDoc(doc(db, "users", currentUser.uid), { 
+      setDoc(doc(db, "users", currentUser.uid), {
         appState: cleanedState,
         email: emailToSave,
         nombre: nombreToSave,
@@ -20835,7 +20982,7 @@ export default function SueltaPrototipo() {
           "Cuestionario"
         ];
         const esPractica = practicasConocidas.some(p => tipoPractica.toLowerCase().includes(p.toLowerCase()));
-        
+
         if (esPractica || tipoPractica.startsWith("Cuestionario")) {
           const progresoId = `progreso_${nuevaEntrada.id}`;
           const progresoRef = doc(db, "users", currentUser.uid, "progreso", progresoId);
@@ -20868,24 +21015,24 @@ export default function SueltaPrototipo() {
       }
       try {
         const subcolecciones = [
-          "diario", 
-          "emociones", 
-          "progreso", 
-          "constelaciones", 
-          "comunicacion_no_violenta", 
-          "reto", 
-          "analisis21Dias", 
+          "diario",
+          "emociones",
+          "progreso",
+          "constelaciones",
+          "comunicacion_no_violenta",
+          "reto",
+          "analisis21Dias",
           "purchases"
         ];
         for (const sub of subcolecciones) {
           try {
             const snap = await getDocs(collection(db, "users", targetUid, sub));
             for (const docSnap of snap.docs) {
-              await deleteDoc(docSnap.ref).catch(() => {});
+              await deleteDoc(docSnap.ref).catch(() => { });
             }
-          } catch (_) {}
+          } catch (_) { }
         }
-      } catch (_) {}
+      } catch (_) { }
     }
 
     // 2. Eliminar cuenta de las cuentas recordadas en el dispositivo
@@ -20906,7 +21053,7 @@ export default function SueltaPrototipo() {
           console.warn("Requiere login reciente para eliminar credenciales Auth. Datos en la nube eliminados.");
           try {
             window.localStorage.setItem("suelta-y-sana:recent-login-error", "true");
-          } catch (storageErr) {}
+          } catch (storageErr) { }
         } else {
           console.warn("Aviso al dar de baja credencial Auth:", e);
         }
@@ -20916,29 +21063,33 @@ export default function SueltaPrototipo() {
     // 4. Cerrar sesión en Firebase Auth
     try {
       await signOut(auth);
-    } catch(e) {}
+    } catch (e) { }
 
-    // 5. Cerrar sesión en Capacitor Google Auth si es nativo Android y el usuario usó Google
+    // 5. Cerrar sesión en Capacitor Google Auth si es nativo Android/iOS y el usuario usó Google
     try {
-      const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
+      const platform = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" ? window.Capacitor.getPlatform() : "";
+      const isNative = platform === "android" || platform === "ios";
       const esUsuarioGoogle = window.sessionStorage.getItem("suelta_used_google_native_auth") === "true" ||
         auth?.currentUser?.providerData?.some((p) => p.providerId === "google.com");
-      if (isAndroid && esUsuarioGoogle) {
+      if (isNative && esUsuarioGoogle) {
         try {
           const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
+          const googleClientId = platform === "ios"
+            ? "706031612034-7rcv45h5jms5l32g32utivgarpaqhsup.apps.googleusercontent.com"
+            : "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com";
           await GoogleAuth.initialize({
-            clientId: "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com",
+            clientId: googleClientId,
             scopes: ["profile", "email"],
             grantOfflineAccess: false,
           });
           await GoogleAuth.signOut();
-        } catch (_) {}
+        } catch (_) { }
       }
-    } catch (_) {}
+    } catch (_) { }
 
     // 6. Deshabilitar auto-select de Google Identity Services
     if (typeof window !== "undefined" && window.google?.accounts?.id) {
-      try { window.google.accounts.id.disableAutoSelect(); } catch (_) {}
+      try { window.google.accounts.id.disableAutoSelect(); } catch (_) { }
     }
 
     // 7. Borrar estado guardado local y marcar confirmación de borrado
@@ -20950,7 +21101,7 @@ export default function SueltaPrototipo() {
       localStorage.removeItem("suelta_ultima_cuenta");
       localStorage.removeItem("suelta_sesion");
       window.sessionStorage.removeItem("suelta_used_google_native_auth");
-    } catch (_) {}
+    } catch (_) { }
 
     ssBorrarEstadoGuardado();
     window.location.reload();
@@ -20959,14 +21110,18 @@ export default function SueltaPrototipo() {
   const cerrarSesion = async () => {
     isLoggingOutRef.current = true;
     try {
-      const isAndroid = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" && window.Capacitor.getPlatform() === "android";
+      const platform = typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.getPlatform === "function" ? window.Capacitor.getPlatform() : "";
+      const isNative = platform === "android" || platform === "ios";
       const esUsuarioGoogle = window.sessionStorage.getItem("suelta_used_google_native_auth") === "true" ||
         auth?.currentUser?.providerData?.some((p) => p.providerId === "google.com");
-      if (isAndroid && esUsuarioGoogle) {
+      if (isNative && esUsuarioGoogle) {
         try {
           const { GoogleAuth } = await import("@codetrix-studio/capacitor-google-auth");
+          const googleClientId = platform === "ios"
+            ? "706031612034-7rcv45h5jms5l32g32utivgarpaqhsup.apps.googleusercontent.com"
+            : "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com";
           await GoogleAuth.initialize({
-            clientId: "706031612034-8g9v90l77et2nlkkqhcjum6crnhm2eeg.apps.googleusercontent.com",
+            clientId: googleClientId,
             scopes: ["profile", "email"],
             grantOfflineAccess: false,
           });
@@ -20975,9 +21130,9 @@ export default function SueltaPrototipo() {
           console.warn("Aviso cerrando sesión en GoogleAuth:", e);
         }
       }
-    } catch (_) {}
+    } catch (_) { }
     if (typeof window !== "undefined" && window.google?.accounts?.id) {
-      try { window.google.accounts.id.disableAutoSelect(); } catch (_) {}
+      try { window.google.accounts.id.disableAutoSelect(); } catch (_) { }
     }
     try {
       await signOut(auth);
@@ -21073,10 +21228,10 @@ export default function SueltaPrototipo() {
       setEsVipUser(isVip);
       setEsPremium(isVip);
     };
-    return () => { 
-      delete window.__setPlanPago; 
-      delete window.__setTrialDays; 
-      delete window.__setVip; 
+    return () => {
+      delete window.__setPlanPago;
+      delete window.__setTrialDays;
+      delete window.__setVip;
     };
   }, []);
 
@@ -21208,7 +21363,7 @@ export default function SueltaPrototipo() {
                 datosPagoBasico: datos
               }
             }, { merge: true });
-          } catch(e) {
+          } catch (e) {
             console.warn("Aviso sincronizando restauración:", e);
           }
         }
@@ -21255,7 +21410,7 @@ export default function SueltaPrototipo() {
 
   if (stage === "landing") {
     return (
-      <ScreenLanding 
+      <ScreenLanding
         onEnterApp={() => {
           window.location.hash = "#app";
           setStage(estadoGuardado.stage || (estadoGuardado.nombre ? "inicio" : "bienvenida"));
@@ -21270,22 +21425,34 @@ export default function SueltaPrototipo() {
 
   return (
     <MenuContext.Provider value={{ onOpenMenu: () => setDrawerOpen(true), toggleMenu: () => setDrawerOpen((prev) => !prev), isDrawerOpen: drawerOpen }}>
-    <div style={{ fontFamily: FONT_BODY }}>
-      <GlobalStyle protoTheme={protoTheme} />
-      <PhoneFrame
-        stageKey={stage}
-        hojasVariante={hojasVariante}
-        mostrarVolver={false}
-        onVolverBienvenida={() => setStage(currentUser || TEST_USER.nombre === nombre ? "inicio" : "bienvenida")}
-        onSwipeRight={({ isEdge }) => handleSwipeGesture("right", isEdge)}
-        onSwipeLeft={() => handleSwipeGesture("left", false)}
-        protoTheme={protoTheme}
-        onSelectProtoTheme={cambiarProtoTheme}
-        deviceMode={deviceMode}
-        onSelectDeviceMode={cambiarDeviceMode}
-        isDrawerOpen={drawerOpen}
-        onCloseDrawer={() => setDrawerOpen(false)}
-        sideDrawer={
+      <div style={{
+        fontFamily: FONT_BODY,
+        position: "fixed",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
+      }}>
+        <GlobalStyle protoTheme={protoTheme} />
+        <PhoneFrame
+          stageKey={stage}
+          hojasVariante={hojasVariante}
+          mostrarVolver={false}
+          onVolverBienvenida={() => setStage(currentUser || TEST_USER.nombre === nombre ? "inicio" : "bienvenida")}
+          onSwipeRight={({ isEdge }) => handleSwipeGesture("right", isEdge)}
+          onSwipeLeft={() => handleSwipeGesture("left", false)}
+          protoTheme={protoTheme}
+          onSelectProtoTheme={cambiarProtoTheme}
+          deviceMode={deviceMode}
+          onSelectDeviceMode={cambiarDeviceMode}
+          isDrawerOpen={drawerOpen}
+          onCloseDrawer={() => setDrawerOpen(false)}
+          sideDrawer={
             <SideNavDrawer
               isOpen={drawerOpen}
               onClose={() => setDrawerOpen(false)}
@@ -21340,915 +21507,911 @@ export default function SueltaPrototipo() {
                 setMostrarModalPrueba(true);
               }}
             />
-        }
-        bottomNav={
-          mostrarNav && !algunModalAbierto ? (
-            <BottomNav
-              current={stage}
-              hubItemId={hubItem?.id}
-              onNavigate={navegar}
-              esPremium={esPremium}
-              enPruebaActiva={enPruebaActiva}
-              planPago={planPago}
-              tieneAccesoTotal={tieneAccesoTotal}
-              tutorialStep={tutorialStep}
-              idioma={idiomaDetectado}
-            />
-          ) : null
-        }
-      >
-        {!authCargado ? (
-          <div
-            className="ss-fade"
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 18,
-              padding: "0 30px",
-              textAlign: "center",
-            }}
-          >
-            <div className="ss-logo-loading-container">
-              <div className="ss-logo-loading-aura" />
-              <img src={LOGO_DATA_URI} className="ss-logo-loading" alt="Cargando..." />
-              <img src={FLOR_DATA_URI} className="ss-flower-orbit-cw" alt="" />
-              <img src={FLOR_DATA_URI} className="ss-flower-orbit-ccw" alt="" />
-            </div>
-            <p style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: INK, margin: 0 }}>
-              {t("Cargando tu espacio de bienestar...", idiomaDetectado)}
-            </p>
-          </div>
-        ) : (
-          <>
-            {stage === "bienvenida" && (
-          <ScreenBienvenida
-            onOpenMenu={() => setDrawerOpen(true)}
-            onNext={() => {
-              setRegDesde("bienvenida");
-              setStage("registro");
-            }}
-            onLogin={handleGoogleLogin}
-            onLoginApple={handleAppleLogin}
-            onLoginManual={handleEmailLogin}
-            onRegisterManual={handleEmailRegister}
-            onLoginOld={() => {
-              borrarUsuarioPrueba();
-              setEsPremium(false);
-              setPlanPago("prueba");
-              setStage("inicio");
-            }}
-            onVerLegal={(tipo) => {
-              setLegalTipo(tipo);
-              setLegalOrigen("bienvenida");
-              setStage("legal");
-            }}
-            onCargarPrueba={cargarUsuarioPrueba}
-            idiomaLabel={IDIOMAS_SOPORTADOS[idiomaDetectado]}
-            idiomaEsEspanol={idiomaDetectado === "es"}
-            onBorrarDatos={borrarDatosGuardados}
-            idioma={idiomaDetectado}
-            onChangeIdioma={handleGuardarIdiomaDesdeAjustes}
-            onAbrirSelectorIdioma={() => {
-              setIdiomaTemporalModal(idiomaDetectado);
-              setMostrarModalIdioma(true);
-            }}
-          />
-        )}
-        {stage === "registro" && (
-          <ScreenRegistro
-            isGoogleAuth={!!currentUser}
-            error={regError}
-            onErrorClose={() => setRegError("")}
-            form={regForm}
-            setForm={setRegForm}
-            aceptaTerminos={regAceptaTerminos}
-            setAceptaTerminos={setRegAceptaTerminos}
-            onBack={() => setStage(regDesde)}
-            onIrPaso={() => {}}
-            idioma={idiomaDetectado}
-            onOpenIdiomaModal={() => {
-              setIdiomaTemporalModal(idiomaDetectado);
-              setMostrarModalIdioma(true);
-            }}
-            onNext={async (form) => {
-              setRegError("");
-              try {
-                let user = currentUser;
-                if (!user) {
-                  const res = await createUserWithEmailAndPassword(auth, form.email, form.password);
-                  user = res.user;
-                }
-                
-                const apodoLimpio = form.apodo && form.apodo.trim();
-                const nombreLimpio = apodoLimpio || form.nombre.split(" ")[0];
-                
-                const isVipReg = await verificarSiEsVip(form.email);
-                const fechaRegNuevo = Date.now();
-                const planNuevo = isVipReg ? "anual" : "prueba";
-
-                // Guardar en Firestore
-                try {
-                  await setDoc(doc(db, "users", user.uid), {
-                    email: form.email,
-                    nombre: form.nombre.trim(),
-                    apodo: apodoLimpio,
-                    edad: String(form.edad),
-                    sexo: form.sexo,
-                    idioma: idiomaDetectado,
-                    celular: form.celular ? `${(COUNTRY_CODES.find(c => c.code === form.codigoPais) || COUNTRY_CODES[0]).dial} ${form.celular}` : "",
-                    fechaRegistro: fechaRegNuevo,
-                    esVip: isVipReg,
-                    accesoTotal: isVipReg,
-                    subscription: {
-                      isActive: isVipReg,
-                      plan: planNuevo,
-                      vip: isVipReg,
-                      startedAt: fechaRegNuevo
-                    },
-                    planPago: planNuevo,
-                    esPremium: true
-                  }, { merge: true });
-                } catch (e) {
-                  handleFirestoreError(e, OperationType.WRITE, "users/" + user.uid);
-                }
-                
-                setNombre(nombreLimpio);
-                setSexo(form.sexo);
-                if (apodoLimpio) setNacimiento((n) => ({ ...n, apodo: apodoLimpio }));
-                setEmail(form.email);
-                setNombreCompleto(form.nombre.trim());
-                setFechaRegistroUser(fechaRegNuevo);
-                setEsVipUser(isVipReg);
-                setEsPremium(true);
-                setPlanPago(planNuevo);
-                setRecordatoriosReto((r) => ({ ...r, email: form.email }));
-
-                // Persistir cuenta registrada de forma local
-                guardarCuentaRecordadaLocal({
-                  uid: user.uid,
-                  email: form.email,
-                  nombre: form.nombre.trim()
-                });
-
-                setStage(regDesde === "captura" ? "captura" : "postRegistro");
-                setRegDesde("bienvenida");
-              } catch (error) {
-                console.error("Error registrando usuario:", error);
-                if (error.code === 'auth/invalid-email') {
-                  setRegError("El correo electrónico ingresado no es válido.");
-                } else if (error.code === 'auth/email-already-in-use') {
-                  setRegError("El cliente ya existe, por favor inicia sesión.");
-                } else if (error.code === 'auth/weak-password') {
-                  setRegError("La contraseña es muy débil. Debe tener al menos 6 caracteres.");
-                } else {
-                  setRegError("Error al registrarse. Por favor, intenta nuevamente.");
-                }
-              }
-            }}
-            onVerLegal={(tipo) => {
-              setLegalTipo(tipo);
-              setLegalOrigen("registro");
-              setStage("legal");
-            }}
-          />
-        )}
-        {stage === "legal" && (
-          <ScreenLegal tipo={legalTipo} onBack={() => setStage(legalOrigen)} idioma={idiomaDetectado} />
-        )}
-        {stage === "inicio" && (
-          <ScreenInicio
-            seleccion={seleccion}
-            toggleSel={toggleSel}
-            onNext={() => {
-              if (tutorialStep === 2 || tutorialStep === 3) {
-                setStage("captura");
-                setTutorialStep(4);
-              } else {
-                setStage("captura");
-              }
-            }}
-            nombre={nombre}
-            apodo={nacimiento?.apodo}
-            onBorrarPrueba={borrarUsuarioPrueba}
-            retoInfo={
-              esPremium
-                ? {
-                    dia: retoDiaActual,
-                    completados: retoCompletados.length,
-                    racha: retoCompletados.length,
-                  }
-                : null
-            }
-            onIrReto={() => navegar("reto")}
-            entradasCount={entradas.length}
-            onConfigurarCuenta={() => setStage("perfil")}
-            onSuscripcion={() => setStage("suscripcion")}
-            onDiario={() => navegar("diario")}
-            onBorrarDatos={borrarDatosGuardados}
-            onCerrarSesion={cerrarSesion}
-            onAbrirGuia={() => setGuiaChecklistAbierta(true)}
-            onStartTutorial={() => setGuiaChecklistAbierta(true)}
-            onOpenMenu={() => setDrawerOpen(true)}
-            tutorialStep={tutorialStep}
-            idioma={idiomaDetectado}
-            esPremium={esPremium}
-            planPago={planPago}
-            enPruebaActiva={enPruebaActiva}
-            diaPruebaActual={diaPruebaActual}
-            diasRestantesPrueba={diasRestantesPrueba}
-            pruebaExpirada={pruebaExpirada}
-            tieneAccesoTotal={tieneAccesoTotal}
-            onAbrirModalPrueba={() => setMostrarModalPrueba(true)}
-            onVerPlanes={() => {
-              if (tieneSuscripcionActiva) {
-                setStage("suscripcion");
-              } else {
-                setMostrarModalPrueba(true);
-              }
-            }}
-          />
-        )}
-        {stage === "perfil" && (
-          <ScreenPerfil
-            nombre={nombre}
-            email={email}
-            planPago={planPago}
-            datosPagoBasico={datosPagoBasico}
-            retoDiaActual={retoDiaActual}
-            retoCompletados={retoCompletados}
-            entradasCount={entradas.length}
-            fotoPerfil={fotoPerfil}
-            onCambiarFotoPerfil={handleGuardarFotoPerfil}
-            onBack={() => setStage("inicio")}
-            onEditarNombre={() => setStage("editarPerfil")}
-            onEditarNacimiento={() => {
-              setNacimientoOrigen("perfil");
-              setStage("nacimiento");
-            }}
-            onOpenRecordatorios={() => setStage("recordatoriosWidget")}
-            onIrReto={() => navegar("reto")}
-            onIrDiario={() => navegar("diario")}
-            onVerSuscripcion={() => setStage("suscripcion")}
-            onVerLegal={(tipo) => {
-              setLegalTipo(tipo);
-              setLegalOrigen("perfil");
-              setStage("legal");
-            }}
-            onBorrarDatos={borrarDatosGuardados}
-            onCerrarSesion={cerrarSesion}
-            idioma={idiomaDetectado}
-            onChangeIdioma={handleGuardarIdiomaDesdeAjustes}
-            diaPruebaActual={diaPruebaActual}
-            diasRestantesPrueba={diasRestantesPrueba}
-            enPruebaActiva={enPruebaActiva}
-            pruebaExpirada={pruebaExpirada}
-            tieneAccesoTotal={tieneAccesoTotal}
-            onAbrirModalPrueba={() => setMostrarModalPrueba(true)}
-          />
-        )}
-        {stage === "editarPerfil" && (
-          <ScreenEditarPerfil
-            nombreActual={nombre}
-            apodoActual={nacimiento?.apodo || ""}
-            fotoActual={fotoPerfil}
-            onBack={() => setStage("perfil")}
-            idioma={idiomaDetectado}
-            onGuardar={({ nombre: nuevoNombre, apodo: nuevoApodo, foto: nuevaFoto }) => {
-              setNombre(nuevoApodo || nuevoNombre);
-              setNacimiento((n) => ({ ...n, apodo: nuevoApodo }));
-              if (nuevaFoto !== undefined) {
-                handleGuardarFotoPerfil(nuevaFoto);
-              }
-              setStage("perfil");
-            }}
-            onVerLegal={(tipo) => {
-              setLegalTipo(tipo);
-              setLegalOrigen("editarPerfil");
-              setStage("legal");
-            }}
-          />
-        )}
-        {stage === "suscripcion" && (
-          <ScreenSuscripcion
-            planPago={planPago}
-            datosPagoBasico={datosPagoBasico}
-            currentUser={currentUser}
-            idioma={idiomaDetectado}
-            tieneAccesoTotal={tieneAccesoTotal}
-            enPruebaActiva={enPruebaActiva}
-            pruebaExpirada={pruebaExpirada}
-            diasRestantesPrueba={diasRestantesPrueba}
-            onContinuarConfiguracion={() => {
-              if (!nacimiento?.fecha) {
-                setNacimientoOrigen("pago");
-                setStage("nacimiento");
-              } else {
-                setStage("inicio");
-              }
-            }}
-            onRestaurarCompras={() => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago("restaurar", "anual");
-                return;
-              }
-              handleRestaurarComprasGooglePlay();
-            }}
-            onAdquirirSuscripcion={() => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago("pago", "anual");
-                return;
-              }
-              setPaywallDesde("suscripcion");
-              setStage("paywall");
-            }}
-            onBack={() => {
-              if (currentUser || auth?.currentUser || nombre) {
-                setStage("perfil");
-              } else {
-                setStage(nacimiento?.fecha ? "inicio" : "bienvenida");
-              }
-            }}
-          />
-        )}
-        {stage === "captura" && (
-          <ScreenCaptura
-            seleccion={seleccion}
-            datos={datos}
-            setDatos={setDatos}
-            onNext={analizar}
-            onBack={() => setStage("inicio")}
-            onIrPaso={(n) => { if (n === 1) { setRegDesde("captura"); setStage("registro"); } }}
-            sexo={sexo}
-            nombre={nombre}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "analizando" && <ScreenAnalizando idioma={idiomaDetectado} onDone={() => setStage("diagnostico")} />}
-        {stage === "diagnostico" && (
-          <ScreenLecturaBienestar
-            resultados={(resultados || []).map(card => translateCard(card, idiomaDetectado))}
-            datos={datos}
-            nombre={nombre}
-            sexo={sexo}
-            idioma={idiomaDetectado}
-            nacimiento={nacimiento}
-            retoDiaActual={retoDiaActual}
-            retoCompletados={retoCompletados}
-            entradasCount={(entradas || []).length}
-            apodo={nacimiento?.apodo}
-            onPaywall={() => {
-              // Quien ya es premium no debe volver a ver la pantalla de compra: si ya dio
-              // sus datos de nacimiento, va directo a su reto; si no, solo le falta ese
-              // paso (no el pago) para llegar ahí.
-              if (esPremium) setStage(nacimiento?.fecha ? "reto" : "nacimiento");
-              else { setPaywallDesde("diagnostico"); setStage("paywall"); }
-            }}
-            onBack={() => setStage("captura")}
-          />
-        )}
-        {stage === "postRegistro" && (
-          <ScreenPostRegistro
-            onNext={() => {
-              if (planPendiente && (regDesde === "paywall" || regDesde === "pago")) {
-                if (planPendiente === "prueba") {
-                  setStage("inicio");
-                } else {
-                  setStage("pago");
-                }
-              } else {
-                setStage("inicio");
-              }
-            }}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "paywall" && (
-          <ScreenPaywall
-            currentUser={currentUser}
-            onRequerirAuth={solicitarAutenticacionParaPago}
-            onPagar={(plan) => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago(plan === "prueba" ? "prueba" : "pago", plan || "anual");
-                return;
-              }
-              setPlanPendiente(plan || "anual");
-              setStage("pago");
-            }}
-            onSaltar={() => setStage("inicio")}
-            onBack={() => setStage(paywallDesde)}
-            idioma={idiomaDetectado}
-            pruebaExpirada={pruebaExpirada}
-            enPruebaActiva={enPruebaActiva}
-            diasRestantesPrueba={diasRestantesPrueba}
-            onRestaurarCompras={() => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago("restaurar", "anual");
-                return;
-              }
-              handleRestaurarComprasGooglePlay();
-            }}
-          />
-        )}
-        {stage === "pago" && planPendiente && (
-          <ScreenPago
-            plan={PLANES_PAGO.find((p) => p.id === planPendiente) || PLANES_PAGO[2]}
-            currentUser={currentUser}
-            onRequerirAuth={solicitarAutenticacionParaPago}
-            onRestaurarCompras={() => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago("restaurar", planPendiente);
-                return;
-              }
-              handleRestaurarComprasGooglePlay();
-            }}
-            onBack={() => setStage("paywall")}
-            idioma={idiomaDetectado}
-            onConfirmar={async (datos) => {
-              const activeUid = currentUser?.uid || auth?.currentUser?.uid;
-              const planEfectivo = planPendiente || datos?.planId || "mensual";
-              setEsPremium(true);
-              setPlanPago(planEfectivo);
-              setDatosPagoBasico(datos);
-
-              try {
-                window.localStorage.setItem("suelta_es_premium", "true");
-                window.localStorage.setItem("suelta_plan_pago", planEfectivo);
-                if (datos) {
-                  window.localStorage.setItem("suelta_datos_pago", JSON.stringify(datos));
-                  window.localStorage.setItem("suelta_google_play_purchase", JSON.stringify(datos));
-                }
-              } catch (_) {}
-
-              if (activeUid) {
-                try {
-                  const docRef = doc(db, "users", activeUid);
-                  await setDoc(docRef, {
-                    esPremium: true,
-                    planPago: planEfectivo,
-                    subscription: {
-                      isActive: true,
-                      plan: planEfectivo,
-                      status: "ACTIVE",
-                      orderId: datos?.orderId || "",
-                      gateway: "google_play",
-                      startedAt: Date.now()
-                    },
-                    datosPagoBasico: datos,
-                    appState: {
-                      planPago: planEfectivo,
-                      esPremium: true,
-                      datosPagoBasico: datos
-                    }
-                  }, { merge: true });
-                } catch (e) {
-                  console.warn("Aviso guardando suscripción en Firestore:", e);
-                }
-              }
-              setCompraExitosaModal({ datosPago: datos, planId: planEfectivo });
-            }}
-          />
-        )}
-        {stage === "nacimiento" && (
-          <ScreenNacimiento
-            nacimiento={nacimiento}
-            setNacimiento={setNacimiento}
-            esEdicion={nacimientoOrigen === "perfil"}
-            onNext={() => setStage(nacimientoOrigen === "perfil" ? "perfil" : "reto")}
-            onBack={() => setStage(nacimientoOrigen === "perfil" ? "perfil" : "pago")}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "reto" && (
-          <ScreenReto
-            onBack={() => setStage("inicio")}
-            onVerHub={() => setStage("hub")}
-            retoDiaActual={retoDiaActual}
-            retoCompletados={retoCompletados}
-            retoHistorial={retoHistorial}
-            retoCompletadosFechas={retoCompletadosFechas}
-            onCompletarDia={async (dia, reflexio) => {
-              setRetoCompletados((c) => (c.includes(dia) ? c : [...c, dia]));
-              if (reflexio !== undefined) {
-                setRetoHistorial((prev) => ({ ...prev, [dia]: reflexio }));
-              }
-              const fechaCompletado = Date.now();
-              setRetoCompletadosFechas((prev) => ({ ...prev, [dia]: fechaCompletado }));
-              if (dia === retoDiaActual && retoDiaActual < 21) {
-                setRetoDiaActual(retoDiaActual + 1);
-              }
-              if (currentUser) {
-                try {
-                  const retoRef = doc(db, "users", currentUser.uid, "reto", `dia_${dia}`);
-                  await setDoc(retoRef, {
-                    dia: Number(dia),
-                    reflexion: reflexio || "",
-                    fechaCompletado: fechaCompletado
-                  });
-                  console.log(`Día ${dia} del reto guardado robustamente en la subcolección 'reto' de Firestore.`);
-                } catch (err) {
-                  console.error("Error al guardar el día del reto en Firestore:", err);
-                }
-              }
-            }}
-            recordatorios={recordatoriosReto}
-            setRecordatorios={setRecordatoriosReto}
-            nombre={nombre}
-            sexo={sexo}
-            entradas={entradas}
-            analisisReporte={analisisReporte}
-            setAnalisisReporte={setAnalisisReporte}
-            tutorialStep={tutorialStep}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "hub" && (
-          <ScreenHub
-            onSelect={(item) => {
-              if (item.id === "cuestionarios") {
-                setStage("cuestionarios");
-                return;
-              }
-              setHubItem(item);
-              if (tutorialStep === 11 && item.id === "constelacion") {
-                setTutorialStep(12);
-              }
-              setStage("hubDetalle");
-            }}
-            onDiario={() => setStage("diario")}
-            onPaywall={() => { setPaywallDesde(stage); setStage("paywall"); }}
-            planPago={planPago}
-            esPremium={esPremium}
-            enPruebaActiva={enPruebaActiva}
-            pruebaExpirada={pruebaExpirada}
-            tieneAccesoTotal={tieneAccesoTotal}
-            tutorialStep={tutorialStep}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "hubDetalle" && hubItem && (
-          <ScreenHubDetalle
-            item={hubItem}
-            nacimiento={nacimiento}
-            nombre={nombre}
-            nombreCompleto={nombreCompleto}
-            sexo={sexo}
-            resultados={resultados}
-            familia={familia}
-            setFamilia={setFamilia}
-            setHubItem={setHubItem}
-            onBack={() => setStage("hub")}
-            onIrReto={() => setStage("hub")}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "cuestionarios" && (
-          <ScreenCuestionarios
-            onSelect={(q) => {
-              setCuestionarioActual(q);
-              setStage("cuestionarioDetalle");
-            }}
-            onBack={() => setStage("hub")}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "cuestionarioDetalle" && cuestionarioActual && (
-          <ScreenCuestionarioDetalle
-            cuestionario={cuestionarioActual}
-            onBack={() => setStage("cuestionarios")}
-            onSalir={() => setStage("cuestionarios")}
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario(cuestionarioActual.titulo, texto))}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientas" && (
-          <ScreenHerramientas
-            onSelect={(item) => {
-              if (tutorialStep !== null && tutorialStep === 8 && item.id !== "respiracion") {
-                console.log("Durante la guía, selecciona la herramienta de Respiración.");
-                return;
-              }
-              setHerramientaItem(item);
-              if (tutorialStep === 8 && item.id === "respiracion") {
-                setTutorialStep(9);
-              }
-              setStage("herramientaDetalle");
-            }}
-            onIrDiario={() => setStage("diario")}
-            silenciado={tono.silenciado}
-            onAlternarSilencio={tono.alternarSilencio}
-            volumen={tono.volumen}
-            onCambiarVolumen={tono.cambiarVolumen}
-            tutorialStep={tutorialStep}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "practicasolfeo" && (
-          <ScreenSolfeoPractica 
-            idioma={idiomaDetectado}
-            onBack={() => setStage("herramientas")}
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Práctica con Solfeo", texto))}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "respiracion" && (
-          <ScreenRespiracion 
-            onBack={() => setStage("herramientas")} 
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Respiración guiada", texto))}
-            tutorialStep={tutorialStep}
-            onComenzarTutorial={() => {
-              if (tutorialStep === 9) {
-                setTutorialStep(10);
-                setStage("hub"); // Paso 10 is Perspectives/Hub
-              }
-            }}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "presente" && (
-          <ScreenPresente 
-            onBack={() => setStage("herramientas")} 
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Ejercicio de presencia", texto))}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "gratitud" && (
-          <ScreenGratitud
-            onBack={() => setStage("herramientas")}
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Momento de gratitud", texto))}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "relajacion" && (
-          <ScreenRelajacion 
-            onBack={() => setStage("herramientas")} 
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Relajación corporal", texto))}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "lugarseguro" && (
-          <ScreenLugarSeguro 
-            onBack={() => setStage("herramientas")} 
-            nombre={nombre} 
-            sexo={sexo} 
-            onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Lugar seguro", texto))}
-            idioma={idiomaDetectado}
-          />
-        )}
-        {stage === "diario" && (
-          <ScreenDiario
-            entradas={entradas}
-            onAdd={(entrada) => agregarNuevaEntrada(entrada)}
-            onHome={() => setStage("inicio")}
-            idioma={idiomaDetectado}
-            onRefinar={(bocetoTexto, respuestas) => {
-              // Las respuestas complementarias afinan la lectura: se re-consulta el
-              // diccionario sumando el nuevo texto del diario al contexto existente.
-              const emStr = Array.isArray(datos.emocion) ? datos.emocion.join(" ") : (datos.emocion || "");
-              const contextoPrevio = [datos.historia, datos.fisica, emStr].join(" ");
-              const nuevo = `${contextoPrevio} ${bocetoTexto} ${Object.values(respuestas).join(" ")}`;
-              const spanishQuery = translateSearchQuery(nuevo, idiomaDetectado);
-              const refinados = buscarEnDiccionario(spanishQuery);
-              if (refinados && refinados.length) {
-                const localizedRefinados = refinados.map(card => translateCard(card, idiomaDetectado));
-                setResultados(localizedRefinados);
-              }
-            }}
-          />
-        )}
-        {stage === "recordatoriosWidget" && (
-          <ScreenRecordatoriosWidget
-            onOpenMenu={() => setDrawerOpen(true)}
-            nombre={nombre}
-            retoDiaActual={retoDiaActual}
-            retoCompletados={retoCompletados}
-            idioma={idiomaDetectado}
-            configInicial={configRecordatorios}
-            onGuardarConfig={(nuevaConfig) => {
-              setConfigRecordatorios(nuevaConfig);
-              if (currentUser) {
-                try {
-                  const docRef = doc(db, "users", currentUser.uid);
-                  setDoc(docRef, {
-                    configRecordatorios: nuevaConfig,
-                    appState: { configRecordatorios: nuevaConfig }
-                  }, { merge: true });
-                } catch (e) {
-                  console.error("Error guardando recordatorios en Firestore:", e);
-                }
-              }
-            }}
-            installPrompt={installPrompt}
-            onBack={() => setStage("perfil")}
-          />
-        )}
-          </>
-        )}
-        <GuiaChecklistPasoAPaso
-          isOpen={guiaChecklistAbierta}
-          onClose={() => {
-            setSubmodalChecklistAbierto(false);
-            setGuiaChecklistAbierta(false);
-          }}
-          onSubModalChange={setSubmodalChecklistAbierto}
-          onNavegarModulo={(destino) => {
-            setSubmodalChecklistAbierto(false);
-            setGuiaChecklistAbierta(false);
-            navegar(destino);
-          }}
-          esPremium={esPremium}
-          tieneAccesoTotal={tieneAccesoTotal}
-          planPago={planPago}
-          enPruebaActiva={enPruebaActiva}
-          diasRestantesPrueba={diasRestantesPrueba}
-          onVerPlanes={() => {
-            setSubmodalChecklistAbierto(false);
-            setGuiaChecklistAbierta(false);
-            setPaywallDesde(stage);
-            setStage("paywall");
-          }}
-          idioma={idiomaDetectado}
-        />
-        <ModalSeleccionIdiomaInicial
-          isOpen={mostrarModalIdioma}
-          idiomaSeleccionado={idiomaTemporalModal}
-          onCambiarIdiomaTemporal={setIdiomaTemporalModal}
-          onConfirmar={handleConfirmarIdiomaModal}
-        />
-        <ModalRequiereAutenticacion
-          isOpen={mostrarModalRequiereAuth}
-          onClose={() => setMostrarModalRequiereAuth(false)}
-          motivo={motivoRequiereAuth}
-          plan={planPendiente || "anual"}
-          idioma={idiomaDetectado}
-          onIrRegistro={() => {
-            setMostrarModalRequiereAuth(false);
-            setRegDesde(stage === "pago" || stage === "paywall" || stage === "suscripcion" ? stage : "paywall");
-            setStage("registro");
-          }}
-          onLoginGoogle={async () => {
-            await handleGoogleLogin();
-            setMostrarModalRequiereAuth(false);
-          }}
-          onLoginApple={async () => {
-            await handleAppleLogin();
-            setMostrarModalRequiereAuth(false);
-          }}
-          onLoginEmail={async (em, pw) => {
-            await handleEmailLogin(em, pw);
-            setMostrarModalRequiereAuth(false);
-          }}
-        />
-        <ModalGuiaPermisosAjustes
-          isOpen={!!modalPermisoAjustesTipo}
-          onClose={() => setModalPermisoAjustesTipo(null)}
-          tipo={modalPermisoAjustesTipo}
-          idioma={idiomaDetectado}
-        />
-        <ModalSeleccionCuentaGoogle
-          isOpen={mostrarModalGoogleInApp}
-          onClose={() => setMostrarModalGoogleInApp(false)}
-          onSeleccionarCuenta={handleSeleccionarCuentaGoogleInApp}
-          onCredentialGoogle={handleCredentialGoogleGIS}
-          onLoginGooglePopup={
-            typeof window !== "undefined" && window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform()
-              ? null
-              : handleGooglePopupLogin
           }
-          idioma={idiomaDetectado}
-        />
-        {errorNotificacion && typeof document !== "undefined" && createPortal(
-          <div 
-            data-modal-backdrop="true"
-            style={{ 
-              position: "fixed", 
-              top: 0, 
-              left: 0, 
-              right: 0, 
-              bottom: 0, 
-              background: "rgba(0,0,0,0.45)", 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
-              padding: 24, 
-              zIndex: 99999,
-              fontFamily: FONT_BODY,
-              overscrollBehavior: "contain",
-              touchAction: "none"
-            }}
-          >
-            <div 
-              data-modal-scrollable="true"
-              style={{ 
-                background: "white", 
-                borderRadius: 24, 
-                padding: "28px 24px 24px", 
-                boxShadow: "0 15px 35px rgba(0,0,0,0.18)", 
-                maxWidth: 320, 
-                width: "100%",
-                textAlign: "center",
+          bottomNav={
+            mostrarNav && !algunModalAbierto ? (
+              <BottomNav
+                current={stage}
+                hubItemId={hubItem?.id}
+                onNavigate={navegar}
+                esPremium={esPremium}
+                enPruebaActiva={enPruebaActiva}
+                planPago={planPago}
+                tieneAccesoTotal={tieneAccesoTotal}
+                tutorialStep={tutorialStep}
+                idioma={idiomaDetectado}
+              />
+            ) : null
+          }
+        >
+          {!authCargado ? (
+            <div
+              className="ss-fade"
+              style={{
+                height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                animation: "ss-fade-scale 0.3s cubic-bezier(0.16, 1, 0.3, 1) both",
-                overscrollBehavior: "contain"
+                justifyContent: "center",
+                gap: 18,
+                padding: "0 30px",
+                textAlign: "center",
               }}
             >
-              {/* Alert icon or Check icon */}
-              <div 
-                style={{ 
-                  width: 52, 
-                  height: 52, 
-                  borderRadius: "50%", 
-                  background: (typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? "rgba(76, 175, 80, 0.12)" : "rgba(138, 107, 184, 0.08)", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  justifyContent: "center", 
-                  marginBottom: 18 
-                }}
-              >
-                {(typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? (
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8a6bb8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                  </svg>
-                )}
+              <div className="ss-logo-loading-container">
+                <div className="ss-logo-loading-aura" />
+                <img src={LOGO_DATA_URI} className="ss-logo-loading" alt="Cargando..." />
+                <img src={FLOR_DATA_URI} className="ss-flower-orbit-cw" alt="" />
+                <img src={FLOR_DATA_URI} className="ss-flower-orbit-ccw" alt="" />
               </div>
-              <h4 style={{ fontSize: 16, fontWeight: 700, color: INK, margin: "0 0 10px", fontFamily: FONT_DISPLAY }}>
-                {(typeof errorNotificacion === "object" && errorNotificacion?.titulo) ? errorNotificacion.titulo : "Aviso de seguridad"}
-              </h4>
-              <p style={{ fontSize: 13, color: MUTED, margin: "0 0 24px", lineHeight: 1.5, fontFamily: FONT_BODY }}>
-                {typeof errorNotificacion === "object" ? errorNotificacion?.mensaje : errorNotificacion}
+              <p style={{ fontFamily: FONT_DISPLAY, fontSize: 17, color: INK, margin: 0 }}>
+                {t("Cargando tu espacio de bienestar...", idiomaDetectado)}
               </p>
-              <button
-                type="button"
-                onClick={() => setErrorNotificacion(null)}
-                className="ss-btn"
-                style={{ 
-                  width: "100%", 
-                  background: (typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? "#2e7d32" : "#8a6bb8", 
-                  color: "white", 
-                  fontSize: 13.5, 
-                  fontWeight: 600, 
-                  padding: "11px 0", 
-                  borderRadius: "99px", 
-                  cursor: "pointer", 
-                  border: "none" 
-                }}
-              >
-                Entendido
-              </button>
             </div>
-          </div>,
-          document.body
-        )}
-        {compraExitosaModal && (
-          <ModalSuscripcionAprobada
-            datosPago={compraExitosaModal.datosPago}
-            planId={compraExitosaModal.planId}
-            currentUser={currentUser}
-            idioma={idiomaDetectado}
-            onContinuar={() => {
-              setCompraExitosaModal(null);
-              setStage("suscripcion");
-            }}
-          />
-        )}
+          ) : (
+            <>
+              {stage === "bienvenida" && (
+                <ScreenBienvenida
+                  onOpenMenu={() => setDrawerOpen(true)}
+                  onNext={() => {
+                    setRegDesde("bienvenida");
+                    setStage("registro");
+                  }}
+                  onLogin={handleGoogleLogin}
+                  onLoginApple={handleAppleLogin}
+                  onLoginManual={handleEmailLogin}
+                  onRegisterManual={handleEmailRegister}
+                  onLoginOld={() => {
+                    borrarUsuarioPrueba();
+                    setEsPremium(false);
+                    setPlanPago("prueba");
+                    setStage("inicio");
+                  }}
+                  onVerLegal={(tipo) => {
+                    setLegalTipo(tipo);
+                    setLegalOrigen("bienvenida");
+                    setStage("legal");
+                  }}
+                  onCargarPrueba={cargarUsuarioPrueba}
+                  idiomaLabel={IDIOMAS_SOPORTADOS[idiomaDetectado]}
+                  idiomaEsEspanol={idiomaDetectado === "es"}
+                  onBorrarDatos={borrarDatosGuardados}
+                  idioma={idiomaDetectado}
+                  onChangeIdioma={handleGuardarIdiomaDesdeAjustes}
+                  onAbrirSelectorIdioma={() => {
+                    setIdiomaTemporalModal(idiomaDetectado);
+                    setMostrarModalIdioma(true);
+                  }}
+                />
+              )}
+              {stage === "registro" && (
+                <ScreenRegistro
+                  isGoogleAuth={!!currentUser}
+                  error={regError}
+                  onErrorClose={() => setRegError("")}
+                  form={regForm}
+                  setForm={setRegForm}
+                  aceptaTerminos={regAceptaTerminos}
+                  setAceptaTerminos={setRegAceptaTerminos}
+                  onBack={() => setStage(regDesde)}
+                  onIrPaso={() => { }}
+                  idioma={idiomaDetectado}
+                  onOpenIdiomaModal={() => {
+                    setIdiomaTemporalModal(idiomaDetectado);
+                    setMostrarModalIdioma(true);
+                  }}
+                  onNext={async (form) => {
+                    setRegError("");
+                    try {
+                      let user = currentUser;
+                      if (!user) {
+                        const res = await createUserWithEmailAndPassword(auth, form.email, form.password);
+                        user = res.user;
+                      }
 
-        {/* Modal Constante y Seguro de Período de Prueba de 3 Días */}
-        {mostrarModalPrueba && !tieneSuscripcionActiva && (
-          <ModalPeriodoPruebaConstante
-            isOpen={mostrarModalPrueba}
+                      const apodoLimpio = form.apodo && form.apodo.trim();
+                      const nombreLimpio = apodoLimpio || form.nombre.split(" ")[0];
+
+                      const isVipReg = await verificarSiEsVip(form.email);
+                      const fechaRegNuevo = Date.now();
+                      const planNuevo = isVipReg ? "anual" : "prueba";
+
+                      // Guardar en Firestore
+                      try {
+                        await setDoc(doc(db, "users", user.uid), {
+                          email: form.email,
+                          nombre: form.nombre.trim(),
+                          apodo: apodoLimpio,
+                          edad: String(form.edad),
+                          sexo: form.sexo,
+                          idioma: idiomaDetectado,
+                          celular: form.celular ? `${(COUNTRY_CODES.find(c => c.code === form.codigoPais) || COUNTRY_CODES[0]).dial} ${form.celular}` : "",
+                          fechaRegistro: fechaRegNuevo,
+                          esVip: isVipReg,
+                          accesoTotal: isVipReg,
+                          subscription: {
+                            isActive: isVipReg,
+                            plan: planNuevo,
+                            vip: isVipReg,
+                            startedAt: fechaRegNuevo
+                          },
+                          planPago: planNuevo,
+                          esPremium: true
+                        }, { merge: true });
+                      } catch (e) {
+                        handleFirestoreError(e, OperationType.WRITE, "users/" + user.uid);
+                      }
+
+                      setNombre(nombreLimpio);
+                      setSexo(form.sexo);
+                      if (apodoLimpio) setNacimiento((n) => ({ ...n, apodo: apodoLimpio }));
+                      setEmail(form.email);
+                      setNombreCompleto(form.nombre.trim());
+                      setFechaRegistroUser(fechaRegNuevo);
+                      setEsVipUser(isVipReg);
+                      setEsPremium(true);
+                      setPlanPago(planNuevo);
+                      setRecordatoriosReto((r) => ({ ...r, email: form.email }));
+
+                      // Persistir cuenta registrada de forma local
+                      guardarCuentaRecordadaLocal({
+                        uid: user.uid,
+                        email: form.email,
+                        nombre: form.nombre.trim()
+                      });
+
+                      setStage(regDesde === "captura" ? "captura" : "postRegistro");
+                      setRegDesde("bienvenida");
+                    } catch (error) {
+                      console.error("Error registrando usuario:", error);
+                      if (error.code === 'auth/invalid-email') {
+                        setRegError("El correo electrónico ingresado no es válido.");
+                      } else if (error.code === 'auth/email-already-in-use') {
+                        setRegError("El cliente ya existe, por favor inicia sesión.");
+                      } else if (error.code === 'auth/weak-password') {
+                        setRegError("La contraseña es muy débil. Debe tener al menos 6 caracteres.");
+                      } else {
+                        setRegError("Error al registrarse. Por favor, intenta nuevamente.");
+                      }
+                    }
+                  }}
+                  onVerLegal={(tipo) => {
+                    setLegalTipo(tipo);
+                    setLegalOrigen("registro");
+                    setStage("legal");
+                  }}
+                />
+              )}
+              {stage === "legal" && (
+                <ScreenLegal tipo={legalTipo} onBack={() => setStage(legalOrigen)} idioma={idiomaDetectado} />
+              )}
+              {stage === "inicio" && (
+                <ScreenInicio
+                  seleccion={seleccion}
+                  toggleSel={toggleSel}
+                  onNext={() => {
+                    if (tutorialStep === 2 || tutorialStep === 3) {
+                      setStage("captura");
+                      setTutorialStep(4);
+                    } else {
+                      setStage("captura");
+                    }
+                  }}
+                  nombre={nombre}
+                  apodo={nacimiento?.apodo}
+                  onBorrarPrueba={borrarUsuarioPrueba}
+                  retoInfo={
+                    esPremium
+                      ? {
+                        dia: retoDiaActual,
+                        completados: retoCompletados.length,
+                        racha: retoCompletados.length,
+                      }
+                      : null
+                  }
+                  onIrReto={() => navegar("reto")}
+                  entradasCount={entradas.length}
+                  onConfigurarCuenta={() => setStage("perfil")}
+                  onSuscripcion={() => setStage("suscripcion")}
+                  onDiario={() => navegar("diario")}
+                  onBorrarDatos={borrarDatosGuardados}
+                  onCerrarSesion={cerrarSesion}
+                  onAbrirGuia={() => setGuiaChecklistAbierta(true)}
+                  onStartTutorial={() => setGuiaChecklistAbierta(true)}
+                  onOpenMenu={() => setDrawerOpen(true)}
+                  tutorialStep={tutorialStep}
+                  idioma={idiomaDetectado}
+                  esPremium={esPremium}
+                  planPago={planPago}
+                  enPruebaActiva={enPruebaActiva}
+                  diaPruebaActual={diaPruebaActual}
+                  diasRestantesPrueba={diasRestantesPrueba}
+                  pruebaExpirada={pruebaExpirada}
+                  tieneAccesoTotal={tieneAccesoTotal}
+                  onAbrirModalPrueba={() => setMostrarModalPrueba(true)}
+                  onVerPlanes={() => {
+                    if (tieneSuscripcionActiva) {
+                      setStage("suscripcion");
+                    } else {
+                      setMostrarModalPrueba(true);
+                    }
+                  }}
+                />
+              )}
+              {stage === "perfil" && (
+                <ScreenPerfil
+                  nombre={nombre}
+                  email={email}
+                  planPago={planPago}
+                  datosPagoBasico={datosPagoBasico}
+                  retoDiaActual={retoDiaActual}
+                  retoCompletados={retoCompletados}
+                  entradasCount={entradas.length}
+                  fotoPerfil={fotoPerfil}
+                  onCambiarFotoPerfil={handleGuardarFotoPerfil}
+                  onBack={() => setStage("inicio")}
+                  onEditarNombre={() => setStage("editarPerfil")}
+                  onEditarNacimiento={() => {
+                    setNacimientoOrigen("perfil");
+                    setStage("nacimiento");
+                  }}
+                  onOpenRecordatorios={() => setStage("recordatoriosWidget")}
+                  onIrReto={() => navegar("reto")}
+                  onIrDiario={() => navegar("diario")}
+                  onVerSuscripcion={() => setStage("suscripcion")}
+                  onVerLegal={(tipo) => {
+                    setLegalTipo(tipo);
+                    setLegalOrigen("perfil");
+                    setStage("legal");
+                  }}
+                  onBorrarDatos={borrarDatosGuardados}
+                  onCerrarSesion={cerrarSesion}
+                  idioma={idiomaDetectado}
+                  onChangeIdioma={handleGuardarIdiomaDesdeAjustes}
+                  diaPruebaActual={diaPruebaActual}
+                  diasRestantesPrueba={diasRestantesPrueba}
+                  enPruebaActiva={enPruebaActiva}
+                  pruebaExpirada={pruebaExpirada}
+                  tieneAccesoTotal={tieneAccesoTotal}
+                  onAbrirModalPrueba={() => setMostrarModalPrueba(true)}
+                />
+              )}
+              {stage === "editarPerfil" && (
+                <ScreenEditarPerfil
+                  nombreActual={nombre}
+                  apodoActual={nacimiento?.apodo || ""}
+                  fotoActual={fotoPerfil}
+                  onBack={() => setStage("perfil")}
+                  idioma={idiomaDetectado}
+                  onGuardar={({ nombre: nuevoNombre, apodo: nuevoApodo, foto: nuevaFoto }) => {
+                    setNombre(nuevoApodo || nuevoNombre);
+                    setNacimiento((n) => ({ ...n, apodo: nuevoApodo }));
+                    if (nuevaFoto !== undefined) {
+                      handleGuardarFotoPerfil(nuevaFoto);
+                    }
+                    setStage("perfil");
+                  }}
+                  onVerLegal={(tipo) => {
+                    setLegalTipo(tipo);
+                    setLegalOrigen("editarPerfil");
+                    setStage("legal");
+                  }}
+                />
+              )}
+              {stage === "suscripcion" && (
+                <ScreenSuscripcion
+                  planPago={planPago}
+                  datosPagoBasico={datosPagoBasico}
+                  currentUser={currentUser}
+                  idioma={idiomaDetectado}
+                  tieneAccesoTotal={tieneAccesoTotal}
+                  enPruebaActiva={enPruebaActiva}
+                  pruebaExpirada={pruebaExpirada}
+                  diasRestantesPrueba={diasRestantesPrueba}
+                  onContinuarConfiguracion={() => {
+                    if (!nacimiento?.fecha) {
+                      setNacimientoOrigen("pago");
+                      setStage("nacimiento");
+                    } else {
+                      setStage("inicio");
+                    }
+                  }}
+                  onRestaurarCompras={() => {
+                    if (!currentUser && !auth?.currentUser) {
+                      solicitarAutenticacionParaPago("restaurar", "anual");
+                      return;
+                    }
+                    handleRestaurarComprasGooglePlay();
+                  }}
+                  onAdquirirSuscripcion={() => {
+                    if (!currentUser && !auth?.currentUser) {
+                      solicitarAutenticacionParaPago("pago", "anual");
+                      return;
+                    }
+                    setPaywallDesde("suscripcion");
+                    setStage("paywall");
+                  }}
+                  onBack={() => {
+                    if (currentUser || auth?.currentUser || nombre) {
+                      setStage("perfil");
+                    } else {
+                      setStage(nacimiento?.fecha ? "inicio" : "bienvenida");
+                    }
+                  }}
+                />
+              )}
+              {stage === "captura" && (
+                <ScreenCaptura
+                  seleccion={seleccion}
+                  datos={datos}
+                  setDatos={setDatos}
+                  onNext={analizar}
+                  onBack={() => setStage("inicio")}
+                  onIrPaso={(n) => { if (n === 1) { setRegDesde("captura"); setStage("registro"); } }}
+                  sexo={sexo}
+                  nombre={nombre}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "analizando" && <ScreenAnalizando idioma={idiomaDetectado} onDone={() => setStage("diagnostico")} />}
+              {stage === "diagnostico" && (
+                <ScreenLecturaBienestar
+                  resultados={(resultados || []).map(card => translateCard(card, idiomaDetectado))}
+                  datos={datos}
+                  nombre={nombre}
+                  sexo={sexo}
+                  idioma={idiomaDetectado}
+                  nacimiento={nacimiento}
+                  retoDiaActual={retoDiaActual}
+                  retoCompletados={retoCompletados}
+                  entradasCount={(entradas || []).length}
+                  apodo={nacimiento?.apodo}
+                  onPaywall={() => {
+                    // Quien ya es premium no debe volver a ver la pantalla de compra: si ya dio
+                    // sus datos de nacimiento, va directo a su reto; si no, solo le falta ese
+                    // paso (no el pago) para llegar ahí.
+                    if (esPremium) setStage(nacimiento?.fecha ? "reto" : "nacimiento");
+                    else { setPaywallDesde("diagnostico"); setStage("paywall"); }
+                  }}
+                  onBack={() => setStage("captura")}
+                />
+              )}
+              {stage === "postRegistro" && (
+                <ScreenPostRegistro
+                  onNext={() => {
+                    if (planPendiente && (regDesde === "paywall" || regDesde === "pago")) {
+                      if (planPendiente === "prueba") {
+                        setStage("inicio");
+                      } else {
+                        setStage("pago");
+                      }
+                    } else {
+                      setStage("inicio");
+                    }
+                  }}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "paywall" && (
+                <ScreenPaywall
+                  currentUser={currentUser}
+                  onRequerirAuth={solicitarAutenticacionParaPago}
+                  onPagar={(plan) => {
+                    if (!currentUser && !auth?.currentUser) {
+                      solicitarAutenticacionParaPago(plan === "prueba" ? "prueba" : "pago", plan || "anual");
+                      return;
+                    }
+                    setPlanPendiente(plan || "anual");
+                    setStage("pago");
+                  }}
+                  onSaltar={() => setStage("inicio")}
+                  onBack={() => setStage(paywallDesde)}
+                  idioma={idiomaDetectado}
+                  pruebaExpirada={pruebaExpirada}
+                  enPruebaActiva={enPruebaActiva}
+                  diasRestantesPrueba={diasRestantesPrueba}
+                  onRestaurarCompras={() => {
+                    if (!currentUser && !auth?.currentUser) {
+                      solicitarAutenticacionParaPago("restaurar", "anual");
+                      return;
+                    }
+                    handleRestaurarComprasGooglePlay();
+                  }}
+                />
+              )}
+              {stage === "pago" && planPendiente && (
+                <ScreenPago
+                  plan={PLANES_PAGO.find((p) => p.id === planPendiente) || PLANES_PAGO[2]}
+                  currentUser={currentUser}
+                  onRequerirAuth={solicitarAutenticacionParaPago}
+                  onRestaurarCompras={() => {
+                    if (!currentUser && !auth?.currentUser) {
+                      solicitarAutenticacionParaPago("restaurar", planPendiente);
+                      return;
+                    }
+                    handleRestaurarComprasGooglePlay();
+                  }}
+                  onBack={() => setStage("paywall")}
+                  idioma={idiomaDetectado}
+                  onConfirmar={async (datos) => {
+                    const activeUid = currentUser?.uid || auth?.currentUser?.uid;
+                    const planEfectivo = planPendiente || datos?.planId || "mensual";
+                    setEsPremium(true);
+                    setPlanPago(planEfectivo);
+                    setDatosPagoBasico(datos);
+
+                    try {
+                      window.localStorage.setItem("suelta_es_premium", "true");
+                      window.localStorage.setItem("suelta_plan_pago", planEfectivo);
+                      if (datos) {
+                        window.localStorage.setItem("suelta_datos_pago", JSON.stringify(datos));
+                        window.localStorage.setItem("suelta_google_play_purchase", JSON.stringify(datos));
+                      }
+                    } catch (_) { }
+
+                    if (activeUid) {
+                      try {
+                        const docRef = doc(db, "users", activeUid);
+                        await setDoc(docRef, {
+                          esPremium: true,
+                          planPago: planEfectivo,
+                          subscription: {
+                            isActive: true,
+                            plan: planEfectivo,
+                            status: "ACTIVE",
+                            orderId: datos?.orderId || "",
+                            gateway: "google_play",
+                            startedAt: Date.now()
+                          },
+                          datosPagoBasico: datos,
+                          appState: {
+                            planPago: planEfectivo,
+                            esPremium: true,
+                            datosPagoBasico: datos
+                          }
+                        }, { merge: true });
+                      } catch (e) {
+                        console.warn("Aviso guardando suscripción en Firestore:", e);
+                      }
+                    }
+                    setCompraExitosaModal({ datosPago: datos, planId: planEfectivo });
+                  }}
+                />
+              )}
+              {stage === "nacimiento" && (
+                <ScreenNacimiento
+                  nacimiento={nacimiento}
+                  setNacimiento={setNacimiento}
+                  esEdicion={nacimientoOrigen === "perfil"}
+                  onNext={() => setStage(nacimientoOrigen === "perfil" ? "perfil" : "reto")}
+                  onBack={() => setStage(nacimientoOrigen === "perfil" ? "perfil" : "pago")}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "reto" && (
+                <ScreenReto
+                  onBack={() => setStage("inicio")}
+                  onVerHub={() => setStage("hub")}
+                  retoDiaActual={retoDiaActual}
+                  retoCompletados={retoCompletados}
+                  retoHistorial={retoHistorial}
+                  retoCompletadosFechas={retoCompletadosFechas}
+                  onCompletarDia={async (dia, reflexio) => {
+                    setRetoCompletados((c) => (c.includes(dia) ? c : [...c, dia]));
+                    if (reflexio !== undefined) {
+                      setRetoHistorial((prev) => ({ ...prev, [dia]: reflexio }));
+                    }
+                    const fechaCompletado = Date.now();
+                    setRetoCompletadosFechas((prev) => ({ ...prev, [dia]: fechaCompletado }));
+                    if (dia === retoDiaActual && retoDiaActual < 21) {
+                      setRetoDiaActual(retoDiaActual + 1);
+                    }
+                    if (currentUser) {
+                      try {
+                        const retoRef = doc(db, "users", currentUser.uid, "reto", `dia_${dia}`);
+                        await setDoc(retoRef, {
+                          dia: Number(dia),
+                          reflexion: reflexio || "",
+                          fechaCompletado: fechaCompletado
+                        });
+                        console.log(`Día ${dia} del reto guardado robustamente en la subcolección 'reto' de Firestore.`);
+                      } catch (err) {
+                        console.error("Error al guardar el día del reto en Firestore:", err);
+                      }
+                    }
+                  }}
+                  recordatorios={recordatoriosReto}
+                  setRecordatorios={setRecordatoriosReto}
+                  nombre={nombre}
+                  sexo={sexo}
+                  entradas={entradas}
+                  analisisReporte={analisisReporte}
+                  setAnalisisReporte={setAnalisisReporte}
+                  tutorialStep={tutorialStep}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "hub" && (
+                <ScreenHub
+                  onSelect={(item) => {
+                    if (item.id === "cuestionarios") {
+                      setStage("cuestionarios");
+                      return;
+                    }
+                    setHubItem(item);
+                    if (tutorialStep === 11 && item.id === "constelacion") {
+                      setTutorialStep(12);
+                    }
+                    setStage("hubDetalle");
+                  }}
+                  onDiario={() => setStage("diario")}
+                  onPaywall={() => { setPaywallDesde(stage); setStage("paywall"); }}
+                  planPago={planPago}
+                  esPremium={esPremium}
+                  enPruebaActiva={enPruebaActiva}
+                  pruebaExpirada={pruebaExpirada}
+                  tieneAccesoTotal={tieneAccesoTotal}
+                  tutorialStep={tutorialStep}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "hubDetalle" && hubItem && (
+                <ScreenHubDetalle
+                  item={hubItem}
+                  nacimiento={nacimiento}
+                  nombre={nombre}
+                  nombreCompleto={nombreCompleto}
+                  sexo={sexo}
+                  resultados={resultados}
+                  familia={familia}
+                  setFamilia={setFamilia}
+                  setHubItem={setHubItem}
+                  onBack={() => setStage("hub")}
+                  onIrReto={() => setStage("hub")}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "cuestionarios" && (
+                <ScreenCuestionarios
+                  onSelect={(q) => {
+                    setCuestionarioActual(q);
+                    setStage("cuestionarioDetalle");
+                  }}
+                  onBack={() => setStage("hub")}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "cuestionarioDetalle" && cuestionarioActual && (
+                <ScreenCuestionarioDetalle
+                  cuestionario={cuestionarioActual}
+                  onBack={() => setStage("cuestionarios")}
+                  onSalir={() => setStage("cuestionarios")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario(cuestionarioActual.titulo, texto))}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientas" && (
+                <ScreenHerramientas
+                  onSelect={(item) => {
+                    if (tutorialStep !== null && tutorialStep === 8 && item.id !== "respiracion") {
+                      console.log("Durante la guía, selecciona la herramienta de Respiración.");
+                      return;
+                    }
+                    setHerramientaItem(item);
+                    if (tutorialStep === 8 && item.id === "respiracion") {
+                      setTutorialStep(9);
+                    }
+                    setStage("herramientaDetalle");
+                  }}
+                  onIrDiario={() => setStage("diario")}
+                  silenciado={tono.silenciado}
+                  onAlternarSilencio={tono.alternarSilencio}
+                  volumen={tono.volumen}
+                  onCambiarVolumen={tono.cambiarVolumen}
+                  tutorialStep={tutorialStep}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "practicasolfeo" && (
+                <ScreenSolfeoPractica
+                  idioma={idiomaDetectado}
+                  onBack={() => setStage("herramientas")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Práctica con Solfeo", texto))}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "respiracion" && (
+                <ScreenRespiracion
+                  onBack={() => setStage("herramientas")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Respiración guiada", texto))}
+                  tutorialStep={tutorialStep}
+                  onComenzarTutorial={() => {
+                    if (tutorialStep === 9) {
+                      setTutorialStep(10);
+                      setStage("hub"); // Paso 10 is Perspectives/Hub
+                    }
+                  }}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "presente" && (
+                <ScreenPresente
+                  onBack={() => setStage("herramientas")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Ejercicio de presencia", texto))}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "gratitud" && (
+                <ScreenGratitud
+                  onBack={() => setStage("herramientas")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Momento de gratitud", texto))}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "relajacion" && (
+                <ScreenRelajacion
+                  onBack={() => setStage("herramientas")}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Relajación corporal", texto))}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "herramientaDetalle" && herramientaItem && herramientaItem.id === "lugarseguro" && (
+                <ScreenLugarSeguro
+                  onBack={() => setStage("herramientas")}
+                  nombre={nombre}
+                  sexo={sexo}
+                  onGuardar={(texto) => agregarNuevaEntrada(crearEntradaDiario("Lugar seguro", texto))}
+                  idioma={idiomaDetectado}
+                />
+              )}
+              {stage === "diario" && (
+                <ScreenDiario
+                  entradas={entradas}
+                  onAdd={(entrada) => agregarNuevaEntrada(entrada)}
+                  onHome={() => setStage("inicio")}
+                  idioma={idiomaDetectado}
+                  onRefinar={(bocetoTexto, respuestas) => {
+                    // Las respuestas complementarias afinan la lectura: se re-consulta el
+                    // diccionario sumando el nuevo texto del diario al contexto existente.
+                    const emStr = Array.isArray(datos.emocion) ? datos.emocion.join(" ") : (datos.emocion || "");
+                    const contextoPrevio = [datos.historia, datos.fisica, emStr].join(" ");
+                    const nuevo = `${contextoPrevio} ${bocetoTexto} ${Object.values(respuestas).join(" ")}`;
+                    const spanishQuery = translateSearchQuery(nuevo, idiomaDetectado);
+                    const refinados = buscarEnDiccionario(spanishQuery);
+                    if (refinados && refinados.length) {
+                      const localizedRefinados = refinados.map(card => translateCard(card, idiomaDetectado));
+                      setResultados(localizedRefinados);
+                    }
+                  }}
+                />
+              )}
+              {stage === "recordatoriosWidget" && (
+                <ScreenRecordatoriosWidget
+                  onOpenMenu={() => setDrawerOpen(true)}
+                  nombre={nombre}
+                  retoDiaActual={retoDiaActual}
+                  retoCompletados={retoCompletados}
+                  idioma={idiomaDetectado}
+                  configInicial={configRecordatorios}
+                  onGuardarConfig={(nuevaConfig) => {
+                    setConfigRecordatorios(nuevaConfig);
+                    if (currentUser) {
+                      try {
+                        const docRef = doc(db, "users", currentUser.uid);
+                        setDoc(docRef, {
+                          configRecordatorios: nuevaConfig,
+                          appState: { configRecordatorios: nuevaConfig }
+                        }, { merge: true });
+                      } catch (e) {
+                        console.error("Error guardando recordatorios en Firestore:", e);
+                      }
+                    }
+                  }}
+                  installPrompt={installPrompt}
+                  onBack={() => setStage("perfil")}
+                />
+              )}
+            </>
+          )}
+          <GuiaChecklistPasoAPaso
+            isOpen={guiaChecklistAbierta}
             onClose={() => {
-              setMostrarModalPrueba(false);
+              setSubmodalChecklistAbierto(false);
+              setGuiaChecklistAbierta(false);
             }}
-            onAdquirirSuscripcion={() => {
-              setMostrarModalPrueba(false);
+            onSubModalChange={setSubmodalChecklistAbierto}
+            onNavegarModulo={(destino) => {
+              setSubmodalChecklistAbierto(false);
+              setGuiaChecklistAbierta(false);
+              navegar(destino);
+            }}
+            esPremium={esPremium}
+            tieneAccesoTotal={tieneAccesoTotal}
+            planPago={planPago}
+            enPruebaActiva={enPruebaActiva}
+            diasRestantesPrueba={diasRestantesPrueba}
+            onVerPlanes={() => {
+              setSubmodalChecklistAbierto(false);
+              setGuiaChecklistAbierta(false);
               setPaywallDesde(stage);
               setStage("paywall");
             }}
-            diaPruebaActual={diaPruebaActual}
-            diasRestantesPrueba={diasRestantesPrueba}
-            pruebaExpirada={pruebaExpirada}
-            tiempoTranscurrido={tiempoTranscurridoPrueba}
-            onRestaurarCompras={() => {
-              if (!currentUser && !auth?.currentUser) {
-                solicitarAutenticacionParaPago("restaurar", "anual");
-                return;
-              }
-              handleRestaurarComprasGooglePlay();
-            }}
             idioma={idiomaDetectado}
           />
-        )}
-      </PhoneFrame>
-    </div>
+          <ModalSeleccionIdiomaInicial
+            isOpen={mostrarModalIdioma}
+            idiomaSeleccionado={idiomaTemporalModal}
+            onCambiarIdiomaTemporal={setIdiomaTemporalModal}
+            onConfirmar={handleConfirmarIdiomaModal}
+          />
+          <ModalRequiereAutenticacion
+            isOpen={mostrarModalRequiereAuth}
+            onClose={() => setMostrarModalRequiereAuth(false)}
+            motivo={motivoRequiereAuth}
+            plan={planPendiente || "anual"}
+            idioma={idiomaDetectado}
+            onIrRegistro={() => {
+              setMostrarModalRequiereAuth(false);
+              setRegDesde(stage === "pago" || stage === "paywall" || stage === "suscripcion" ? stage : "paywall");
+              setStage("registro");
+            }}
+            onLoginGoogle={async () => {
+              await handleGoogleLogin();
+              setMostrarModalRequiereAuth(false);
+            }}
+            onLoginApple={async () => {
+              await handleAppleLogin();
+              setMostrarModalRequiereAuth(false);
+            }}
+            onLoginEmail={async (em, pw) => {
+              await handleEmailLogin(em, pw);
+              setMostrarModalRequiereAuth(false);
+            }}
+          />
+          <ModalGuiaPermisosAjustes
+            isOpen={!!modalPermisoAjustesTipo}
+            onClose={() => setModalPermisoAjustesTipo(null)}
+            tipo={modalPermisoAjustesTipo}
+            idioma={idiomaDetectado}
+          />
+          <ModalSeleccionCuentaGoogle
+            isOpen={mostrarModalGoogleInApp}
+            onClose={() => setMostrarModalGoogleInApp(false)}
+            onSeleccionarCuenta={handleSeleccionarCuentaGoogleInApp}
+            onCredentialGoogle={handleCredentialGoogleGIS}
+            onLoginGooglePopup={handleGooglePopupLogin}
+            idioma={idiomaDetectado}
+          />
+          {errorNotificacion && typeof document !== "undefined" && createPortal(
+            <div
+              data-modal-backdrop="true"
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(0,0,0,0.45)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 24,
+                zIndex: 99999,
+                fontFamily: FONT_BODY,
+                overscrollBehavior: "contain",
+                touchAction: "none"
+              }}
+            >
+              <div
+                data-modal-scrollable="true"
+                style={{
+                  background: "white",
+                  borderRadius: 24,
+                  padding: "28px 24px 24px",
+                  boxShadow: "0 15px 35px rgba(0,0,0,0.18)",
+                  maxWidth: 320,
+                  width: "100%",
+                  textAlign: "center",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  animation: "ss-fade-scale 0.3s cubic-bezier(0.16, 1, 0.3, 1) both",
+                  overscrollBehavior: "contain"
+                }}
+              >
+                {/* Alert icon or Check icon */}
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "50%",
+                    background: (typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? "rgba(76, 175, 80, 0.12)" : "rgba(138, 107, 184, 0.08)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 18
+                  }}
+                >
+                  {(typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? (
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8a6bb8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  )}
+                </div>
+                <h4 style={{ fontSize: 16, fontWeight: 700, color: INK, margin: "0 0 10px", fontFamily: FONT_DISPLAY }}>
+                  {(typeof errorNotificacion === "object" && errorNotificacion?.titulo) ? errorNotificacion.titulo : "Aviso de seguridad"}
+                </h4>
+                <p style={{ fontSize: 13, color: MUTED, margin: "0 0 24px", lineHeight: 1.5, fontFamily: FONT_BODY }}>
+                  {typeof errorNotificacion === "object" ? errorNotificacion?.mensaje : errorNotificacion}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setErrorNotificacion(null)}
+                  className="ss-btn"
+                  style={{
+                    width: "100%",
+                    background: (typeof errorNotificacion === "object" && errorNotificacion?.tipo === "exito") ? "#2e7d32" : "#8a6bb8",
+                    color: "white",
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    padding: "11px 0",
+                    borderRadius: "99px",
+                    cursor: "pointer",
+                    border: "none"
+                  }}
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>,
+            document.body
+          )}
+          {compraExitosaModal && (
+            <ModalSuscripcionAprobada
+              datosPago={compraExitosaModal.datosPago}
+              planId={compraExitosaModal.planId}
+              currentUser={currentUser}
+              idioma={idiomaDetectado}
+              onContinuar={() => {
+                setCompraExitosaModal(null);
+                setStage("suscripcion");
+              }}
+            />
+          )}
+
+          {/* Modal Constante y Seguro de Período de Prueba de 3 Días */}
+          {mostrarModalPrueba && !tieneSuscripcionActiva && (
+            <ModalPeriodoPruebaConstante
+              isOpen={mostrarModalPrueba}
+              onClose={() => {
+                setMostrarModalPrueba(false);
+              }}
+              onAdquirirSuscripcion={() => {
+                setMostrarModalPrueba(false);
+                setPaywallDesde(stage);
+                setStage("paywall");
+              }}
+              diaPruebaActual={diaPruebaActual}
+              diasRestantesPrueba={diasRestantesPrueba}
+              pruebaExpirada={pruebaExpirada}
+              tiempoTranscurrido={tiempoTranscurridoPrueba}
+              onRestaurarCompras={() => {
+                if (!currentUser && !auth?.currentUser) {
+                  solicitarAutenticacionParaPago("restaurar", "anual");
+                  return;
+                }
+                handleRestaurarComprasGooglePlay();
+              }}
+              idioma={idiomaDetectado}
+            />
+          )}
+        </PhoneFrame>
+      </div>
     </MenuContext.Provider>
   );
 }

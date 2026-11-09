@@ -47,5 +47,27 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.suelta.app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.suelta.app</string>
+				<string>com.googleusercontent.apps.706031612034-7rcv45h5jms5l32g32utivgarpaqhsup</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Suelta necesita acceso a tu cámara para capturar fotos de perfil y acompañar tus registros de bienestar.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Suelta necesita acceso a tu micrófono para notas de voz en tu diario emocional y prácticas de calma.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Suelta necesita acceso a tu galería para seleccionar imágenes en tu diario y perfil.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Suelta necesita permiso para guardar tus cartas astrales y reflexiones en tu galería de fotos.</string>
 </dict>
 </plist>

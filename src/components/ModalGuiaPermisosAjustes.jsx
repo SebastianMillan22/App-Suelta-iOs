@@ -4,8 +4,15 @@ import { Settings, ShieldAlert, Mic, Bell, Camera, ChevronRight, Check, X, Exter
 import { t } from "../data/translations.js";
 import { useBloquearScrollFondo } from "../utils/useBloquearScrollFondo.js";
 
+function esIos() {
+  if (typeof window === "undefined") return false;
+  const platform = window.Capacitor?.getPlatform?.();
+  if (platform === "ios") return true;
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+}
+
 /**
- * Modal universal para redirigir a los Ajustes de Android
+ * Modal universal para redirigir a los Ajustes de iOS o Android
  * y mostrar el paso a paso exacto para otorgar permisos.
  */
 export function ModalGuiaPermisosAjustes({
@@ -19,14 +26,31 @@ export function ModalGuiaPermisosAjustes({
   const [abriendo, setAbriendo] = React.useState(false);
 
   if (!isOpen) return null;
+  const esDispositivoIos = esIos();
 
   // Intenta abrir la pantalla de ajustes de la aplicación nativa para dar permisos
   const abrirAjustesDispositivo = async () => {
     setAbriendo(true);
     try {
+      // 1. En iOS, abrir app-settings: lleva directamente a Ajustes > Suelta
+      if (esDispositivoIos) {
+        if (window.Capacitor?.Plugins?.App?.openUrl) {
+          try {
+            await window.Capacitor.Plugins.App.openUrl({ url: "app-settings:" });
+            setTimeout(() => setAbriendo(false), 1200);
+            return;
+          } catch (_) {}
+        }
+        try {
+          window.location.href = "app-settings:";
+          setTimeout(() => setAbriendo(false), 1200);
+          return;
+        } catch (_) {}
+      }
+
       const pkgName = "suelta_app.com";
 
-      // 1. Plugins nativos de Capacitor (NativeSettings / App / Permissions)
+      // 2. Plugins nativos de Capacitor (NativeSettings / App / Permissions)
       if (window.Capacitor?.Plugins?.NativeSettings) {
         const ns = window.Capacitor.Plugins.NativeSettings;
         const targetOption = tipo === "notificaciones" ? "app_notification_settings" : "application_details";
@@ -43,10 +67,10 @@ export function ModalGuiaPermisosAjustes({
         }
       }
 
-      // 2. Capacitor App Plugin / OpenUrl directo
+      // 3. Capacitor App Plugin / OpenUrl directo
       if (window.Capacitor?.Plugins?.App?.openUrl) {
         try {
-          if (tipo === "notificaciones") {
+          if (tipo === "notificaciones" && !esDispositivoIos) {
             await window.Capacitor.Plugins.App.openUrl({
               url: `intent:#Intent;action=android.settings.APP_NOTIFICATION_SETTINGS;S.android.provider.extra.APP_PACKAGE=${pkgName};S.app_package=${pkgName};end`
             });
@@ -56,7 +80,7 @@ export function ModalGuiaPermisosAjustes({
         } catch (e) {}
 
         try {
-          await window.Capacitor.Plugins.App.openUrl({ url: `package:${pkgName}` });
+          await window.Capacitor.Plugins.App.openUrl({ url: esDispositivoIos ? "app-settings:" : `package:${pkgName}` });
           setTimeout(() => setAbriendo(false), 1500);
           return;
         } catch (e) {
@@ -68,8 +92,8 @@ export function ModalGuiaPermisosAjustes({
         }
       }
 
-      // 3. Android Intent directo para detalles de la aplicación o notificaciones
-      if (typeof window !== "undefined") {
+      // 4. Android Intent directo para detalles de la aplicación o notificaciones
+      if (typeof window !== "undefined" && !esDispositivoIos) {
         let intentUrl = "";
         if (tipo === "notificaciones") {
           intentUrl = `intent:#Intent;action=android.settings.APP_NOTIFICATION_SETTINGS;S.android.provider.extra.APP_PACKAGE=${pkgName};S.app_package=${pkgName};end`;
@@ -87,7 +111,7 @@ export function ModalGuiaPermisosAjustes({
         } catch (e) {}
       }
 
-      // 4. Solicitar permiso directamente en este toque
+      // 5. Solicitar permiso directamente en este toque
       if (tipo === "microfono" && navigator.mediaDevices?.getUserMedia) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -134,287 +158,252 @@ export function ModalGuiaPermisosAjustes({
       colorIcono: "#0284c7",
       bgIcono: "#e0f2fe",
       motivo: t("El micrófono te permite expresarte y dictar tus historias, diario emocional y reflexiones de voz sin tener que escribir a mano.", idioma),
-      pasos: [
+      pasos: esDispositivoIos ? [
+        t("Toca el botón 'Abrir Ajustes' abajo para ir a la configuración de Suelta en tu iPhone.", idioma),
+        t("En la lista de permisos de Suelta, activa el interruptor de 'Micrófono'.", idioma),
+        t("Regresa a Suelta para disfrutar del dictado por voz y notas de audio.", idioma)
+      ] : [
         t("Abre los Ajustes o Configuración de tu teléfono Android.", idioma),
         t("Ve a la sección 'Aplicaciones' (o 'Administrador de aplicaciones').", idioma),
         t("Busca y selecciona 'Suelta'.", idioma),
-        t("Toca en 'Permisos' (o 'Permisos de la app').", idioma),
-        t("Selecciona 'Micrófono' y cámbialo a 'Permitir solo mientras la app está en uso'.", idioma)
+        t("Toca en 'Permisos' y activa la opción 'Micrófono' (selecciona 'Permitir solo mientras la app está en uso').", idioma),
+        t("Regresa a Suelta para disfrutar del dictado y notas de audio.", idioma)
       ]
     },
     notificaciones: {
-      titulo: t("Activar Permiso de Notificaciones", idioma),
+      titulo: t("Activar Notificaciones y Recordatorios", idioma),
       icono: Bell,
-      colorIcono: "#d97706",
-      bgIcono: "#fef3c7",
-      motivo: t("Las notificaciones te envían tus recordatorios de calma, afirmaciones diarias y te avisan para continuar tu reto de 21 días.", idioma),
-      pasos: [
+      colorIcono: "#e11d48",
+      bgIcono: "#ffe4e6",
+      motivo: t("Las notificaciones te envían afirmaciones de bienestar, recordatorios de tu reto de 21 días y pausas de respiración en los horarios que elijas.", idioma),
+      pasos: esDispositivoIos ? [
+        t("Toca el botón 'Abrir Ajustes' abajo para ir a la configuración de Suelta en tu iPhone.", idioma),
+        t("Toca en 'Notificaciones' y activa 'Permitir notificaciones'.", idioma),
+        t("Elige tus estilos preferidos (Tiras, Pantalla bloqueada y Sonidos).", idioma),
+        t("Regresa a Suelta: tus recordatorios y afirmaciones diarias quedarán activos.", idioma)
+      ] : [
         t("Abre los Ajustes o Configuración de tu teléfono Android.", idioma),
-        t("Ve a 'Aplicaciones' y selecciona 'Suelta'.", idioma),
-        t("Toca en la sección 'Notificaciones'.", idioma),
-        t("Activa el interruptor 'Permitir todas las notificaciones de Suelta'.", idioma),
-        t("Asegúrate de que no esté en modo 'Silencioso' o bloqueado por Ahorro de Batería.", idioma)
+        t("Ve a 'Aplicaciones' > 'Suelta' > 'Notificaciones'.", idioma),
+        t("Activa el interruptor principal 'Permitir todas las notificaciones de Suelta'.", idioma),
+        t("Asegúrate de que el canal 'Recordatorios de Bienestar ¡Suelta!' esté en estado 'Permitido'.", idioma),
+        t("Regresa a Suelta: tus recordatorios y afirmaciones diarias quedarán activos.", idioma)
       ]
     },
     camara: {
       titulo: t("Activar Permiso de Cámara", idioma),
       icono: Camera,
-      colorIcono: "#9333ea",
-      bgIcono: "#f3e8ff",
-      motivo: t("La cámara te permite tomar tu foto de perfil de bienestar y registrar imágenes significativas en tu diario.", idioma),
-      pasos: [
+      colorIcono: "#16a34a",
+      bgIcono: "#dcfce7",
+      motivo: t("La cámara te permite capturar fotos para personalizar tu perfil y registrar momentos de calma en tu diario visual.", idioma),
+      pasos: esDispositivoIos ? [
+        t("Toca el botón 'Abrir Ajustes' abajo para ir a la configuración de Suelta en tu iPhone.", idioma),
+        t("Activa el interruptor de 'Cámara' (y 'Fotos' si deseas adjuntar desde tu galería).", idioma),
+        t("Regresa a Suelta para tomar fotos directamente desde la app.", idioma)
+      ] : [
         t("Abre los Ajustes o Configuración de tu teléfono Android.", idioma),
-        t("Ve a 'Aplicaciones' > Busca 'Suelta'.", idioma),
-        t("Toca en 'Permisos'.", idioma),
-        t("Selecciona 'Cámara' y cámbiala a 'Permitir solo mientras la app está en uso'.", idioma)
+        t("Ve a 'Aplicaciones' > 'Suelta' > 'Permisos'.", idioma),
+        t("Toca en 'Cámara' y selecciona 'Permitir solo mientras la app está en uso'.", idioma),
+        t("Regresa a Suelta para tomar fotos directamente desde la app.", idioma)
+      ]
+    },
+    general: {
+      titulo: t("Permisos de la Aplicación", idioma),
+      icono: Settings,
+      colorIcono: "#3f6b5b",
+      bgIcono: "#eaf3ef",
+      motivo: t("Para aprovechar al máximo todas las funciones de ¡Suelta!, asegúrate de otorgar los permisos necesarios.", idioma),
+      pasos: esDispositivoIos ? [
+        t("Abre Ajustes en tu iPhone y desliza hacia abajo hasta encontrar 'Suelta'.", idioma),
+        t("Activa los permisos de Cámara, Micrófono y Notificaciones.", idioma),
+        t("Regresa a la app Suelta.", idioma)
+      ] : [
+        t("Abre Ajustes > Aplicaciones > Suelta.", idioma),
+        t("Toca en 'Permisos' y revisa los permisos autorizados.", idioma),
+        t("Regresa a la app Suelta.", idioma)
       ]
     }
-  }[tipo] || {
-    titulo: t("Habilitar Permisos de la App", idioma),
-    icono: Settings,
-    colorIcono: "#3f6b5b",
-    bgIcono: "#e8f5e9",
-    motivo: t("Para que Suelta funcione con todas sus herramientas, necesita los permisos de tu sistema Android.", idioma),
-    pasos: [
-      t("Abre los Ajustes de tu teléfono Android.", idioma),
-      t("Ve a 'Aplicaciones' > 'Suelta' > 'Permisos'.", idioma),
-      t("Habilita los permisos que requieras (Micrófono, Notificaciones o Cámara).", idioma)
-    ]
   };
 
-  const IconoPrincipal = config.icono;
+  const info = config[tipo] || config.general;
+  const IconoComponente = info.icono;
 
-  const modalNode = (
+  const modalContent = (
     <div
       data-modal-backdrop="true"
       style={{
         position: "fixed",
-        inset: 0,
-        zIndex: 999999,
-        background: "rgba(15, 23, 42, 0.75)",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: "rgba(17, 29, 24, 0.65)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
         display: "flex",
-        alignItems: "flex-end",
+        alignItems: "center",
         justifyContent: "center",
-        padding: "0",
-        overscrollBehavior: "contain",
-        touchAction: "none",
-        animation: "fadeIn 0.2s ease"
+        zIndex: 999999,
+        padding: "16px",
+        boxSizing: "border-box"
       }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      onClick={onClose}
     >
       <div
         data-modal-scrollable="true"
+        onClick={(e) => e.stopPropagation()}
         style={{
-          width: "100%",
-          maxWidth: 480,
           background: "#ffffff",
-          borderTopLeftRadius: 28,
-          borderTopRightRadius: 28,
-          padding: "24px 20px 28px",
-          boxShadow: "0 -10px 40px rgba(0,0,0,0.25)",
+          borderRadius: 24,
+          padding: "24px 20px",
+          width: "100%",
+          maxWidth: 420,
+          maxHeight: "90vh",
+          overflowY: "auto",
+          boxShadow: "0 20px 45px rgba(0,0,0,0.25)",
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          maxHeight: "90dvh",
-          overflowY: "auto",
-          overscrollBehavior: "contain",
-          WebkitOverflowScrolling: "touch",
-          animation: "slideUp 0.25s ease-out"
+          boxSizing: "border-box",
+          position: "relative",
+          animation: "ssSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) both"
         }}
       >
-        {/* Barra superior de arrastre */}
-        <div style={{ width: 44, height: 4, background: "#cbd5e1", borderRadius: 2, margin: "0 auto 4px" }} />
-
-        {/* Encabezado */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 14,
-                background: config.bgIcono,
-                color: config.colorIcono,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0
-              }}
-            >
-              <IconoPrincipal size={24} />
-            </div>
-            <div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1e293b", margin: 0, lineHeight: 1.25 }}>
-                {config.titulo}
-              </h3>
-              <span style={{ fontSize: 12, color: "#dc2626", fontWeight: 600, display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-                <ShieldAlert size={13} /> {t("Permiso bloqueado o denegado en el sistema", idioma)}
-              </span>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "#f1f5f9",
-              border: "none",
-              borderRadius: "50%",
-              width: 32,
-              height: 32,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#64748b",
-              cursor: "pointer",
-              flexShrink: 0
-            }}
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        {/* Explicación / Por qué es necesario */}
-        <div style={{ background: "#f8fafc", padding: "12px 14px", borderRadius: 14, border: "1px solid #e2e8f0" }}>
-          <p style={{ fontSize: 13, color: "#334155", margin: 0, lineHeight: 1.45 }}>
-            {config.motivo}
-          </p>
-        </div>
-
-        {/* Botón principal directo para abrir Ajustes de Android */}
+        {/* Botón Cerrar */}
         <button
-          onClick={() => {
-            abrirAjustesDispositivo();
-          }}
-          disabled={abriendo}
+          onClick={onClose}
+          aria-label={t("Cerrar", idioma)}
           style={{
-            width: "100%",
-            background: abriendo ? "#0d5c56" : "#0f766e",
-            color: "#ffffff",
+            position: "absolute",
+            top: 14,
+            right: 14,
+            background: "rgba(0,0,0,0.05)",
             border: "none",
-            borderRadius: 14,
-            padding: "14px 16px",
-            fontSize: 15,
-            fontWeight: 700,
-            cursor: abriendo ? "wait" : "pointer",
+            borderRadius: "50%",
+            width: 32,
+            height: 32,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: 8,
-            boxShadow: "0 4px 12px rgba(15,118,110,0.25)",
-            transition: "all 0.15s ease",
-            opacity: abriendo ? 0.85 : 1
+            cursor: "pointer",
+            color: "#4a5568"
           }}
         >
-          <Settings size={18} className={abriendo ? "animate-spin" : ""} />
-          <span>{abriendo ? t("Abriendo Ajustes...", idioma) : t("Ir a Ajustes de la Aplicación", idioma)}</span>
-          <ExternalLink size={15} style={{ opacity: 0.8 }} />
+          <X size={16} />
         </button>
 
-        {/* Paso a paso visual numerado */}
+        {/* Cabecera */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, paddingRight: 30 }}>
+          <div style={{
+            width: 46,
+            height: 46,
+            borderRadius: 14,
+            background: info.bgIcono,
+            color: info.colorIcono,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0
+          }}>
+            <IconoComponente size={24} />
+          </div>
+          <div>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "#64748b", textTransform: "uppercase", letterSpacing: 0.5 }}>
+              {esDispositivoIos ? t("Ajustes de iOS", idioma) : t("Ajustes de Android", idioma)}
+            </span>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1e293b", margin: 0, lineHeight: 1.3 }}>
+              {info.titulo}
+            </h3>
+          </div>
+        </div>
+
+        {/* Motivo amigable */}
+        <div style={{
+          background: "#f8fafc",
+          border: "1px solid #e2e8f0",
+          borderRadius: 14,
+          padding: "12px 14px",
+          fontSize: 12.5,
+          color: "#475569",
+          lineHeight: 1.5
+        }}>
+          {info.motivo}
+        </div>
+
+        {/* Paso a paso */}
         <div>
-          <h4 style={{ fontSize: 13.5, fontWeight: 700, color: "#475569", margin: "0 0 10px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-            {t("Paso a paso para activarlo en tu Android:", idioma)}
+          <h4 style={{ fontSize: 13, fontWeight: 700, color: "#334155", margin: "0 0 10px", display: "flex", alignItems: "center", gap: 6 }}>
+            <span>{t("Paso a paso para habilitarlo:", idioma)}</span>
           </h4>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {config.pasos.map((paso, idx) => (
-              <div
-                key={idx}
-                style={{
+            {info.pasos.map((paso, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: 12, color: "#334155", lineHeight: 1.45 }}>
+                <span style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  background: "#3f6b5b",
+                  color: "white",
+                  fontSize: 11,
+                  fontWeight: 700,
                   display: "flex",
-                  alignItems: "flex-start",
-                  gap: 10,
-                  padding: "8px 10px",
-                  borderRadius: 10,
-                  background: idx === config.pasos.length - 1 ? "#f0fdf4" : "#ffffff",
-                  border: `1px solid ${idx === config.pasos.length - 1 ? "#bbf7d0" : "#f1f5f9"}`
-                }}
-              >
-                <div
-                  style={{
-                    width: 22,
-                    height: 22,
-                    borderRadius: "50%",
-                    background: idx === config.pasos.length - 1 ? "#22c55e" : "#0f766e",
-                    color: "white",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    marginTop: 1
-                  }}
-                >
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                  marginTop: 1
+                }}>
                   {idx + 1}
-                </div>
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: idx === config.pasos.length - 1 ? "#15803d" : "#334155",
-                    fontWeight: idx === config.pasos.length - 1 ? 600 : 400,
-                    lineHeight: 1.4
-                  }}
-                >
-                  {paso}
                 </span>
+                <span style={{ flex: 1 }}>{paso}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Acciones inferiores */}
-        <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+        {/* Botón de Acción Principal para Abrir Ajustes */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
           <button
-            onClick={onClose}
+            onClick={abrirAjustesDispositivo}
+            disabled={abriendo}
+            className="ss-btn ss-btn-primary"
             style={{
-              flex: 1,
-              background: "#f1f5f9",
-              color: "#475569",
-              border: "none",
-              borderRadius: 12,
-              padding: "12px",
-              fontSize: 13.5,
-              fontWeight: 600,
-              cursor: "pointer"
+              width: "100%",
+              padding: "14px",
+              fontSize: 14,
+              fontWeight: 700,
+              borderRadius: 14,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              boxShadow: "0 6px 16px rgba(63, 107, 91, 0.25)"
             }}
           >
-            {t("Entendido", idioma)}
+            <Settings size={18} />
+            <span>
+              {abriendo 
+                ? t("Abriendo Ajustes...", idioma) 
+                : (esDispositivoIos ? t("Abrir Ajustes de iOS", idioma) : t("Abrir Ajustes del Dispositivo", idioma))}
+            </span>
+            <ExternalLink size={15} style={{ opacity: 0.8 }} />
           </button>
-          {onReintentar && (
-            <button
-              onClick={() => {
-                onClose();
-                onReintentar();
-              }}
-              style={{
-                flex: 1,
-                background: "#f0fdf4",
-                border: "1px solid #bbf7d0",
-                color: "#166534",
-                borderRadius: 12,
-                padding: "12px",
-                fontSize: 13.5,
-                fontWeight: 700,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6
-              }}
-            >
-              <Check size={16} />
-              <span>{t("Ya los di, comprobar", idioma)}</span>
-            </button>
-          )}
+
+          <button
+            onClick={onClose}
+            className="ss-btn ss-btn-ghost"
+            style={{
+              width: "100%",
+              padding: "11px",
+              fontSize: 13,
+              fontWeight: 600,
+              borderRadius: 12
+            }}
+          >
+            {t("Entendido, lo haré más tarde", idioma)}
+          </button>
         </div>
       </div>
     </div>
   );
 
-  if (typeof document !== "undefined") {
-    return createPortal(modalNode, document.body);
-  }
-
-  return modalNode;
+  return typeof document !== "undefined" ? createPortal(modalContent, document.body) : modalContent;
 }

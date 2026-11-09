@@ -45,6 +45,13 @@ import {
 import { ModalGuiaPermisosAjustes } from "./ModalGuiaPermisosAjustes";
 import { t } from "../data/translations.js";
 
+function esPlataformaIos() {
+  if (typeof window === "undefined") return false;
+  const platform = window.Capacitor?.getPlatform?.();
+  if (platform === "ios") return true;
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+}
+
 export function ScreenRecordatoriosWidget({ 
   onBack, 
   onOpenMenu = null,
@@ -250,7 +257,7 @@ export function ScreenRecordatoriosWidget({
           {t("← Volver", idioma)}
         </button>
         <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, margin: 0, color: "#2d3748", fontWeight: 700 }}>
-          {t("Recordatorios y Widget Android", idioma)}
+          {esPlataformaIos() ? t("Recordatorios y Widget iOS", idioma) : t("Recordatorios y Widget Android", idioma)}
         </h2>
         {onOpenMenu ? (
           <HamburgerButton onClick={onOpenMenu} />
@@ -298,7 +305,9 @@ export function ScreenRecordatoriosWidget({
               {t("Permisos y Funciones del Dispositivo Móvil", idioma)}
             </h3>
             <p style={{ fontSize: 12.5, color: "#718096", margin: 0, lineHeight: 1.45 }}>
-              {t("Administra y activa los permisos de tu Android para una experiencia 100% fluida.", idioma)}
+              {esPlataformaIos() 
+                ? t("Administra y activa los permisos de tu iPhone para una experiencia 100% fluida.", idioma)
+                : t("Administra y activa los permisos de tu Android para una experiencia 100% fluida.", idioma)}
             </p>
           </div>
 
@@ -704,7 +713,7 @@ export function ScreenRecordatoriosWidget({
           </button>
         </div>
 
-        {/* Modal / Guía Paso a Paso para Instaurar Widget en Android */}
+        {/* Modal / Guía Paso a Paso para Instaurar Widget en iOS o Android */}
         {mostrarGuiaWidget && (
           <div style={{
             background: "#ffffff",
@@ -715,7 +724,9 @@ export function ScreenRecordatoriosWidget({
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <h4 style={{ fontSize: 14, fontWeight: 700, color: "#2d3748", margin: 0, display: "flex", alignItems: "center", gap: 6 }}>
-                {t("📱 Cómo añadir a la pantalla de tu móvil Android:", idioma)}
+                {esPlataformaIos()
+                  ? t("📱 Cómo añadir a la pantalla de tu iPhone o iPad:", idioma)
+                  : t("📱 Cómo añadir a la pantalla de tu móvil Android:", idioma)}
               </h4>
               <button 
                 onClick={() => setMostrarGuiaWidget(false)}
@@ -724,12 +735,22 @@ export function ScreenRecordatoriosWidget({
                 ✕
               </button>
             </div>
-            <ol style={{ fontSize: 12.5, color: "#4a5568", paddingLeft: 18, margin: "0 0 12px", lineHeight: 1.6 }}>
-              <li><strong>{t("Mantén presionado el icono de la app Suelta en tu pantalla de inicio o cajón de aplicaciones.", idioma)}</strong></li>
-              <li>{t("Toca en \"Widgets\" o \"Accesos directos\" en el menú flotante que aparece sobre el icono.", idioma)}</li>
-              <li>{t("Arrastra tu widget de afirmación, racha o respiración al espacio deseado de tu pantalla de inicio.", idioma)}</li>
-              <li><strong>{t("¡Listo! Tu progreso y afirmaciones diarias se actualizarán automáticamente sin consumir batería adicional.", idioma)}</strong></li>
-            </ol>
+            {esPlataformaIos() ? (
+              <ol style={{ fontSize: 12.5, color: "#4a5568", paddingLeft: 18, margin: "0 0 12px", lineHeight: 1.6 }}>
+                <li><strong>{t("En tu pantalla de inicio, mantén presionado un espacio vacío hasta que los iconos tiemblen.", idioma)}</strong></li>
+                <li>{t("Toca el botón '+' en la esquina superior izquierda de la pantalla.", idioma)}</li>
+                <li>{t("Busca 'Suelta' en la lista de widgets disponibles.", idioma)}</li>
+                <li>{t("Selecciona tu estilo preferido (Afirmación, Racha o Pausa) y toca 'Agregar widget'.", idioma)}</li>
+                <li><strong>{t("¡Listo! Tu widget se mantendrá actualizado con tus afirmaciones y tu reto diario.", idioma)}</strong></li>
+              </ol>
+            ) : (
+              <ol style={{ fontSize: 12.5, color: "#4a5568", paddingLeft: 18, margin: "0 0 12px", lineHeight: 1.6 }}>
+                <li><strong>{t("Mantén presionado el icono de la app Suelta en tu pantalla de inicio o cajón de aplicaciones.", idioma)}</strong></li>
+                <li>{t("Toca en \"Widgets\" o \"Accesos directos\" en el menú flotante que aparece sobre el icono.", idioma)}</li>
+                <li>{t("Arrastra tu widget de afirmación, racha o respiración al espacio deseado de tu pantalla de inicio.", idioma)}</li>
+                <li><strong>{t("¡Listo! Tu progreso y afirmaciones diarias se actualizarán automáticamente sin consumir batería adicional.", idioma)}</strong></li>
+              </ol>
+            )}
             <button
               onClick={() => setMostrarGuiaWidget(false)}
               className="ss-btn ss-btn-ghost"
