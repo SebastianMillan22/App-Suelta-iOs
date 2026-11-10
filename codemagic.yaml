@@ -49,6 +49,9 @@ workflows:
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
+          app-store-connect fetch-signing-files "com.suelta.app.SueltaWidget" \
+            --type IOS_APP_STORE \
+            --create || echo "Aviso: Perfil de SueltaWidget pendiente o ya existente"
 
       - name: Agregar certificados al Llavero
         script: |

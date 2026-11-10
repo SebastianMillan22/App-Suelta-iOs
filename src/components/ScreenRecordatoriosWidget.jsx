@@ -1,5 +1,6 @@
 import HamburgerButton from "./HamburgerButton.jsx";
 import React, { useState, useEffect } from "react";
+import { sincronizarWidgetNativo } from "../utils/sueltaWidgetSync.js";
 import { 
   Bell, 
   BellRing, 
@@ -226,6 +227,13 @@ export function ScreenRecordatoriosWidget({
   };
 
   const handleInstalarWidget = async () => {
+    // Sincronizar datos con el App Group de WidgetKit iOS
+    await sincronizarWidgetNativo({
+      afirmacion: afirmacionDiaria,
+      racha: rachaDias,
+      estilo: widgetEstilo
+    });
+
     if (installPrompt) {
       try {
         await installPrompt.prompt();
@@ -240,11 +248,19 @@ export function ScreenRecordatoriosWidget({
         console.warn("Prompt de instalación:", e);
       }
     }
-    // Si no está disponible el evento automático, abrir guía nativa de Android
+    // Abrir guía paso a paso para añadir el widget a la pantalla de inicio
     setMostrarGuiaWidget(true);
   };
 
   const rachaDias = retoCompletados.length || retoDiaActual;
+
+  useEffect(() => {
+    sincronizarWidgetNativo({
+      afirmacion: afirmacionDiaria,
+      racha: rachaDias,
+      estilo: widgetEstilo
+    });
+  }, [afirmacionDiaria, rachaDias, widgetEstilo]);
 
   return (
     <div className="ss-fade" style={{ padding: "0 20px 30px", minHeight: "100%", display: "flex", flexDirection: "column", background: "#fcfaf7" }}>
