@@ -50,8 +50,11 @@ import {
   obtenerUrlGestionGooglePlay,
   GOOGLE_PLAY_CONFIG,
   detectarSoporteGooglePlay,
-  inicializarGooglePlayBillingStore
+  inicializarGooglePlayBillingStore,
+  obtenerConfiguracionSku,
+  esPlataformaIos
 } from "./utils/googlePlayBilling.js";
+import { obtenerPlanesPagoPorPlataforma, obtenerPreciosAppStore } from "./data/appleStorePrices.js";
 import { GooglePlayIcon, GooglePlayShieldBadge } from "./components/GooglePlayBadge.jsx";
 import { ModalRequiereAutenticacion } from "./components/ModalRequiereAutenticacion.jsx";
 import { ModalGuiaPermisosAjustes } from "./components/ModalGuiaPermisosAjustes.jsx";
@@ -2933,7 +2936,9 @@ function ScreenPerfil({ nombre, email, planPago, datosPagoBasico, retoDiaActual,
   const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
   const esAlpha = planPago === "anual";
   const esPremium = planPago === "mensual" || planPago === "anual";
-  const plan = PLANES_PAGO.find((p) => p.id === planPago);
+  const esApple = esPlataformaIos();
+  const planesDisponibles = obtenerPlanesPagoPorPlataforma(esApple);
+  const plan = planesDisponibles.find((p) => p.id === planPago) || PLANES_PAGO.find((p) => p.id === planPago);
   const inicial = (nombre || "?").trim().charAt(0).toUpperCase();
   const pctReto = Math.round(((retoCompletados ? retoCompletados.length : 0) / 21) * 100);
   const racha = retoCompletados ? retoCompletados.length : 0;
@@ -3573,7 +3578,9 @@ function ScreenSuscripcion({
   const tieneCompraValida = !!(datosPagoBasico?.orderId || datosPagoBasico?.transaccionId || datosPagoBasico?.purchaseToken);
   const esPremium = tieneAccesoTotal || planPago === "mensual" || planPago === "anual" || tieneCompraValida;
   const planEfectivo = tieneAccesoTotal ? "anual" : (planPago === "mensual" || planPago === "anual" ? planPago : (datosPagoBasico?.planId || "anual"));
-  const plan = PLANES_PAGO.find((p) => p.id === planEfectivo) || PLANES_PAGO[2];
+  const esApple = datosPagoBasico?.plataforma?.includes("Apple") || datosPagoBasico?.gateway === "apple_app_store" || esPlataformaIos();
+  const planesDisponibles = obtenerPlanesPagoPorPlataforma(esApple);
+  const plan = planesDisponibles.find((p) => p.id === planEfectivo) || planesDisponibles[2];
   const esGooglePlay = datosPagoBasico?.plataforma?.includes("Google Play") || datosPagoBasico?.gateway === "google_play" || !datosPagoBasico?.gateway;
   const uidUsuario = currentUser?.uid || auth?.currentUser?.uid || "";
 
@@ -8138,7 +8145,12 @@ function ScreenPostRegistro({ onNext, idioma }) {
 function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = false, enPruebaActiva = false, diasRestantesPrueba = 0, onRestaurarCompras = null, currentUser = null, onRequerirAuth = null }) {
   const [planElegido, setPlanElegido] = useState(pruebaExpirada ? "anual" : "anual");
   const [verDetalles, setVerDetalles] = useState(false);
-  const plan = PLANES_PAGO.find((p) => p.id === planElegido) || PLANES_PAGO[2];
+  const esApple = typeof window !== "undefined" && (
+    window.Capacitor?.getPlatform?.() === "ios" ||
+    (/iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent))
+  );
+  const planesDisponibles = obtenerPlanesPagoPorPlataforma(esApple);
+  const plan = planesDisponibles.find((p) => p.id === planElegido) || planesDisponibles[2];
   const esGratisPlan = planElegido === "prueba";
   const estaAutenticado = !!(currentUser || auth?.currentUser);
 
@@ -8254,7 +8266,7 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
 
         {/* Tarjetas de Plan con Arquitectura de Precios Persuasiva */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
-          {PLANES_PAGO.map((p) => {
+          {planesDisponibles.map((p) => {
             const activo = planElegido === p.id;
 
             // Colores personalizados por tarjeta
@@ -8310,7 +8322,7 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                     whiteSpace: "nowrap",
                     boxShadow: "0 3px 6px rgba(214,71,43,0.2)"
                   }}>
-                    ✨ {t("Ahorra 78%", idioma)}
+                    ✨ {t(p.badgeAhorro || "Ahorra 78%", idioma) || (p.badgeAhorro || "Ahorra 78%")}
                   </span>
                 )}
 
@@ -8348,19 +8360,19 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                   {p.id === "anual" ? (
                     <>
                       <span style={{ fontSize: 16, fontWeight: 900, color: KINOEMOTION_UI, lineHeight: 1.1 }}>
-                        9.833
+                        {p.displayNumero || (esApple ? "10.825" : "9.833")}
                       </span>
                       <span style={{ fontSize: 9, fontWeight: 600, color: KINOEMOTION_UI, textTransform: "uppercase", letterSpacing: 0.2 }}>
-                        COP / {t("mes", idioma)}
+                        {p.displayMoneda || "COP"} / {t("mes", idioma)}
                       </span>
                     </>
                   ) : p.id === "mensual" ? (
                     <>
                       <span style={{ fontSize: 16, fontWeight: 800, color: activo ? SAGE_DARK : INK, lineHeight: 1.1 }}>
-                        45.000
+                        {p.displayNumero || (esApple ? "14.900" : "45.000")}
                       </span>
                       <span style={{ fontSize: 9, fontWeight: 600, color: MUTED }}>
-                        COP / {t("mes", idioma)}
+                        {p.displayMoneda || "COP"} / {t("mes", idioma)}
                       </span>
                     </>
                   ) : (
@@ -8568,7 +8580,7 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
                 <div style={{ padding: "10px 12px", fontSize: 10, fontWeight: 700, color: MUTED, textTransform: "uppercase" }}>
                   {t("Beneficio", idioma)}
                 </div>
-                {PLANES_PAGO.map((p) => (
+                {planesDisponibles.map((p) => (
                   <div key={p.id} style={{
                     padding: "10px 4px",
                     textAlign: "center",
@@ -8805,7 +8817,7 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
   const [mensajePlayProgreso, setMensajePlayProgreso] = useState("");
   const [orderIdGenerado, setOrderIdGenerado] = useState("");
 
-  const skuInfo = GOOGLE_PLAY_CONFIG.skus[plan.id] || GOOGLE_PLAY_CONFIG.skus.anual;
+  const skuInfo = obtenerConfiguracionSku(plan.id, esApple);
   const usuarioEmail = targetUser?.email || (estaAutenticado ? "usuario@gmail.com" : t("Sin cuenta iniciada", idioma));
 
   const handleSuscribirse = async () => {
@@ -8976,7 +8988,7 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
               </div>
               <p style={{ fontSize: 11, color: "rgba(255,255,255,0.85)", margin: "2px 0 0", fontWeight: 500 }}>
                 {esApple
-                  ? (t("Facturación segura y protegida de Apple App Store", idioma) || "Facturación segura y protegida de Apple App Store")
+                  ? `${t("Facturación segura y protegida de Apple App Store", idioma) || "Facturación segura y protegida de Apple App Store"}${skuInfo.pais ? ` (${skuInfo.pais})` : ""}`
                   : t("Facturación segura y directa de Google Play para Android", idioma)}
               </p>
             </div>
@@ -9008,7 +9020,7 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
             </div>
             <div style={{ textAlign: "right" }}>
               <span style={{ fontSize: 18, fontWeight: 900, color: plan.id === "anual" ? KINOEMOTION : SAGE_DARK }}>
-                {skuInfo.precioFormatted}
+                {skuInfo.precioFormatted || plan.precio}
               </span>
               <span style={{ fontSize: 11, color: MUTED, display: "block" }}>
                 {t(plan.periodo, idioma) || plan.periodo}
@@ -21921,7 +21933,7 @@ export default function SueltaPrototipo() {
               )}
               {stage === "pago" && planPendiente && (
                 <ScreenPago
-                  plan={PLANES_PAGO.find((p) => p.id === planPendiente) || PLANES_PAGO[2]}
+                  plan={obtenerPlanesPagoPorPlataforma(esPlataformaIos()).find((p) => p.id === planPendiente) || PLANES_PAGO[2]}
                   currentUser={currentUser}
                   onRequerirAuth={solicitarAutenticacionParaPago}
                   onRestaurarCompras={() => {

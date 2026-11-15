@@ -37,3 +37,4 @@ public class SueltaWidgetPlugin: CAPPlugin, CAPBridgedPlugin {
         call.resolve(["success": true])
     }
 }
+

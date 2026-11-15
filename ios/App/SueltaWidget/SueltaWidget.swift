@@ -208,3 +208,4 @@ struct SueltaWidget: Widget {
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
+

@@ -20,3 +20,4 @@ export async function sincronizarWidgetNativo({ afirmacion, racha, estilo = "afi
 }
 
 export default sincronizarWidgetNativo;
+

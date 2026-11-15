@@ -11,12 +11,13 @@
 import { doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { t } from "../data/translations.js";
+import { obtenerPreciosAppStore } from "../data/appleStorePrices.js";
 
 export function esPlataformaIos() {
   if (typeof window === "undefined") return false;
   const platform = window.Capacitor?.getPlatform?.();
   if (platform === "ios") return true;
-  return /iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+  return /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
 }
 
 // Configuración oficial de SKUs sincronizada con Google Play Console y App Store Connect
@@ -54,6 +55,25 @@ export const GOOGLE_PLAY_CONFIG = {
     }
   }
 };
+
+/**
+ * Retorna la configuración y precio formateado de un SKU adaptado al país del usuario en iOS (App Store) o a Google Play en Android.
+ */
+export function obtenerConfiguracionSku(planId, esApple = null) {
+  const isApple = esApple !== null ? esApple : esPlataformaIos();
+  const baseSku = GOOGLE_PLAY_CONFIG.skus[planId] || GOOGLE_PLAY_CONFIG.skus.anual;
+  if (!isApple) {
+    return baseSku;
+  }
+  const preciosApple = obtenerPreciosAppStore();
+  const esAnual = planId === "anual";
+  return {
+    ...baseSku,
+    precioFormatted: esAnual ? preciosApple.anualFormatted : preciosApple.mensualFormatted,
+    moneda: preciosApple.moneda,
+    pais: preciosApple.pais
+  };
+}
 
 let storeInicializado = false;
 let storeListenersConfigurados = false;
