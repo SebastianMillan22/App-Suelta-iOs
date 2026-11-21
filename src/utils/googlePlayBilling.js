@@ -8,6 +8,7 @@
  * - Persistencia y acuse de recibo obligatorio en Firebase Firestore y localStorage
  */
 
+import { Capacitor } from "@capacitor/core";
 import { doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db, auth } from "../firebase";
 import { t } from "../data/translations.js";
@@ -15,9 +16,17 @@ import { obtenerPreciosAppStore } from "../data/appleStorePrices.js";
 
 export function esPlataformaIos() {
   if (typeof window === "undefined") return false;
-  const platform = window.Capacitor?.getPlatform?.();
-  if (platform === "ios") return true;
-  return /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+  try {
+    const platform = Capacitor.getPlatform();
+    if (platform === "ios") return true;
+    if (platform === "android") return false;
+  } catch (e) {}
+  const capPlatform = window.Capacitor?.getPlatform?.();
+  if (capPlatform === "ios") return true;
+  if (capPlatform === "android") return false;
+  const ua = navigator.userAgent || "";
+  if (/Android/i.test(ua)) return false;
+  return /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 
 // Configuración oficial de SKUs sincronizada con Google Play Console y App Store Connect

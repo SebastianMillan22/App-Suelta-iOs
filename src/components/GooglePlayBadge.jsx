@@ -1,11 +1,9 @@
 import React from "react";
 import { t } from "../data/translations.js";
+import { esPlataformaIos } from "../utils/googlePlayBilling.js";
 
 function esPlataformaApple() {
-  if (typeof window === "undefined") return false;
-  const platform = window.Capacitor?.getPlatform?.();
-  if (platform === "ios") return true;
-  return /iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+  return esPlataformaIos();
 }
 
 export function AppleStoreIcon({ size = 20, className = "" }) {

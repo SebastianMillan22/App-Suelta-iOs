@@ -2083,6 +2083,46 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
                   {t("Continuar con Google", idioma)}
                 </button>
 
+                {/* Botón directo de Apple para cumplir estrictamente Guideline 4.8 */}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      setErrorLogin("");
+                      if (onLoginApple) {
+                        await onLoginApple();
+                      } else {
+                        await onLogin(false);
+                      }
+                    } catch (err) {
+                      setErrorLogin("ERROR: " + formatAuthError(err));
+                    }
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "10px",
+                    width: "100%",
+                    padding: "13px 16px",
+                    borderRadius: "20px",
+                    border: "1.5px solid #000000",
+                    background: "#000000",
+                    color: "#FFFFFF",
+                    fontFamily: FONT_BODY,
+                    fontSize: "14px",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 170 170" fill="#FFFFFF">
+                    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.85-11.7-14.44-6.01-9.67-10.74-20.47-14.19-32.41-3.46-11.94-5.19-23.2-5.19-33.78 0-14.75 3.65-27.15 10.96-37.19 7.31-10.04 16.7-15.17 28.16-15.39 4.36 0 9.29 1.14 14.81 3.42 5.51 2.29 9.3 3.48 11.35 3.58 2.07-.1 6.03-1.35 11.89-3.74 5.86-2.39 10.78-3.48 14.75-3.26 12.19.65 21.94 4.99 29.27 13.04-10.66 6.52-15.88 15.54-15.66 27.06.22 9.13 3.69 16.85 10.43 23.15 6.74 6.3 14.78 9.99 24.12 11.08-2.17 6.74-4.78 13.68-7.83 20.82zM119.22 33.15c0-7.39 2.61-14.13 7.83-20.21 5.22-6.09 11.63-9.88 19.23-11.39.22 1.09.33 2.17.33 3.26 0 7.39-2.72 14.23-8.15 20.53-5.43 6.3-12.06 10.05-19.89 11.24-.22-1.08-.35-2.22-.35-3.43z" />
+                  </svg>
+                  {t("Continuar con Apple", idioma)}
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setTab("login")}
@@ -2395,24 +2435,8 @@ function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginMa
           )}
         </div>
 
-        {/* Botones de Pie de Pantalla (Exactos a capturas) */}
+        {/* Botones de Pie de Pantalla con enlaces legales */}
         <div style={{ marginTop: "auto", paddingTop: 18, display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-          <button
-            onClick={onLoginOld}
-            style={{
-              background: "none",
-              border: "none",
-              color: "#3f6b5b",
-              fontSize: "13.5px",
-              fontWeight: "700",
-              textDecoration: "underline",
-              cursor: "pointer",
-              transition: "opacity 0.2s ease"
-            }}
-          >
-            {t("Explorar sin cuenta", idioma)}
-          </button>
-
           <div style={{ display: "flex", gap: "20px" }}>
             <button
               onClick={() => onVerLegal("terminos")}
@@ -3668,8 +3692,8 @@ function ScreenSuscripcion({
                     </span>
                   </div>
 
-                  {/* Acciones de Google Play Store */}
-                  {esGooglePlay && (
+                  {/* Acciones de Suscripción Oficial */}
+                  {esGooglePlay && !esApple ? (
                     <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
                       <a
                         href={obtenerUrlGestionGooglePlay(datosPagoBasico.productId)}
@@ -3694,15 +3718,40 @@ function ScreenSuscripcion({
                         <span>{t("Administrar en Google Play Store", idioma)}</span>
                       </a>
                     </div>
+                  ) : (
+                    <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+                      <a
+                        href="https://apps.apple.com/account/subscriptions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 8,
+                          background: "#000000",
+                          color: "white",
+                          borderRadius: 12,
+                          padding: "10px 14px",
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          textDecoration: "none",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.25)"
+                        }}
+                      >
+                        <GooglePlayIcon size={17} />
+                        <span>{t("Administrar en Apple App Store", idioma) || "Administrar en Apple App Store"}</span>
+                      </a>
+                    </div>
                   )}
 
                   {onAdquirirSuscripcion && (
                     <button
                       onClick={onAdquirirSuscripcion}
                       style={{
-                        background: "#f0fdf4",
-                        border: "1px solid #bbf7d0",
-                        color: "#166534",
+                        background: esApple ? "#f8fafc" : "#f0fdf4",
+                        border: `1px solid ${esApple ? "#e2e8f0" : "#bbf7d0"}`,
+                        color: esApple ? "#0f172a" : "#166534",
                         borderRadius: 12,
                         padding: "10px 14px",
                         fontSize: 12.5,
@@ -3716,7 +3765,7 @@ function ScreenSuscripcion({
                       }}
                     >
                       <Sparkles size={16} />
-                      <span>{t("Cambiar plan / Iniciar compra en Google Play", idioma)}</span>
+                      <span>{esApple ? (t("Cambiar plan / Iniciar compra en App Store", idioma) || "Cambiar plan / Iniciar compra en App Store") : t("Cambiar plan / Iniciar compra en Google Play", idioma)}</span>
                     </button>
                   )}
                 </>
@@ -3741,7 +3790,7 @@ function ScreenSuscripcion({
                   }}
                 >
                   <GooglePlayIcon size={14} />
-                  <span>{t("Sincronizar / Restaurar compras de Google Play", idioma)}</span>
+                  <span>{esApple ? (t("Sincronizar / Restaurar compras de App Store", idioma) || "Sincronizar / Restaurar compras de App Store") : t("Sincronizar / Restaurar compras de Google Play", idioma)}</span>
                 </button>
               )}
             </div>
@@ -8142,13 +8191,10 @@ function ScreenPostRegistro({ onNext, idioma }) {
   );
 }
 
-function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = false, enPruebaActiva = false, diasRestantesPrueba = 0, onRestaurarCompras = null, currentUser = null, onRequerirAuth = null }) {
+function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = false, enPruebaActiva = false, diasRestantesPrueba = 0, onRestaurarCompras = null, currentUser = null, onRequerirAuth = null, onVerLegal = null }) {
   const [planElegido, setPlanElegido] = useState(pruebaExpirada ? "anual" : "anual");
   const [verDetalles, setVerDetalles] = useState(false);
-  const esApple = typeof window !== "undefined" && (
-    window.Capacitor?.getPlatform?.() === "ios" ||
-    (/iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent))
-  );
+  const esApple = esPlataformaIos();
   const planesDisponibles = obtenerPlanesPagoPorPlataforma(esApple);
   const plan = planesDisponibles.find((p) => p.id === planElegido) || planesDisponibles[2];
   const esGratisPlan = planElegido === "prueba";
@@ -8218,7 +8264,7 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
           }}>
             <GooglePlayIcon size={15} />
             <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
-              Google Play Billing
+              {esApple ? "Apple In-App Purchase" : "Google Play Billing"}
             </span>
             <span style={{ width: 3, height: 3, borderRadius: "50%", background: "#94a3b8" }} />
             <span style={{ fontSize: 10.5, color: "#64748b" }}>
@@ -8791,12 +8837,31 @@ function ScreenPaywall({ onPagar, onSaltar, onBack, idioma, pruebaExpirada = fal
           >
             <GooglePlayIcon size={13} />
             <span>
-              {typeof window !== "undefined" && (window.Capacitor?.getPlatform?.() === "ios" || (/iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent)))
+              {esApple
                 ? (t("¿Ya te suscribiste en App Store? Restaurar compras", idioma) || "¿Ya te suscribiste en App Store? Restaurar compras")
                 : t("¿Ya compraste en Google Play? Restaurar compras", idioma)}
             </span>
           </button>
         )}
+
+        {/* Enlaces Legales obligatorios para suscripciones en App Store (Guideline 3.1.2) */}
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 14, marginTop: 4, paddingBottom: 6 }}>
+          <button
+            type="button"
+            onClick={() => onVerLegal ? onVerLegal("terminos") : window.open("https://suelta.app/terminos", "_blank")}
+            style={{ background: "none", border: "none", color: MUTED, fontSize: 11, textDecoration: "underline", cursor: "pointer", padding: "4px 0" }}
+          >
+            {t("Términos de uso (EULA)", idioma) || "Términos de uso (EULA)"}
+          </button>
+          <span style={{ color: MUTED, fontSize: 10 }}>•</span>
+          <button
+            type="button"
+            onClick={() => onVerLegal ? onVerLegal("privacidad") : window.open("https://suelta.app/privacidad", "_blank")}
+            style={{ background: "none", border: "none", color: MUTED, fontSize: 11, textDecoration: "underline", cursor: "pointer", padding: "4px 0" }}
+          >
+            {t("Política de privacidad", idioma) || "Política de privacidad"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -8806,10 +8871,7 @@ function ScreenPago({ plan, onConfirmar, onBack, idioma, currentUser = null, onR
   const activeAuth = auth?.currentUser;
   const targetUser = (currentUser?.uid && !currentUser.uid.startsWith("play_user_")) ? currentUser : activeAuth;
   const estaAutenticado = !!targetUser?.uid;
-  const esApple = typeof window !== "undefined" && (
-    window.Capacitor?.getPlatform?.() === "ios" ||
-    (/iPad|iPhone|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent))
-  );
+  const esApple = esPlataformaIos();
   const nombreTienda = esApple ? "App Store" : "Google Play Store";
   const [errorPago, setErrorPago] = useState("");
   const [avisoPlayStore, setAvisoPlayStore] = useState("");
@@ -9195,6 +9257,7 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
   useBloquearScrollFondo(true);
   if (typeof document === "undefined") return null;
 
+  const esApple = esPlataformaIos();
   const [tardoMasDeLoEsperado, setTardoMasDeLoEsperado] = useState(false);
 
   useEffect(() => {
@@ -9234,8 +9297,8 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", maxWidth: 380 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <GooglePlayIcon size={20} />
-          <span style={{ fontSize: 12, fontWeight: 800, color: "#01875f", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Google Play Billing
+          <span style={{ fontSize: 12, fontWeight: 800, color: esApple ? "#0f172a" : "#01875f", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            {esApple ? (t("Apple App Store", idioma) || "Apple App Store") : "Google Play Billing"}
           </span>
         </div>
         {onCancelar && (
@@ -9275,22 +9338,22 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
           width: 80,
           height: 80,
           borderRadius: "50%",
-          background: "#ecfdf5",
-          border: "2px solid #a7f3d0",
+          background: esApple ? "#f1f5f9" : "#ecfdf5",
+          border: `2px solid ${esApple ? "#cbd5e1" : "#a7f3d0"}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           marginBottom: 16,
           position: "relative",
-          boxShadow: "0 8px 24px rgba(1,135,95,0.15)"
+          boxShadow: esApple ? "0 8px 24px rgba(0,0,0,0.12)" : "0 8px 24px rgba(1,135,95,0.15)"
         }}>
           <div style={{
             width: 58,
             height: 58,
             borderRadius: "50%",
             border: "4px solid transparent",
-            borderTopColor: "#01875f",
-            borderRightColor: "#01875f",
+            borderTopColor: esApple ? "#0f172a" : "#01875f",
+            borderRightColor: esApple ? "#0f172a" : "#01875f",
             animation: "ss-spin 0.75s linear infinite"
           }} />
           <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
@@ -9303,8 +9366,8 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
           fontWeight: 800,
           textTransform: "uppercase",
           letterSpacing: "0.06em",
-          color: "#01875f",
-          background: "rgba(1,135,95,0.12)",
+          color: esApple ? "#0f172a" : "#01875f",
+          background: esApple ? "rgba(15,23,42,0.08)" : "rgba(1,135,95,0.12)",
           padding: "4px 14px",
           borderRadius: 99,
           marginBottom: 10
@@ -9320,7 +9383,7 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
           margin: "0 0 8px",
           lineHeight: 1.3
         }}>
-          {mensaje || t("Conectando con Google Play Store...", idioma)}
+          {mensaje || (esApple ? (t("Conectando con Apple App Store...", idioma) || "Conectando con Apple App Store...") : t("Conectando con Google Play Store...", idioma))}
         </h3>
 
         <p style={{
@@ -9330,8 +9393,12 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
           lineHeight: 1.5
         }}>
           {tardoMasDeLoEsperado
-            ? t("Si la ventana oficial de Google Play no se abrió en pantalla o tardó en cargar, puedes reintentar o regresar sin problemas.", idioma)
-            : t("Por favor espera un momento mientras se verifica la transacción con Google Play de forma segura.", idioma)
+            ? (esApple
+                ? (t("Si la ventana oficial de Apple App Store no se abrió en pantalla o tardó en cargar, puedes reintentar o regresar sin problemas.", idioma) || "Si la ventana oficial de Apple App Store no se abrió en pantalla o tardó en cargar, puedes reintentar o regresar sin problemas.")
+                : t("Si la ventana oficial de Google Play no se abrió en pantalla o tardó en cargar, puedes reintentar o regresar sin problemas.", idioma))
+            : (esApple
+                ? (t("Por favor espera un momento mientras se verifica la transacción con Apple App Store de forma segura.", idioma) || "Por favor espera un momento mientras se verifica la transacción con Apple App Store de forma segura.")
+                : t("Por favor espera un momento mientras se verifica la transacción con Google Play de forma segura.", idioma))
           }
         </p>
 
@@ -9350,7 +9417,9 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
         }} className="ss-fade-scale">
           {tardoMasDeLoEsperado && (
             <p style={{ fontSize: 12, fontWeight: 700, color: "#9a3412", margin: "0 0 2px" }}>
-              {t("¿La ventana de Google Play no apareció o se cerró?", idioma)}
+              {esApple
+                ? (t("¿La ventana de Apple App Store no apareció o se cerró?", idioma) || "¿La ventana de Apple App Store no apareció o se cerró?")
+                : t("¿La ventana de Google Play no apareció o se cerró?", idioma)}
             </p>
           )}
 
@@ -9359,7 +9428,7 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
               <button
                 onClick={onReintentar}
                 style={{
-                  background: "#01875f",
+                  background: esApple ? "#000000" : "#01875f",
                   color: "white",
                   border: "none",
                   borderRadius: 12,
@@ -9371,11 +9440,11 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 8,
-                  boxShadow: "0 2px 8px rgba(1,135,95,0.25)"
+                  boxShadow: esApple ? "0 2px 8px rgba(0,0,0,0.25)" : "0 2px 8px rgba(1,135,95,0.25)"
                 }}
               >
                 <GooglePlayIcon size={16} />
-                <span>{t("Reintentar conexión", idioma)}</span>
+                <span>{esApple ? (t("Reintentar con App Store", idioma) || "Reintentar con App Store") : t("Reintentar conexión", idioma)}</span>
               </button>
             )}
 
@@ -9421,7 +9490,9 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
       {/* Footer Info */}
       <div style={{ textAlign: "center", width: "100%" }}>
         <p style={{ fontSize: 11, color: "#94a3b8", margin: 0 }}>
-          🔒 {t("Transacción cifrada y protegida por Google Play", idioma)}
+          🔒 {esApple
+            ? (t("Transacción cifrada y protegida por Apple App Store", idioma) || "Transacción cifrada y protegida por Apple App Store")
+            : t("Transacción cifrada y protegida por Google Play", idioma)}
         </p>
       </div>
     </div>
@@ -9433,6 +9504,8 @@ function ModalPagoPendiente({ mensaje, idioma = "es", onCancelar = null, onVolve
 function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null, idioma = "es" }) {
   useBloquearScrollFondo(true);
   if (typeof document === "undefined") return null;
+
+  const esApple = esPlataformaIos();
 
   const modalContent = (
     <div
@@ -9465,7 +9538,7 @@ function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <GooglePlayIcon size={20} />
           <span style={{ fontSize: 12, fontWeight: 800, color: "#b91c1c", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Google Play Store
+            {esApple ? (t("Apple App Store", idioma) || "Apple App Store") : "Google Play Store"}
           </span>
         </div>
         {onCerrar && (
@@ -9564,7 +9637,9 @@ function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null
             margin: 0,
             lineHeight: 1.45
           }}>
-            {error || t("La operación en Google Play no pudo completarse. No se ha realizado ningún cobro.", idioma)}
+            {error || (esApple
+              ? (t("La operación en Apple App Store no pudo completarse. No se ha realizado ningún cobro.", idioma) || "La operación en Apple App Store no pudo completarse. No se ha realizado ningún cobro.")
+              : t("La operación en Google Play no pudo completarse. No se ha realizado ningún cobro.", idioma))}
           </p>
         </div>
       </div>
@@ -9576,7 +9651,7 @@ function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null
             onClick={onReintentar}
             style={{
               width: "100%",
-              background: "#01875f",
+              background: esApple ? "#000000" : "#01875f",
               color: "white",
               padding: "14px",
               fontSize: 14.5,
@@ -9584,7 +9659,7 @@ function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null
               borderRadius: 24,
               border: "none",
               cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(1,135,95,0.35)",
+              boxShadow: esApple ? "0 4px 14px rgba(0,0,0,0.25)" : "0 4px 14px rgba(1,135,95,0.35)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -9592,7 +9667,7 @@ function ModalPagoRechazado({ error, onReintentar, onCerrar, onVolverHome = null
             }}
           >
             <GooglePlayIcon size={18} />
-            <span>{t("Reintentar con Google Play", idioma)}</span>
+            <span>{esApple ? (t("Reintentar con App Store", idioma) || "Reintentar con App Store") : t("Reintentar con Google Play", idioma)}</span>
           </button>
         )}
         {onCerrar && (
@@ -9642,6 +9717,7 @@ function ModalSuscripcionAprobada({ datosPago, planId, currentUser = null, onCon
   if (!datosPago) return null;
   if (typeof document === "undefined") return null;
 
+  const esApple = esPlataformaIos() || datosPago?.plataforma?.includes("Apple");
   const planNombre = planId === "anual" ? t("Suelta Premium Anual (Acceso Total)", idioma) : t("Suelta Premium Mensual", idioma);
   const esAnual = planId === "anual";
   const targetUid = currentUser?.uid || auth?.currentUser?.uid || "";
@@ -9675,8 +9751,8 @@ function ModalSuscripcionAprobada({ datosPago, planId, currentUser = null, onCon
       {/* Top Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <GooglePlayIcon size={20} />
-        <span style={{ fontSize: 12, fontWeight: 800, color: "#01875f", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Google Play Store
+        <span style={{ fontSize: 12, fontWeight: 800, color: esApple ? "#0f172a" : "#01875f", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          {esApple ? (t("Apple App Store", idioma) || "Apple App Store") : "Google Play Store"}
         </span>
       </div>
 
@@ -21928,6 +22004,11 @@ export default function SueltaPrototipo() {
                       return;
                     }
                     handleRestaurarComprasGooglePlay();
+                  }}
+                  onVerLegal={(tipo) => {
+                    setLegalTipo(tipo);
+                    setLegalOrigen("paywall");
+                    setStage("legal");
                   }}
                 />
               )}
