@@ -52,7 +52,7 @@ export function getLocalizedGuiaUI(idioma = "es") {
       bannerActivoSub: "Enjoy unlimited access to all your wellness tools and modules.",
       bannerActivoBtn: "View Subscription Details",
       bannerPruebaTitulo: "Unlock All Modules with 3-Day Free Trial",
-      bannerPruebaSub: "Cancel anytime. Google Play billing protection.",
+      bannerPruebaSub: "Cancel anytime without penalties. Protected official billing.",
       bannerPruebaBtn: "View Plans & Activate Trial"
     },
     pt: {
@@ -102,7 +102,7 @@ export function getLocalizedGuiaUI(idioma = "es") {
       bannerActivoSub: "Profitez d'un accès illimité à tous vos outils de bien-être.",
       bannerActivoBtn: "Voir les détails de l'abonnement",
       bannerPruebaTitulo: "Débloquez tous les modules avec 3 jours gratuits",
-      bannerPruebaSub: "Annulez à tout moment sans pénalités. Sécurisé par Google Play.",
+      bannerPruebaSub: "Annulez à tout moment sans pénalités. Paiement officiel sécurisé.",
       bannerPruebaBtn: "Voir les Formules et Activer l'Essai"
     },
     it: {
@@ -127,7 +127,7 @@ export function getLocalizedGuiaUI(idioma = "es") {
       bannerActivoSub: "Approfitta dell'accesso illimitato a tutti gli strumenti di benessere.",
       bannerActivoBtn: "Vedi dettagli abbonamento",
       bannerPruebaTitulo: "Sblocca tutti i moduli con 3 giorni gratuiti",
-      bannerPruebaSub: "Cancella in qualsiasi momento senza penali. Protetto da Google Play.",
+      bannerPruebaSub: "Cancella in qualsiasi momento senza penali. Fatturazione ufficiale protetta.",
       bannerPruebaBtn: "Vedi Piani e Attiva Prova"
     }
   };
@@ -355,7 +355,7 @@ export function getLocalizedEstructuraGuia(idioma = "es", context = {}) {
                     "Desbloqueo inmediato de los 21 días del Reto emocional",
                     "Cartas astrológicas y mayas con efemérides completas",
                     "Constelaciones familiares y cuestionarios clínicos",
-                    "Garantía oficial y facturación segura de Google Play"
+                    "Garantía oficial y facturación segura de la tienda oficial"
                   ],
               accionTexto: esUsuarioSubscrito ? "Ver detalles de mi suscripción" : "Ver Planes y Activar Prueba",
               destino: esUsuarioSubscrito ? "suscripcion" : "paywall"
@@ -573,7 +573,7 @@ export function getLocalizedEstructuraGuia(idioma = "es", context = {}) {
                     "Instant unlock of all 21 emotional release challenge days",
                     "Complete astrological charts with accurate ephemeris",
                     "Family constellation readings and clinical questionnaires",
-                    "Google Play billing security and official guarantee"
+                    "Official app store billing security and guarantee"
                   ],
               accionTexto: esUsuarioSubscrito ? "View Subscription Details" : "View Plans & Activate Trial",
               destino: esUsuarioSubscrito ? "suscripcion" : "paywall"
@@ -791,7 +791,7 @@ export function getLocalizedEstructuraGuia(idioma = "es", context = {}) {
                     "Desbloqueio imediato dos 21 dias do Desafio emocional",
                     "Cartas astrológicas e maias completas",
                     "Constelações familiares e questionários clínicos",
-                    "Garantia oficial e segurança do Google Play"
+                    "Garantia oficial e segurança de faturamento"
                   ],
               accionTexto: esUsuarioSubscrito ? "Ver detalhes da assinatura" : "Ver Planos e Ativar Teste",
               destino: esUsuarioSubscrito ? "suscripcion" : "paywall"
@@ -1009,7 +1009,7 @@ export function getLocalizedEstructuraGuia(idioma = "es", context = {}) {
                     "Déblocage instantané des 21 jours du Défi émotionnel",
                     "Thèmes astraux et éphémérides complètes",
                     "Constellations familiales et bilans émotionnels",
-                    "Garantie officielle et paiement sécurisé Google Play"
+                    "Garantie officielle et paiement sécurisé"
                   ],
               accionTexto: esUsuarioSubscrito ? "Voir les détails de l'abonnement" : "Voir les Formules et Activer l'Essai",
               destino: esUsuarioSubscrito ? "suscripcion" : "paywall"
@@ -1227,7 +1227,7 @@ export function getLocalizedEstructuraGuia(idioma = "es", context = {}) {
                     "Sblocco immediato dei 21 giorni della Sfida emotiva",
                     "Carte astrologiche ed effemeridi complete",
                     "Costellazioni familiari e questionari clinici",
-                    "Garanzia ufficiale e fatturazione sicura Google Play"
+                    "Garanzia ufficiale e fatturazione sicura"
                   ],
               accionTexto: esUsuarioSubscrito ? "Vedi dettagli abbonamento" : "Vedi Piani e Attiva Prova",
               destino: esUsuarioSubscrito ? "suscripcion" : "paywall"

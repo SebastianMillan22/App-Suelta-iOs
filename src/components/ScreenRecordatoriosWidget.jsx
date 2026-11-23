@@ -45,13 +45,7 @@ import {
 } from "../utils/devicePermissions";
 import { ModalGuiaPermisosAjustes } from "./ModalGuiaPermisosAjustes";
 import { t } from "../data/translations.js";
-
-function esPlataformaIos() {
-  if (typeof window === "undefined") return false;
-  const platform = window.Capacitor?.getPlatform?.();
-  if (platform === "ios") return true;
-  return /iPad|iPhone|iPod/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
-}
+import { esPlataformaIos } from "../utils/googlePlayBilling.js";
 
 export function ScreenRecordatoriosWidget({ 
   onBack, 

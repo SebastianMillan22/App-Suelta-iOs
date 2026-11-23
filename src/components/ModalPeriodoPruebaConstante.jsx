@@ -2,6 +2,7 @@ import React, { useMemo, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Sparkles, Clock, ShieldCheck, CheckCircle2, Lock, ArrowRight, X, Heart, Star } from "lucide-react";
 import { t } from "../data/translations.js";
+import { esPlataformaIos } from "../utils/googlePlayBilling.js";
 
 const FONT_DISPLAY = "'Cinzel Decorative', Georgia, serif";
 const FONT_BODY = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
@@ -56,8 +57,8 @@ export function ModalPeriodoPruebaConstante({
         avisoDestacado: t("Tu progreso y reflexiones están guardados de forma segura. Desbloquéalos adquiriendo tu suscripción.", idioma),
         btnTexto: t("Adquirir suscripción Premium", idioma),
         btnBg: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-        permiteCerrar: true,
-        textoCerrar: t("Continuar sin suscripción", idioma),
+        permiteCerrar: false,
+        textoCerrar: "",
         progresoPorcentaje: 100
       };
     }
@@ -530,11 +531,13 @@ export function ModalPeriodoPruebaConstante({
               textDecoration: "underline"
             }}
           >
-            {t("¿Ya compraste tu suscripción? Restaurar compras", idioma)}
+            {esPlataformaIos()
+              ? (t("¿Ya te suscribiste en App Store? Restaurar compras", idioma) || "¿Ya te suscribiste en App Store? Restaurar compras")
+              : t("¿Ya compraste tu suscripción en Google Play? Restaurar compras", idioma)}
           </button>
         )}
 
-        {/* Indicador de seguridad nativa de Google Play */}
+        {/* Indicador de seguridad nativa oficial */}
         <div
           style={{
             marginTop: 14,
@@ -549,7 +552,11 @@ export function ModalPeriodoPruebaConstante({
           }}
         >
           <ShieldCheck size={13} color="#64748b" />
-          <span>{t("Google Play Billing oficial · Sin cargos automáticos sorpresa", idioma)}</span>
+          <span>
+            {esPlataformaIos()
+              ? (t("Apple In-App Purchase oficial · Sin cargos automáticos sorpresa", idioma) || "Apple In-App Purchase oficial · Sin cargos automáticos sorpresa")
+              : t("Google Play Billing oficial · Sin cargos automáticos sorpresa", idioma)}
+          </span>
         </div>
       </div>
     </div>

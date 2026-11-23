@@ -17,16 +17,32 @@ import { obtenerPreciosAppStore } from "../data/appleStorePrices.js";
 export function esPlataformaIos() {
   if (typeof window === "undefined") return false;
   try {
-    const platform = Capacitor.getPlatform();
-    if (platform === "ios") return true;
-    if (platform === "android") return false;
+    if (typeof Capacitor !== "undefined" && Capacitor?.getPlatform) {
+      const platform = Capacitor.getPlatform();
+      if (platform === "ios") return true;
+      if (platform === "android") return false;
+    }
   } catch (e) {}
   const capPlatform = window.Capacitor?.getPlatform?.();
   if (capPlatform === "ios") return true;
   if (capPlatform === "android") return false;
-  const ua = navigator.userAgent || "";
-  if (/Android/i.test(ua)) return false;
-  return /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  const ua = (typeof navigator !== "undefined" && navigator.userAgent) ? navigator.userAgent : "";
+  const navPlatform = (typeof navigator !== "undefined" && navigator.platform) ? navigator.platform : "";
+  const vendor = (typeof navigator !== "undefined" && navigator.vendor) ? navigator.vendor : "";
+
+  if (/Android/i.test(ua) || /Android/i.test(navPlatform)) return false;
+
+  const isIosDevice = /iPhone|iPad|iPod/i.test(ua) || /iPhone|iPad|iPod/i.test(navPlatform);
+  const isIpadMacIntel = (navPlatform === "MacIntel" || /Macintosh/i.test(ua)) && typeof navigator !== "undefined" && navigator.maxTouchPoints > 1;
+
+  if (isIosDevice || isIpadMacIntel) return true;
+
+  if (/Apple/i.test(vendor) && /Mobile/i.test(ua) && !/Android/i.test(ua)) {
+    return true;
+  }
+
+  return false;
 }
 
 // Configuración oficial de SKUs sincronizada con Google Play Console y App Store Connect
