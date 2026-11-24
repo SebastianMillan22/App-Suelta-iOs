@@ -1811,7 +1811,7 @@ function HojasDispersas({ variante = 0 }) {
 // ondas de calma, el mensaje central del "Diálogo" (la app da herramientas; el destino
 // de esas herramientas es la conversación humana), el control del sonido ambiental y el
 // idioma detectado automáticamente de la configuración del dispositivo.
-function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginOld, onLoginManual, onRegisterManual, onCargarPrueba, onVerLegal, idiomaLabel, idiomaEsEspanol, onBorrarDatos, idioma, onChangeIdioma, onAbrirSelectorIdioma, onOpenMenu }) {
+function ScreenBienvenida({ onNext, onLogin, onLoginApple, onLoginManual, onRegisterManual, onCargarPrueba, onVerLegal, idiomaLabel, idiomaEsEspanol, onBorrarDatos, idioma, onChangeIdioma, onAbrirSelectorIdioma, onOpenMenu }) {
   const menuCtx = React.useContext(MenuContext);
   const handleOpenMenu = onOpenMenu || menuCtx?.onOpenMenu;
   const [tab, setTab] = React.useState("presentacion");
@@ -21649,12 +21649,6 @@ export default function SueltaPrototipo() {
                   onLoginApple={handleAppleLogin}
                   onLoginManual={handleEmailLogin}
                   onRegisterManual={handleEmailRegister}
-                  onLoginOld={() => {
-                    borrarUsuarioPrueba();
-                    setEsPremium(false);
-                    setPlanPago("prueba");
-                    setStage("inicio");
-                  }}
                   onVerLegal={(tipo) => {
                     setLegalTipo(tipo);
                     setLegalOrigen("bienvenida");
