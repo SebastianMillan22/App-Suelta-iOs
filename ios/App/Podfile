@@ -31,18 +31,38 @@ post_install do |installer|
     script_content = File.read(frameworks_script)
     marker = "# Injected PrivacyInfo.xcprivacy by Suelta Build"
     unless script_content.include?(marker)
-      target_pattern = 'code_sign_if_enabled "${destination}"'
-      replacement = <<-SH
-    #{marker}
-    local privacy_manifest="${PODS_ROOT}/../App/PrivacyInfo.xcprivacy"
-    if [ -f "${privacy_manifest}" ]; then
-      cp -f "${privacy_manifest}" "${destination}/PrivacyInfo.xcprivacy"
+      fn_pattern = /code_sign_if_enabled\s*\(\)\s*\{/
+      if script_content =~ fn_pattern
+        replacement = <<-SH
+code_sign_if_enabled() {
+  #{marker}
+  if [ -d "$1" ]; then
+    local p_manifest="${PODS_ROOT}/../App/PrivacyInfo.xcprivacy"
+    if [ -f "${p_manifest}" ]; then
+      cp -f "${p_manifest}" "$1/PrivacyInfo.xcprivacy"
+      echo "[Podfile Hook] Inyectado PrivacyInfo.xcprivacy en $1"
     fi
-    code_sign_if_enabled "${destination}"
-      SH
-      updated_content = script_content.gsub(target_pattern, replacement.strip)
-      File.write(frameworks_script, updated_content)
-      puts "[Podfile] Parcheado exitosamente Pods-App-frameworks.sh para incluir PrivacyInfo.xcprivacy."
+  fi
+        SH
+        updated_content = script_content.sub(fn_pattern, replacement.strip)
+        File.write(frameworks_script, updated_content)
+        puts "[Podfile] Parcheado exitosamente code_sign_if_enabled en Pods-App-frameworks.sh."
+      else
+        puts "[Podfile AVISO] No se encontro code_sign_if_enabled en Pods-App-frameworks.sh."
+      end
+    end
+  end
+
+  # Add PrivacyInfo.xcprivacy directly to Pod directories
+  privacy_manifest_src = File.expand_path('../../ios/App/App/PrivacyInfo.xcprivacy', __FILE__)
+  if File.exist?(privacy_manifest_src)
+    ['GoogleSignIn', 'GTMAppAuth', 'GTMSessionFetcher', 'CodetrixStudioCapacitorGoogleAuth'].each do |pod_name|
+      pod_dir = File.join(installer.sandbox.root, pod_name)
+      if File.exist?(pod_dir)
+        dest_path = File.join(pod_dir, 'PrivacyInfo.xcprivacy')
+        File.write(dest_path, File.read(privacy_manifest_src))
+        puts "[Podfile] Copiado PrivacyInfo.xcprivacy en pod #{pod_name}"
+      end
     end
   end
 end
