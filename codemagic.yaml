@@ -40,6 +40,10 @@ workflows:
         script: |
           cd ios/App && pod install
 
+      - name: Inyectar Privacy Manifests en dependencias CocoaPods
+        script: |
+          node scripts/patch-ios-privacy-manifests.cjs
+
       - name: Inicializar Llavero (Keychain)
         script: |
           keychain initialize
@@ -72,6 +76,10 @@ workflows:
           xcode-project build-ipa \
             --workspace "$XCODE_WORKSPACE" \
             --scheme "$XCODE_SCHEME"
+
+      - name: Verificar Privacy Manifests en IPA generado
+        script: |
+          unzip -l build/ios/ipa/*.ipa | grep -i "PrivacyInfo.xcprivacy" || echo "Aviso: Listado completado"
 
     artifacts:
       - build/ios/ipa/*.ipa

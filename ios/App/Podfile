@@ -24,4 +24,25 @@ end
 
 post_install do |installer|
   assertDeploymentTarget(installer)
+
+  # Patch Pods-App-frameworks.sh to inject PrivacyInfo.xcprivacy into third-party frameworks before code signing
+  frameworks_script = File.join(installer.sandbox.target_support_files_dir('Pods-App'), 'Pods-App-frameworks.sh')
+  if File.exist?(frameworks_script)
+    script_content = File.read(frameworks_script)
+    marker = "# Injected PrivacyInfo.xcprivacy by Suelta Build"
+    unless script_content.include?(marker)
+      target_pattern = 'code_sign_if_enabled "${destination}"'
+      replacement = <<-SH
+    #{marker}
+    local privacy_manifest="${PODS_ROOT}/../App/PrivacyInfo.xcprivacy"
+    if [ -f "${privacy_manifest}" ]; then
+      cp -f "${privacy_manifest}" "${destination}/PrivacyInfo.xcprivacy"
+    fi
+    code_sign_if_enabled "${destination}"
+      SH
+      updated_content = script_content.gsub(target_pattern, replacement.strip)
+      File.write(frameworks_script, updated_content)
+      puts "[Podfile] Parcheado exitosamente Pods-App-frameworks.sh para incluir PrivacyInfo.xcprivacy."
+    end
+  end
 end
